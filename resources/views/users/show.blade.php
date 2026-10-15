@@ -1,0 +1,54 @@
+@extends('layouts.app')
+@section('title', $user->name)
+@section('content')
+    <x-page-header :title="$user->name" :breadcrumbs="['Người dùng' => route('users.index'), $user->name => null]">
+        @can('update', $user)<a href="{{ route('users.edit', $user) }}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>Chỉnh sửa</a>@endcan
+    </x-page-header>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-people" tone="blue" label="Khách hàng phụ trách" :value="$stats['customers']" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-funnel" tone="purple" label="Lead được giao" :value="$stats['leads']" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-kanban" label="Cơ hội đang mở" :value="$stats['opportunities']" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-check2-square" tone="gray" label="Việc chưa xong" :value="$stats['tasks']" /></div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card mb-4"><div class="card-body text-center">
+                <x-avatar :user="$user" size="lg" class="mb-2" />
+                <div class="fw-bold">{{ $user->name }}</div><div class="small text-muted mb-2">{{ $user->email }}</div>
+                @foreach ($user->roles as $r)<span class="badge badge-soft-orange">{{ $r->name }}</span>@endforeach {!! badge(App\Models\User::STATUSES, $user->status) !!}
+                <hr>
+                <dl class="detail-list text-start small">
+                    <dt>Phòng ban</dt><dd>{{ $user->department?->name ?? '—' }}</dd>
+                    <dt>Chức vụ</dt><dd>{{ $user->position ?? '—' }}</dd>
+                    <dt>Điện thoại</dt><dd>{{ $user->phone ?? '—' }}</dd>
+                    <dt>Đăng nhập gần nhất</dt><dd>{{ vn_date($user->last_login_at, true) }}</dd>
+                    <dt>Ngày tạo</dt><dd>{{ vn_date($user->created_at) }}</dd>
+                </dl>
+            </div></div>
+            @can('update', $user)
+                <div class="card"><div class="card-header">Đặt lại mật khẩu</div><div class="card-body">
+                    <form method="POST" action="{{ route('users.send-reset', $user) }}" class="mb-3">@csrf
+                        <button class="btn btn-light w-100"><i class="bi bi-envelope me-1"></i>Gửi liên kết đặt lại qua email</button></form>
+                    <div class="small text-muted mb-2">Hoặc đặt mật khẩu tạm thời (khi chưa cấu hình email):</div>
+                    <form method="POST" action="{{ route('users.password', $user) }}" class="needs-validation" novalidate>@csrf @method('PUT')
+                        <x-input name="password" type="password" label="Mật khẩu mới" required minlength="8" autocomplete="new-password" />
+                        <x-input name="password_confirmation" type="password" label="Nhập lại" required minlength="8" autocomplete="new-password" />
+                        <button class="btn btn-outline-primary w-100">Đặt mật khẩu</button>
+                    </form>
+                </div></div>
+            @endcan
+        </div>
+        <div class="col-lg-8">
+            <div class="card"><div class="card-header">Hoạt động gần đây</div><div class="card-body">
+                <ul class="timeline">
+                    @forelse ($logs as $l)
+                        <li><span class="tl-icon"><i class="bi bi-activity"></i></span><div class="small fw-semibold">{{ $l->description }}</div>
+                            <div class="small-xs text-muted">{{ vn_date($l->created_at, true) }} · IP {{ $l->ip_address ?? '—' }}</div></li>
+                    @empty
+                        <li class="ps-0 small text-muted">Chưa có hoạt động.</li>
+                    @endforelse
+                </ul>
+            </div></div>
+        </div>
+    </div>
+@endsection

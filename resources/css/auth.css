@@ -1,0 +1,226 @@
+/* =====================================================================
+   TOP CRM — Trang truy cập (đăng nhập, khởi tạo, quên/đặt lại mật khẩu)
+   - Máy tính (>= 992px): bố cục CỐ ĐỊNH đúng 1 màn hình, không cuộn trang.
+     Kích thước tự co theo chiều cao màn hình (các mốc: 940 / 860 / 768 / 680px).
+   - Điện thoại & máy tính bảng (< 992px): xem tệp auth-mobile.css (nạp SAU tệp này)
+   ===================================================================== */
+
+.top-auth {
+    --ta-bg: #140B06;
+    --ta-copper: #E8843A;
+    --ta-copper-2: #C0621F;
+    --ta-copper-soft: #F2A15E;
+    --ta-text: #F6ECE4;
+    --ta-muted: #C2AE9F;
+    --ta-line: rgba(255, 196, 150, .16);
+    --ta-glass: rgba(42, 25, 15, .74);
+    --ta-input: rgba(255, 255, 255, .045);
+    /* Kích thước điều chỉnh theo chiều cao (giá trị chuẩn cho màn hình 941px) */
+    --ta-footer-h: 64px;
+    --ta-hero-logo: 80px;
+    --ta-h1: 2.85rem;
+    --ta-lead: 1.02rem;
+    --ta-feature-ic: 54px;
+    --ta-feature-gap: 1.05rem;
+    --ta-section-gap: 2.2rem;
+    --ta-card-logo: 64px;
+    --ta-card-pad-y: 2.5rem;
+    --ta-card-pad-x: 2.4rem;
+    --ta-input-h: 56px;
+    --ta-card-gap: 1.6rem;
+
+    font-family: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+    background: var(--ta-bg);
+    color: var(--ta-text);
+    font-size: 15px;
+    margin: 0;
+}
+.top-auth a { color: var(--ta-copper-soft); }
+.top-auth a:hover { color: #FFC18C; }
+
+/* ---------- Khung trang ---------- */
+.ta-shell { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) var(--ta-footer-h);
+    min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
+@media (min-width: 992px) and (min-height: 600px) {
+    /* Cố định đúng 1 màn hình — không có thanh cuộn dọc */
+    html, body.top-auth { height: 100%; overflow: hidden; }
+    .ta-shell { height: 100vh; height: 100dvh; }
+}
+
+/* ---------- Nền ---------- */
+.ta-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    background:
+        radial-gradient(60% 55% at 50% 30%, rgba(232, 132, 58, .20), transparent 70%),
+        radial-gradient(40% 40% at 8% 85%, rgba(176, 84, 28, .22), transparent 70%),
+        radial-gradient(45% 50% at 95% 10%, rgba(120, 60, 25, .35), transparent 70%),
+        linear-gradient(180deg, #1C100A 0%, #140B06 100%);
+}
+.ta-photo { position: absolute; top: 0; bottom: var(--ta-footer-h); left: 29%; width: 44%;
+    background-size: cover; background-position: center 28%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+}
+.ta-shade { position: absolute; inset: 0;
+    background:
+        linear-gradient(90deg, rgba(20, 11, 6, .95) 0%, rgba(20, 11, 6, .7) 26%, rgba(20, 11, 6, .12) 44%, rgba(20, 11, 6, .18) 60%, rgba(20, 11, 6, .8) 76%, rgba(20, 11, 6, .95) 100%),
+        linear-gradient(180deg, transparent 70%, rgba(20, 11, 6, .85) 100%);
+}
+.ta-arcs { position: absolute; right: -120px; top: -80px; width: 760px; height: 1100px; opacity: .5; }
+
+/* ---------- Thanh trên (ngôn ngữ) ---------- */
+.ta-topbar { position: absolute; top: 0; right: 0; z-index: 5; padding: 1.3rem 2.6rem 0; }
+.ta-lang .btn { color: #F3E6DB; background: transparent; border: 0; display: flex; align-items: center; gap: .55rem; font-size: 1rem; }
+.ta-lang .btn:hover { color: #fff; }
+.ta-lang .dropdown-menu { background: #26170E; border: 1px solid var(--ta-line); }
+.ta-lang .dropdown-item { color: #F3E6DB; }
+.ta-lang .dropdown-item:hover, .ta-lang .dropdown-item.active { background: rgba(232, 132, 58, .2); color: #fff; }
+.ta-lang .dropdown-item.disabled { color: #8D7A6C; }
+
+/* ---------- Vùng chính ---------- */
+.ta-main { position: relative; z-index: 2; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 525px; gap: 3rem;
+    align-items: center; padding: 4.4rem 2.6rem 1.25rem 4.2rem; max-width: 1720px; width: 100%; margin: 0 auto; }
+
+/* ---------- Thương hiệu ---------- */
+.brand-lockup { display: flex; align-items: center; gap: .85rem; }
+.brand-mark { flex-shrink: 0; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
+.brand-words { line-height: 1; }
+.brand-name { font-weight: 800; letter-spacing: .02em;
+    background: linear-gradient(180deg, #FFC48E 0%, #E8843A 55%, #B85A1C 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.brand-tagline { font-weight: 600; letter-spacing: .22em; color: #EBDDD2; margin-top: .3em; white-space: nowrap; }
+.brand-slogan { font-size: 11px; color: var(--ta-muted); margin-top: .7em; white-space: nowrap; }
+
+/* ---------- Cột trái ---------- */
+.ta-hero { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.ta-hero .brand-mark { width: var(--ta-hero-logo); height: var(--ta-hero-logo); }
+.ta-divider { width: 58px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--ta-copper), var(--ta-copper-2)); margin: calc(var(--ta-section-gap) * .7) 0 var(--ta-section-gap); flex-shrink: 0; }
+.ta-hero h1 { font-weight: 700; font-size: var(--ta-h1); line-height: 1.24; margin: 0 0 1rem; color: #FBF4EE; text-shadow: 0 4px 18px rgba(0, 0, 0, .5); max-width: 640px; }
+.ta-hero h1 .accent { display: block; background: linear-gradient(90deg, #F7B070, #E2803A); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ta-hero .lead-text { color: #E7D9CE; font-size: var(--ta-lead); line-height: 1.65; max-width: 480px; margin: 0 0 var(--ta-section-gap); text-shadow: 0 2px 10px rgba(0, 0, 0, .6); }
+.ta-features { list-style: none; padding: 0; margin: 0 0 var(--ta-section-gap); display: grid; gap: var(--ta-feature-gap); }
+.ta-features li { display: flex; align-items: center; gap: 1.05rem; }
+.ta-features .ic { width: var(--ta-feature-ic); height: var(--ta-feature-ic); border-radius: 12px; display: grid; place-items: center; font-size: calc(var(--ta-feature-ic) * .44); color: #fff; flex-shrink: 0;
+    background: linear-gradient(145deg, #F09A52, #B9581B); box-shadow: 0 8px 20px rgba(185, 88, 27, .35), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.ta-features .t { font-weight: 600; font-size: 1.04rem; color: #FBF4EE; display: block; }
+.ta-features .d { font-size: .9rem; color: var(--ta-muted); }
+
+.ta-stats { display: grid; grid-template-columns: repeat(4, auto); justify-content: space-between; width: min(870px, 100%);
+    background: rgba(30, 18, 10, .74); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--ta-line); border-radius: 18px; padding: 1.15rem 1.4rem; box-shadow: 0 18px 40px rgba(0, 0, 0, .35); }
+.ta-stat { display: flex; align-items: center; gap: .8rem; padding: 0 1.4rem 0 0; }
+.ta-stat + .ta-stat { border-left: 1px solid var(--ta-line); padding-left: 1.4rem; }
+.ta-stat i { font-size: 2rem; color: var(--ta-copper); }
+.ta-stat .v { font-weight: 700; font-size: 1.3rem; color: #FBF4EE; line-height: 1.15; white-space: nowrap; }
+.ta-stat .l { font-size: .78rem; color: var(--ta-muted); white-space: nowrap; }
+
+/* ---------- Thẻ đăng nhập ---------- */
+.ta-card-wrap { min-height: 0; max-height: 100%; display: flex; justify-content: center; }
+@media (min-width: 992px) {
+    /* Thẻ không bao giờ tràn khỏi màn hình; nếu nội dung dài (trang khởi tạo) thì cuộn bên trong thẻ */
+    .ta-card { max-height: 100%; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(232, 132, 58, .4) transparent; }
+}
+.ta-card { width: 100%; background: var(--ta-glass); backdrop-filter: blur(18px) saturate(1.1); -webkit-backdrop-filter: blur(18px) saturate(1.1);
+    border: 1px solid var(--ta-line); border-radius: 22px; padding: var(--ta-card-pad-y) var(--ta-card-pad-x) calc(var(--ta-card-pad-y) * .8);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 220, 190, .06); }
+.ta-card .card-brand { display: flex; flex-direction: column; align-items: center; margin-bottom: var(--ta-card-gap); }
+.ta-card .card-brand .brand-mark { width: var(--ta-card-logo); height: var(--ta-card-logo); }
+.ta-card .card-brand .ta-divider { margin: 1rem auto 0; width: 44px; }
+.ta-card h2 { font-weight: 700; font-size: 1.75rem; text-align: center; margin: 0 0 .35rem; color: #FBF4EE; }
+.ta-card .sub { text-align: center; color: var(--ta-muted); margin-bottom: calc(var(--ta-card-gap) * 1.2); }
+.ta-field { position: relative; margin-bottom: 1rem; }
+.ta-field > i.lead-icon { position: absolute; left: 1.05rem; top: calc(var(--ta-input-h) / 2); transform: translateY(-50%); font-size: 1.15rem; color: #D9C4B3; pointer-events: none; }
+.ta-field .form-control { height: var(--ta-input-h); border-radius: 10px; background: var(--ta-input); border: 1px solid rgba(255, 200, 160, .2); color: var(--ta-text);
+    padding-left: 3.1rem; padding-right: 3rem; font-size: .98rem; }
+.ta-field .form-control::placeholder { color: #B9A496; }
+.ta-field .form-control:focus { background: rgba(255, 255, 255, .07); border-color: var(--ta-copper); box-shadow: 0 0 0 .22rem rgba(232, 132, 58, .18); color: #fff; }
+.ta-field .form-control:-webkit-autofill { -webkit-box-shadow: 0 0 0 40px #2c1a10 inset; -webkit-text-fill-color: var(--ta-text); caret-color: #fff; }
+.ta-field .toggle-pw { position: absolute; right: .55rem; top: calc(var(--ta-input-h) / 2); transform: translateY(-50%); background: transparent; border: 0; color: #D9C4B3; font-size: 1.15rem; padding: .4rem .55rem; border-radius: 8px; }
+.ta-field .toggle-pw:hover { color: #fff; background: rgba(255, 255, 255, .06); }
+.ta-field .invalid-feedback { font-size: .82rem; color: #FF9B8A; }
+.ta-field .form-control.is-invalid { border-color: #E5604B; background-image: none; }
+.ta-help { font-size: .8rem; color: var(--ta-muted); margin-top: -.55rem; margin-bottom: .9rem; }
+.ta-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 .75rem; }
+.ta-row-2 .ta-field .form-control { padding-right: 2.6rem; }
+@media (min-width: 992px) and (max-height: 820px) { .ta-optional { display: none; } }
+.ta-card .form-check-input { background-color: transparent; border-color: rgba(255, 200, 160, .45); width: 1.15em; height: 1.15em; }
+.ta-card .form-check-input:checked { background-color: var(--ta-copper); border-color: var(--ta-copper); }
+.ta-card .form-check-label { color: #E7D9CE; font-size: .92rem; }
+.ta-row-remember { display: flex; justify-content: space-between; align-items: center; margin: .25rem 0 calc(var(--ta-card-gap) * .85); }
+.ta-btn { height: var(--ta-input-h); border: 0; border-radius: 10px; width: 100%; color: #fff; font-weight: 600; font-size: 1.08rem;
+    background: linear-gradient(180deg, #EC8E45 0%, #C9692A 100%); box-shadow: 0 12px 28px rgba(201, 105, 42, .35), inset 0 1px 0 rgba(255, 255, 255, .25);
+    display: inline-flex; align-items: center; justify-content: center; gap: .6rem; transition: transform .15s, box-shadow .15s, filter .15s; }
+.ta-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 16px 34px rgba(201, 105, 42, .45); color: #fff; }
+.ta-btn:disabled { opacity: .75; }
+.ta-or { display: flex; align-items: center; gap: 1rem; color: var(--ta-muted); font-size: .9rem; margin: calc(var(--ta-card-gap) * .95) 0 1rem; }
+.ta-or::before, .ta-or::after { content: ''; flex: 1; height: 1px; background: var(--ta-line); }
+.ta-social { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+.ta-social a { height: calc(var(--ta-input-h) - 2px); border-radius: 10px; border: 1px solid rgba(255, 200, 160, .2); background: rgba(255, 255, 255, .035);
+    display: flex; align-items: center; justify-content: center; gap: .65rem; color: #F3E6DB; font-weight: 500; transition: background .15s, border-color .15s; }
+.ta-social a:hover { background: rgba(255, 255, 255, .08); border-color: rgba(255, 200, 160, .4); color: #fff; }
+.ta-social a.not-configured { opacity: .78; }
+.ta-note { text-align: center; color: #D9C8BA; font-size: .86rem; margin: calc(var(--ta-card-gap) * 1.05) 0 0; }
+.ta-alert { border-radius: 10px; padding: .7rem 1rem; font-size: .86rem; margin-bottom: 1.1rem; border: 1px solid; }
+.ta-alert.info { background: rgba(232, 132, 58, .1); border-color: rgba(232, 132, 58, .35); color: #F6D5B8; }
+.ta-alert.warn { background: rgba(245, 158, 11, .1); border-color: rgba(245, 158, 11, .35); color: #FBE3B5; }
+.ta-back { display: inline-flex; align-items: center; gap: .4rem; font-size: .88rem; margin-bottom: .8rem; }
+
+/* ---------- Chân trang ---------- */
+.ta-footer { position: relative; z-index: 2; background: rgba(14, 8, 4, .92); border-top: 1px solid rgba(255, 196, 150, .1); padding: 0 4.2rem;
+    display: flex; align-items: center; justify-content: space-between; gap: .75rem; font-size: .86rem; color: #BFAE9F; }
+.ta-footer nav { display: flex; }
+.ta-footer nav a { color: #D9C8BA; padding: 0 1.1rem; border-left: 1px solid rgba(255, 196, 150, .25); white-space: nowrap; }
+.ta-footer nav a:first-child { border-left: 0; }
+.ta-footer nav a:last-child { padding-right: 0; }
+.ta-footer nav a:hover { color: var(--ta-copper-soft); }
+
+/* ---------- Trang nội dung (điều khoản, bảo mật, hỗ trợ) — được phép cuộn bên trong ---------- */
+.ta-page { position: relative; z-index: 2; min-height: 0; overflow-y: auto; padding: 4.2rem 1.25rem 2rem; }
+.ta-page-inner { max-width: 900px; margin: 0 auto; }
+.ta-page .ta-card { padding: 2.2rem; }
+.ta-page h1 { font-size: 1.7rem; font-weight: 700; color: #FBF4EE; margin-bottom: 1.25rem; }
+.ta-page .content { color: #E7D9CE; line-height: 1.8; }
+.ta-page .content h3 { color: var(--ta-copper-soft); font-size: 1.08rem; font-weight: 600; margin-top: 1.4rem; }
+
+/* ==================== Co giãn theo CHIỀU CAO màn hình (máy tính) ==================== */
+@media (min-width: 992px) and (max-height: 900px) {
+    .top-auth { --ta-hero-logo: 70px; --ta-h1: 2.55rem; --ta-feature-ic: 48px; --ta-feature-gap: .85rem; --ta-section-gap: 1.7rem;
+        --ta-card-logo: 56px; --ta-card-pad-y: 2.1rem; --ta-input-h: 52px; --ta-card-gap: 1.35rem; --ta-footer-h: 58px; }
+    .ta-stats { padding: 1rem 1.3rem; } .ta-stat i { font-size: 1.75rem; } .ta-stat .v { font-size: 1.18rem; }
+    .ta-card h2 { font-size: 1.6rem; }
+}
+@media (min-width: 992px) and (max-height: 800px) {
+    .top-auth { --ta-hero-logo: 60px; --ta-h1: 2.2rem; --ta-lead: .95rem; --ta-feature-ic: 42px; --ta-feature-gap: .65rem; --ta-section-gap: 1.3rem;
+        --ta-card-logo: 50px; --ta-card-pad-y: 1.7rem; --ta-card-pad-x: 2.1rem; --ta-input-h: 48px; --ta-card-gap: 1.1rem; --ta-footer-h: 52px; }
+    .brand-slogan { display: none; }
+    .ta-features .t { font-size: .98rem; } .ta-features .d { font-size: .84rem; }
+    .ta-stats { padding: .85rem 1.2rem; } .ta-stat i { font-size: 1.55rem; } .ta-stat .v { font-size: 1.08rem; }
+    .ta-card h2 { font-size: 1.45rem; } .ta-card .sub { font-size: .92rem; }
+    .ta-topbar { padding-top: .9rem; }
+    .ta-main { padding-top: 3.9rem; padding-bottom: .9rem; }
+}
+@media (min-width: 992px) and (max-height: 700px) {
+    .top-auth { --ta-hero-logo: 52px; --ta-h1: 1.95rem; --ta-feature-ic: 38px; --ta-feature-gap: .5rem; --ta-section-gap: 1rem;
+        --ta-card-logo: 44px; --ta-card-pad-y: 1.35rem; --ta-input-h: 44px; --ta-card-gap: .85rem; --ta-footer-h: 46px; }
+    .ta-features .d { display: none; }
+    .ta-hero .lead-text { -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+    .ta-card .card-brand .ta-divider { display: none; }
+    .ta-note { font-size: .8rem; }
+    .ta-main { padding-top: 3.4rem; padding-bottom: .6rem; }
+}
+@media (min-width: 992px) and (max-height: 620px) {
+    .ta-stats { display: none; }
+}
+
+/* ==================== Co giãn theo CHIỀU RỘNG (máy tính nhỏ) ==================== */
+@media (min-width: 992px) and (max-width: 1440px) {
+    .ta-main { grid-template-columns: minmax(0, 1fr) 470px; gap: 2.4rem; padding-left: 3rem; padding-right: 2.2rem; }
+    .ta-footer { padding: 0 3rem; }
+    .top-auth { --ta-card-pad-x: 2.1rem; }
+}
+@media (min-width: 992px) and (max-width: 1300px) {
+    .ta-main { grid-template-columns: minmax(0, 1fr) 430px; gap: 2rem; padding-left: 2.2rem; }
+    .ta-stat { padding-right: .9rem; } .ta-stat + .ta-stat { padding-left: .9rem; }
+    .ta-stat i { font-size: 1.45rem; } .ta-stat .v { font-size: 1.02rem; } .ta-stat .l { font-size: .72rem; }
+    .ta-stats { padding: .9rem 1rem; }
+    .ta-footer { padding: 0 2.2rem; font-size: .8rem; }
+    .top-auth { --ta-h1: min(var(--ta-h1), 2.3rem); }
+}

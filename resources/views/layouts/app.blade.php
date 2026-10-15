@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'Tổng quan') · {{ $crmSettings['company_name'] }}</title>
+    {{-- Áp dụng giao diện sáng/tối trước khi vẽ trang (tránh nháy màu) --}}
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('crm.theme');
+                if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-bs-theme', t === 'dark' ? 'dark' : 'light');
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @php($brandColor = strtoupper($crmSettings['brand_color'] ?? '#D9823B'))
+    @if (! in_array($brandColor, ['#D9823B', '#FF6B00'], true) && preg_match('/^#[0-9A-F]{6}$/', $brandColor))
+        <style>:root { --crm-primary: {{ $brandColor }}; --crm-primary-hover: {{ $brandColor }}; }</style>
+    @endif
+    @stack('styles')
+</head>
+<body>
+@php($authUser = auth()->user())
+
+<aside class="crm-sidebar" aria-label="Điều hướng chính">
+    <a href="{{ route('dashboard') }}" class="brand">
+        <x-brand-logo :size="36" />
+        <span class="brand-text"><span class="sidebar-brand-name">{{ $crmSettings['brand_name'] }}</span> CRM<small>{{ $crmSettings['brand_tagline'] }}</small></span>
+    </a>
+    <nav class="crm-nav">
+        @foreach (\App\Support\Menu::for($authUser) as $section)
+            @if ($section['title'])<div class="nav-section">{{ $section['title'] }}</div>@endif
+            @foreach ($section['items'] as $item)
+                @if ($item['children'])
+                    <button class="nav-group-toggle {{ $item['active'] ? 'has-active' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $item['id'] }}"
+                            aria-expanded="{{ $item['active'] ? 'true' : 'false' }}" aria-controls="{{ $item['id'] }}" title="{{ $item['label'] }}">
+                        <i class="bi {{ $item['icon'] }}"></i><span>{{ $item['label'] }}</span><i class="bi bi-chevron-down chev"></i>
+                    </button>
+                    <div class="collapse {{ $item['active'] ? 'show' : '' }}" id="{{ $item['id'] }}">
+                        <div class="nav-sub">
+                            @foreach ($item['children'] as $child)
+                                <a href="{{ route($child['route']) }}" class="nav-link {{ $child['active'] ? 'active' : '' }}">{{ $child['label'] }}</a>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <a href="{{ route($item['route']) }}" class="nav-link {{ $item['active'] ? 'active' : '' }}" title="{{ $item['label'] }}">
+                        <i class="bi {{ $item['icon'] }}"></i><span>{{ $item['label'] }}</span>
+                    </a>
+                @endif
+            @endforeach
+        @endforeach
+    </nav>
+    <div class="sidebar-footer">
+        <a href="{{ route('pages.support') }}" class="nav-link"><i class="bi bi-question-circle"></i><span>Hướng dẫn & hỗ trợ</span></a>
+    </div>
+</aside>
+<div class="crm-backdrop"></div>
+
+<div class="crm-main">
+    @if ($hasDemoData ?? false)
+        <div class="demo-ribbon no-print"><i class="bi bi-cone-striped me-1"></i> Hệ thống đang chứa DỮ LIỆU DEMO phục vụ thử nghiệm — không phải số liệu kinh doanh thật.</div>
+    @endif
+    <header class="crm-topbar">
+        <button class="topbar-icon" type="button" data-toggle-sidebar aria-label="Thu gọn / mở menu"><i class="bi bi-list"></i></button>
+
+        <div class="crm-search d-none d-md-block">
+            <i class="bi bi-search"></i>
+            <input type="search" id="globalSearch" class="form-control" placeholder="Tìm khách hàng, đơn hàng, cơ hội..." autocomplete="off" data-url="{{ route('search') }}" aria-label="Tìm kiếm">
+            <kbd>Ctrl K</kbd>
+            <div id="globalSearchResults" class="crm-search-results"></div>
+        </div>
+
+        <div class="ms-auto d-flex align-items-center gap-1">
+            <button class="topbar-icon theme-toggle" type="button" data-theme-toggle title="Chuyển giao diện sáng / tối" aria-label="Chuyển giao diện sáng / tối">
+                <i class="bi bi-moon-stars"></i><i class="bi bi-sun"></i>
+            </button>
+
+            <div class="dropdown" id="notifDropdown" data-url="{{ route('notifications.feed') }}">
+                <button class="topbar-icon" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-label="Thông báo">
+                    <i class="bi bi-bell"></i>
+                    @if ($unreadNotifications > 0)
+                        <span class="dot" id="notifBadge">{{ $unreadNotifications > 99 ? '99+' : $unreadNotifications }}</span>
+                    @endif
+                </button>
+                <div class="dropdown-menu dropdown-menu-end p-0" style="width: 360px; max-width: 92vw;">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                        <strong>Thông báo</strong>
+                        <a href="#" class="small" id="notifMarkAll" data-url="{{ route('notifications.read-all') }}">Đánh dấu tất cả đã đọc</a>
+                    </div>
+                    <div id="notifList" class="p-2" style="max-height: 380px; overflow-y: auto;"></div>
+                    <a href="{{ route('notifications.index') }}" class="d-block text-center py-2 border-top small fw-semibold">Xem tất cả</a>
+                </div>
+            </div>
+
+            @php($quick = collect([
+                ['customers.create', 'Khách hàng', 'bi-people', 'create', \App\Models\Customer::class],
+                ['leads.create', 'Lead', 'bi-funnel', 'create', \App\Models\Lead::class],
+                ['opportunities.create', 'Cơ hội', 'bi-kanban', 'create', \App\Models\Opportunity::class],
+                ['tasks.create', 'Công việc', 'bi-check2-square', 'create', \App\Models\Task::class],
+                ['quotations.create', 'Báo giá', 'bi-file-earmark-text', 'create', \App\Models\Quotation::class],
+                ['tickets.create', 'Ticket hỗ trợ', 'bi-headset', 'create', \App\Models\SupportTicket::class],
+            ])->filter(fn ($q) => $authUser->can($q[3], $q[4])))
+            @if ($quick->isNotEmpty())
+                <div class="dropdown ms-1">
+                    <button class="btn btn-primary btn-sm d-flex align-items-center gap-1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-plus-lg"></i><span class="d-none d-sm-inline">Tạo mới</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        @foreach ($quick as $q)
+                            <li><a class="dropdown-item" href="{{ route($q[0]) }}"><i class="bi {{ $q[2] }} me-2 text-orange"></i>{{ $q[1] }}</a></li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <span class="topbar-divider d-none d-md-block"></span>
+
+            <div class="dropdown">
+                <button class="topbar-user" data-bs-toggle="dropdown" aria-label="Tài khoản">
+                    <x-avatar :user="$authUser" />
+                    <span class="d-none d-lg-block text-start lh-sm">
+                        <span class="d-block fw-semibold small">{{ $authUser->name }}</span>
+                        <span class="d-block small-xs text-muted">{{ $authUser->getRoleNames()->first() ?? 'Chưa có vai trò' }}</span>
+                    </span>
+                    <i class="bi bi-chevron-down small text-muted d-none d-lg-block"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
+                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}#password"><i class="bi bi-key me-2"></i>Đổi mật khẩu</a></li>
+                    <li><a class="dropdown-item" href="{{ route('profile.sessions') }}"><i class="bi bi-laptop me-2"></i>Phiên đăng nhập</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">@csrf
+                            <button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="crm-content fade-in">
+        @yield('content')
+    </main>
+
+    <footer class="crm-footer d-flex flex-wrap justify-content-between gap-2">
+        <span>© {{ date('Y') }} {{ $crmSettings['copyright_text'] }}.@if ($crmSettings['copyright_owner']) Bản quyền thuộc {{ $crmSettings['copyright_owner'] }}.@endif</span>
+        <span>Múi giờ {{ config('app.timezone') }} · {{ now()->format('d/m/Y H:i') }}</span>
+    </footer>
+</div>
+
+{{-- Hộp thoại xác nhận dùng chung --}}
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="empty-icon mx-auto mb-3" style="width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--crm-danger-soft);color:var(--crm-danger-text);font-size:1.5rem;"><i class="bi bi-exclamation-triangle"></i></div>
+                <p class="confirm-message mb-0 fw-semibold"></p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger confirm-ok">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@include('partials.flash')
+@stack('scripts')
+</body>
+</html>

@@ -1,0 +1,60 @@
+/* =====================================================================
+   TOP CRM — Trang truy cập trên ĐIỆN THOẠI & MÁY TÍNH BẢNG (< 992px)
+
+   ĐÂY LÀ BẢN CƠ SỞ (đã hoạt động). Khi có thiết kế/code giao diện điện thoại
+   riêng, hãy thay nội dung trong các khối @media bên dưới.
+   Xem hướng dẫn: docs/MOBILE_UI.md
+
+   Các "móc" có sẵn trong HTML để tùy biến cho điện thoại:
+     .ta-mobile-only   → chỉ hiện trên điện thoại (ẩn trên máy tính)
+     .ta-desktop-only  → chỉ hiện trên máy tính (ẩn trên điện thoại)
+     .ta-mobile-brand  → khối thương hiệu đầu trang trên điện thoại
+     .ta-mobile-stats  → dải chỉ số thu gọn trên điện thoại
+   ===================================================================== */
+
+.ta-mobile-only { display: none !important; }
+
+@media (max-width: 991.98px) {
+    .ta-mobile-only { display: revert !important; }
+    .ta-desktop-only { display: none !important; }
+
+    .top-auth { --ta-input-h: 52px; --ta-card-logo: 52px; --ta-card-pad-y: 1.8rem; --ta-card-pad-x: 1.6rem; --ta-card-gap: 1.2rem; }
+
+    /* Cho phép cuộn tự nhiên trên điện thoại; tôn trọng tai thỏ / thanh điều hướng */
+    .ta-shell { grid-template-rows: auto minmax(0, 1fr) auto; min-height: 100dvh;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+    .ta-topbar { position: relative; grid-row: 1; display: flex; justify-content: flex-end; padding: .75rem 1rem 0; }
+    .ta-main { grid-row: 2; grid-template-columns: 1fr; justify-items: center; align-content: center; gap: 1.25rem; padding: .5rem 1rem 1.5rem; }
+    .ta-hero { display: none; }
+    html, body.top-auth { overflow-x: hidden; }
+    .ta-card-wrap { width: 100%; max-width: 460px; min-width: 0; }
+    .ta-card { min-width: 0; }
+    .ta-card .brand-lockup { max-width: 100%; }
+    .ta-card .brand-tagline { letter-spacing: .16em; }
+    .ta-page { grid-row: 2; padding-top: 1rem; }
+
+    .ta-photo { left: 0; width: 100%; bottom: 0; opacity: .55; -webkit-mask-image: none; mask-image: none; background-position: center 30%; }
+    .ta-shade { background: linear-gradient(180deg, rgba(20, 11, 6, .5) 0%, rgba(20, 11, 6, .82) 45%, rgba(20, 11, 6, .95) 100%); }
+    .ta-arcs { display: none; }
+
+    .ta-footer { grid-row: 3; flex-direction: column; justify-content: center; text-align: center; padding: .9rem 1rem; gap: .4rem; font-size: .78rem; }
+    .ta-footer nav { justify-content: center; flex-wrap: wrap; }
+
+    /* Ô nhập cỡ chữ >= 16px để iPhone không tự phóng to khi chạm vào */
+    .ta-field .form-control { font-size: 16px; }
+}
+
+@media (max-width: 575.98px) {
+    .ta-card { border-radius: 18px; }
+    .ta-card h2 { font-size: 1.4rem; }
+    .ta-card .sub { font-size: .9rem; }
+    .ta-social { grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .ta-social a { font-size: .92rem; }
+    .ta-row-remember { flex-wrap: wrap; gap: .5rem; }
+    .ta-row-2 { grid-template-columns: 1fr; }
+    .ta-footer nav a { padding: 0 .6rem; }
+}
+
+@media (max-width: 359.98px) {
+    .ta-social { grid-template-columns: 1fr; }
+}
