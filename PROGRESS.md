@@ -18,16 +18,16 @@
   - Đã chụp màn hình (Edge headless, scratchpad/shot.ps1) ở 1920x1080, 1672x941, 1600x900, 1440x860, 1366x768, 1280x650, 390/360 mobile — OK.
 - docs/MOBILE_UI.md: nơi ghép code giao diện điện thoại (user sẽ gửi code sau).
 
-## ĐANG LÀM (TẠM DỪNG 15/10/2026) — Giao diện macOS kính mờ (ảnh 4 của user; hủy thiết kế sidebar sáng trước đó)
-- ĐÃ XONG (chưa commit):
-  - resources/css/app.css: token macOS sáng/tối, wallpaper mờ, sidebar kính, `.crm-window`, topbar, footer; CSS dashboard (hello-card, kpi-card, seg, funnel, promo-card, sched...).
-  - layouts/app.blade.php: cấu trúc mới (wallpaper, mac-lights vàng = thu gọn menu, xanh = toàn màn hình; thẻ workspace/user; topbar có Tạo mới, chuông, lịch, sáng/tối, ngôn ngữ, avatar; footer có link).
-  - app.js: nút toàn màn hình; crmPalette.surface dùng `--crm-surface-solid`.
-  - DashboardService: invoicesIssued, sparklines, revenueSeries(day/week/month/year), revenueYears, funnelCumulative, customerSources, taskBoard, recentOrders, daySchedule.
-  - DashboardController: truyền dữ liệu mới + `widget()` (route dashboard.widget/{revenue|schedule}); view dashboard.blade.php mới + dashboard/_schedule.blade.php.
-  - `npm run build` OK.
-- LỖI CẦN SỬA TIẾP: test 76 pass / 3 fail — "Undefined variable $crmSettings" trong dashboard.blade.php (view composer chỉ gắn cho layout; dùng `\App\Models\Setting::allCached()` hoặc `$crmSettings ?? Setting::allCached()` trong view).
-- SAU ĐÓ: chạy lại test → chụp CDP sáng/tối 1600/1366/390 (`cdp.ps1 -Login phuphuc ...`) → sửa lỗi hiển thị → cập nhật trang design-system → commit Git → báo user duyệt thiết kế.
+## Giao diện macOS kính mờ — XONG 15/10/2026 (commit de5b831), CHỜ USER DUYỆT
+- Layout kính mờ (wallpaper, sidebar kính + đèn macOS, crm-window, topbar, footer), dashboard mới theo ảnh 4 (dữ liệu thật), endpoint dashboard.widget.
+- 80 test PASS. Đã chụp sáng/tối 1600/1366/mobile qua CSDL xem thử `orangecrm_preview` (tài khoản preview, chỉ dữ liệu demo; chạy: DB_DATABASE=orangecrm_preview php artisan serve --port=8002 --no-reload).
+- Lưu ý: mật khẩu tạm của tài khoản phuphuc không còn đăng nhập được (user đã đổi) → KHÔNG đụng tài khoản thật; chụp màn hình dùng CSDL preview.
+
+## Sao lưu & Git — XONG 15/10/2026
+- `SAO_LUU.bat` → scripts/backup.ps1: mysqldump (MYSQL_PWD, không lộ dòng lệnh) → C:\TOPCRM_Backup\database (zip, giữ 30); uploads (robocopy); .env → secrets\ (ACL chỉ user/SYSTEM/Admins, giữ 10); git commit tự động (chặn tệp bí mật) + push sang kho bare C:\TOPCRM_Backup\git\phuc-crm.git; push origin nếu có.
+- Đã thử khôi phục bản sao lưu vào CSDL tạm: số bản ghi khớp 100%, đã xóa CSDL tạm. Clone kho sao lưu OK, không có .env.
+- Hướng dẫn: docs/GIT_BACKUP.md. GitHub: CHƯA làm — cần user tạo kho PRIVATE và gửi link (push ra ngoài phải được user xác nhận).
+- BƯỚC TIẾP sau khi user duyệt giao diện: Phase 1 bước 1.0 (nâng cấp MariaDB 10.11, chạy SAO_LUU.bat trước).
 
 ## Sự cố MySQL (đã xử lý 14/10)
 - APPCRASH 0x80000003 (13/10 16:29, 14/10 11:35) của mysqld 10.4.32 — nguyên nhân chưa rõ; đã có watchdog (scripts/mysql-watchdog.ps1, bật từ START_CRM.bat).

@@ -76,7 +76,7 @@ try {
     if (-not $git) { Warn 'Chưa cài Git — bỏ qua sao lưu mã nguồn.' }
     else {
         $bare = Join-Path $BackupRoot 'git\phuc-crm.git'
-        if (-not (Test-Path $bare)) { git init --bare --quiet $bare; Say "Tạo kho Git sao lưu: $bare" }
+        if (-not (Test-Path $bare)) { git init --bare --quiet --initial-branch=main $bare; Say "Tạo kho Git sao lưu: $bare" }
         if (-not (git remote | Select-String -SimpleMatch -Pattern 'backup' -Quiet)) { git remote add backup $bare }
 
         if (-not $NoCommit) {
