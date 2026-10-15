@@ -1,9 +1,9 @@
-# Hướng dẫn quản trị OrangeCRM
+# Hướng dẫn quản trị TOP CRM
 
 ## 1. Tài khoản quản trị đầu tiên
 
-- Khi hệ thống chưa được khởi tạo, mọi truy cập đều được chuyển tới trang **/setup** để bạn tự tạo tài khoản (tự đặt mật khẩu). Sau khi tạo xong, trang này **khóa vĩnh viễn**, kể cả khi tài khoản Super Admin về sau bị xóa (chống người lạ chiếm quyền). Dù có nhiều yêu cầu gửi cùng lúc thì cũng chỉ một tài khoản được tạo.
-- Cách khác: mở Command Prompt tại `C:\phuc-crm` và chạy `php artisan crm:create-admin`. Lệnh này cũng dùng để **lấy lại quyền** khi quên mật khẩu Super Admin.
+- Khi hệ thống chưa được khởi tạo, mọi truy cập đều được chuyển tới trang **/setup** để bạn tự tạo tài khoản (tự đặt mật khẩu). Sau khi tạo xong, trang này **khóa vĩnh viễn**, kể cả khi tài khoản quản trị về sau bị xóa (chống người lạ chiếm quyền). Dù có nhiều yêu cầu gửi cùng lúc thì cũng chỉ một tài khoản được tạo.
+- Cách khác: mở Command Prompt tại `C:\phuc-crm` và chạy `php artisan crm:create-admin`. Lệnh này cũng dùng để **lấy lại quyền** khi quên mật khẩu tài khoản quản trị nền tảng.
 
 ## 2. Quản lý nhân viên (menu *Người dùng*)
 
@@ -17,24 +17,46 @@
 
 > Máy chủ chưa cấu hình email thật (`MAIL_MAILER=log`), nên liên kết đặt lại mật khẩu được ghi vào `storage/logs/laravel.log`. Cách đơn giản nhất là dùng **Đặt mật khẩu tạm thời** rồi báo nhân viên đổi lại sau khi đăng nhập.
 
-Administrator không thể sửa, khóa hay xóa Super Admin, và không thể gán vai trò Super Admin cho người khác.
+Quản trị viên tổ chức không thể sửa, khóa, xóa hay tắt 2FA của Chủ sở hữu và quản trị nền tảng, và không thể gán vai trò Chủ sở hữu cho người khác. Mật khẩu mới phải có tối thiểu 10 ký tự, gồm chữ hoa, chữ thường và chữ số.
 
 ## 3. Vai trò và phân quyền
 
+Có hai tầng:
+- **Quản trị nền tảng** (*Platform Super Administrator*): người tạo hệ thống. Toàn quyền ở mọi tổ chức, quản lý danh sách tổ chức (menu *Quản lý tổ chức*).
+- **Vai trò trong tổ chức:** mỗi tổ chức có bộ 14 vai trò riêng; chỉnh quyền ở tổ chức này không ảnh hưởng tổ chức khác.
+
 | Vai trò | Phạm vi mặc định |
 |---|---|
-| Super Admin | Toàn quyền, không thể giới hạn |
-| Administrator | Toàn bộ chức năng, trừ thao tác trên Super Admin |
-| Sales Manager | Mọi dữ liệu bán hàng của cả nhóm, duyệt đơn, phân công, báo cáo |
-| Sales Staff | Chỉ khách hàng, lead, cơ hội, báo giá, đơn hàng **mình phụ trách hoặc tự tạo** |
-| Marketing Staff | Chiến dịch, toàn bộ lead, xem khách hàng |
-| Customer Support | Ticket hỗ trợ, xem và cập nhật khách hàng, người liên hệ |
-| Viewer | Chỉ xem, không tạo, sửa, xóa |
+| Organization Owner (Chủ sở hữu) | Toàn quyền trong tổ chức; chỉ chủ sở hữu gán được vai trò chủ sở hữu |
+| Organization Administrator | Toàn bộ chức năng, trừ thao tác trên chủ sở hữu và quản trị nền tảng |
+| Sales Manager / Sales Employee | Quản lý: mọi dữ liệu bán hàng của nhóm. Nhân viên: chỉ dữ liệu **mình phụ trách hoặc tự tạo** |
+| Marketing Manager / Marketing Employee | Chiến dịch, lead, xem khách hàng |
+| Customer Support Manager / Support Agent | Ticket hỗ trợ, khách hàng, người liên hệ |
+| Finance Manager / Accountant | Hóa đơn, thanh toán, báo cáo |
+| Inventory Manager, Project Manager, Employee | Theo ma trận mặc định, chủ sở hữu tự điều chỉnh |
+| Read-only Auditor | Chỉ xem (kể cả nhật ký hoạt động), không tạo, sửa, xóa |
 
-**Chỉnh quyền:** vào *Vai trò & quyền*, bấm **Chỉnh quyền**, tích hoặc bỏ tích ma trận *Xem / Xem tất cả / Tạo / Sửa / Xóa / Xuất / Phân công / Duyệt / Quản trị* cho từng module.
+**Chỉnh quyền:** vào *Vai trò & quyền*, bấm **Chỉnh quyền**, tích hoặc bỏ tích ma trận *Xem / Xem tất cả / Tạo / Sửa / Xóa / Xuất / Phân công / Duyệt / Quản trị / Sử dụng* cho từng module.
 - **Xem tất cả:** thấy dữ liệu của mọi nhân viên. Không tích thì chỉ thấy dữ liệu mình phụ trách.
+- **Kết nối API → Sử dụng:** được tạo khóa API (mặc định chỉ Chủ sở hữu và Quản trị viên).
 - Quyền được kiểm tra ở **máy chủ**, không chỉ ẩn nút. Người không có quyền mà cố truy cập sẽ nhận lỗi 403.
-- Có thể **tạo vai trò mới** tùy ý. Vai trò mặc định không xóa được.
+- Có thể **tạo vai trò mới** tùy ý. Vai trò mặc định không xóa được. Chi tiết kỹ thuật: [RBAC.md](RBAC.md).
+
+## 3a. Tổ chức (không gian làm việc)
+
+- Một tài khoản có thể thuộc nhiều tổ chức; chuyển tổ chức ở ô **Không gian làm việc** góc dưới menu trái. Dữ liệu mỗi tổ chức hoàn toàn tách biệt.
+- Quản trị nền tảng tạo tổ chức mới kèm chủ sở hữu ở menu *Quản lý tổ chức*; có thể tạm ngưng một tổ chức (thành viên không làm việc được cho tới khi mở lại).
+- Thêm nhân viên đã có tài khoản ở tổ chức khác: nhập đúng email của họ khi **Tạo tài khoản** — họ dùng mật khẩu sẵn có. Với tài khoản dùng chung, quản trị tổ chức chỉ đổi được vai trò, phòng ban và trạng thái thành viên.
+- *Hạn chế hiện tại:* Cài đặt hệ thống (tên công ty, logo...) và phòng ban của nhân viên còn dùng chung giữa các tổ chức — sẽ tách ở Phase 2.
+
+## 3b. Bảo mật
+
+- Mỗi người tự bật **xác thực 2 lớp** ở *ảnh đại diện → Bảo mật tài khoản* (quét QR bằng Google/Microsoft Authenticator, lưu 8 mã khôi phục). Ở đây cũng có **lịch sử đăng nhập** và **xác minh email**.
+- Nhân viên mất điện thoại và mã khôi phục: mở chi tiết nhân viên → **Tắt xác thực 2 lớp** (hãy xác minh đúng người trước).
+- Quản trị nền tảng có thể bật **Bắt buộc xác thực 2 lớp cho tài khoản quản trị** trong *Cài đặt hệ thống*.
+- Đăng nhập từ thiết bị lạ sẽ có cảnh báo trong chuông thông báo và email.
+- Khóa API cho phần mềm khác: *ảnh đại diện → Khóa API*; quản trị viên thấy và thu hồi được khóa của mọi thành viên. Xem [API.md](API.md).
+- Tổng hợp và danh sách việc trước khi đưa lên Internet: [SECURITY.md](SECURITY.md).
 
 ## 4. Phòng ban
 
@@ -78,7 +100,7 @@ Menu *Nhật ký hoạt động* ghi lại: ai làm gì, lúc nào, trên dữ l
 php artisan crm:purge-demo
 ```
 
-Chỉ xóa bản ghi demo (`is_demo = 1`) và 7 tài khoản nhân viên demo. Sau đó dải vàng "DỮ LIỆU DEMO" ở đầu trang sẽ biến mất (trong tối đa 10 phút).
+Chỉ xóa bản ghi demo (`is_demo = 1`) và các tài khoản nhân viên demo. Sau đó dải vàng "DỮ LIỆU DEMO" ở đầu trang sẽ biến mất (trong tối đa 10 phút).
 
 ## 8. Sao lưu định kỳ
 
@@ -92,7 +114,7 @@ Chạy trong Command Prompt tại `C:\phuc-crm`:
 |---|---|
 | `php artisan crm:health` | Kiểm tra tình trạng hệ thống |
 | `php artisan crm:install` | Cập nhật cấu trúc database (an toàn) |
-| `php artisan crm:create-admin` | Tạo hoặc đặt lại Super Admin |
+| `php artisan crm:create-admin` | Tạo hoặc đặt lại tài khoản quản trị nền tảng |
 | `php artisan crm:purge-demo` | Xóa dữ liệu demo |
 | `php artisan crm:task-reminders` | Chạy nhắc việc ngay (bình thường tự chạy mỗi 15 phút khi CRM đang mở) |
 | `php artisan optimize:clear` | Xóa bộ nhớ đệm khi giao diện hiển thị sai |

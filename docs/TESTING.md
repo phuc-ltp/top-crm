@@ -1,0 +1,60 @@
+# Kiểm thử TOP CRM
+
+*Cách chạy, phạm vi bao phủ và quy trình kiểm thử. Kết quả lần chạy gần nhất ở cuối trang. Báo cáo kiểm thử bàn giao ban đầu (14/10): [TEST_REPORT.md](TEST_REPORT.md).*
+
+## 1. Chạy kiểm thử
+```powershell
+cd C:\phuc-crm
+php artisan test                                   # toàn bộ (~4–5 phút)
+php artisan test tests/Feature/ApiTokenTest.php    # một tệp
+php artisan test --filter=two_factor               # theo tên
+```
+- Chạy trên database **riêng** `orangecrm_test` (khai báo trong `phpunit.xml`), làm mới sau mỗi test (`RefreshDatabase`). `TestCase` **từ chối chạy** nếu cấu hình trỏ vào `orangecrm_db`.
+- Mỗi test tạo lại 14 vai trò + dữ liệu cấu hình → chậm hơn bình thường nhưng sát thực tế.
+- **Không chạy hai bộ test cùng lúc** (dùng chung database test).
+- Giao diện phải được build (`npm run build`) trước khi chạy test trang.
+
+## 2. Phạm vi bao phủ (190 test)
+
+| Tệp | Số test | Nội dung chính |
+|---|---:|---|
+| Unit/BusinessLogicTest | 7 | Tính tiền chứng từ, chuẩn hóa điện thoại, chấm điểm lead, định dạng tiền/ngày, sinh mã |
+| AuthTest | 15 | /setup một lần, đăng nhập/đăng xuất, khóa tạm khi sai nhiều lần, quên/đặt lại/đổi mật khẩu, mật khẩu không vào nhật ký |
+| LoginPageTest | 12 | Trang đăng nhập (email hoặc tên đăng nhập), Google/Facebook, trang công khai, cài đặt thương hiệu (secret mã hóa), trang lỗi, dashboard |
+| AccountSecurityTest | 20 | Quy định mật khẩu, 2FA (luồng, chống dùng lại, giới hạn, mã khôi phục, mã hóa), đặt lại 2FA theo quyền, lịch sử đăng nhập, cảnh báo thiết bị mới, xác minh email, bắt buộc 2FA |
+| AuthorizationTest | 9 | Phân quyền hành động và phạm vi "chỉ của mình" |
+| RbacTest | 12 | Quản trị nền tảng, 14 vai trò theo tổ chức, bảo vệ chủ sở hữu |
+| OrganizationTest | 8 | Tổ chức mặc định, tự gán `organization_id` (không gán được từ form), unique theo tổ chức, thành viên mới, chặn xóa cứng tổ chức có dữ liệu |
+| TenantIsolationTest | 15 | Người tổ chức A không xem/sửa/xóa/tìm/xuất/tham chiếu dữ liệu tổ chức B |
+| WorkspaceTest | 17 | Chuyển tổ chức, quản lý tổ chức, thành viên dùng chung, tạm ngưng/gỡ |
+| ApiTokenTest | 14 | Tạo/thu hồi khóa, phạm vi, không vượt quyền, gắn tổ chức, tự vô hiệu, không dùng cho trang web |
+| CustomerTest | 7 | CRUD, kiểm tra dữ liệu, cảnh báo trùng, tìm kiếm/phân trang, nhập CSV, ghi chú tương tác, chống XSS |
+| LeadPipelineTest | 6 | Lead, chuyển đổi, pipeline |
+| SalesFlowTest | 6 | Báo giá → đơn hàng → hóa đơn → thanh toán, chặn thanh toán vượt |
+| OperationsTest | 8 | Công việc (checklist, bình luận, đính kèm, chặn tải tệp của người khác), nhắc việc/quá hạn, chiến dịch, ticket, người dùng, cài đặt, thông báo |
+| DatabaseTest | 10 | Bảng InnoDB/utf8mb4, khóa ngoại (RESTRICT/CASCADE/SET NULL), unique, quan hệ, seeder, xóa dữ liệu demo, rollback migration |
+| PageSmokeTest | 6 | Mọi trang mở được với mọi vai trò, báo cáo/xuất Excel/PDF, AJAX & API trả JSON |
+| LayoutTest | 7 | Sáng/tối theo tài khoản, ô tìm chức năng |
+| LocaleTest | 11 | Song ngữ: mọi câu giao diện có bản dịch tiếng Anh, câu dùng trong JavaScript đã khai báo |
+
+## 3. Kiểm thử ngoài PHPUnit (thực hiện mỗi bước Phase 1)
+| Hạng mục | Cách làm |
+|---|---|
+| Migration | Bản sao database thật `orangecrm_migcheck`: 3 vòng migrate/rollback + so sánh schema, rồi xóa bản sao |
+| Giao diện | Edge headless qua DevTools Protocol, database xem thử `orangecrm_preview` (chỉ dữ liệu demo): chụp màn hình sáng/tối, đo tràn ngang ở 1920 / 1366 / 820 / 390 px |
+| Luồng thật | Bật 2FA qua giao diện → QR → nhập mã → mã khôi phục; gọi API bằng HTTP thật (200/401/403) |
+| File SQL | Import vào database trống (2 lần), kiểm tra không có quản trị / dữ liệu thật, không còn migration thiếu |
+| Lỗ hổng thư viện | `composer audit`, `npm audit` |
+
+## 4. Quy tắc khi thêm tính năng
+- Mỗi tính năng mới có test cho: người có quyền làm được, người không có quyền bị chặn, dữ liệu tổ chức khác không chạm được.
+- Câu giao diện mới phải có trong `lang/en.json` (test `LocaleTest` sẽ báo thiếu).
+- Không đánh dấu hoàn thành khi chưa chạy toàn bộ `php artisan test`.
+
+## 5. Kết quả gần nhất
+| Hạng mục | Kết quả (17/10/2026, hết Phase 1) |
+|---|---|
+| PHPUnit | **190/190 đạt** (5.817 kiểm tra), 293 giây |
+| `composer audit` / `npm audit` | 0 lỗ hổng |
+| Import file SQL vào database trống (2 lần) | Đạt — 50 bảng, không thiếu migration, không có quản trị / dữ liệu thật |
+| Môi trường | Windows 11 · XAMPP · PHP 8.2.12 · MariaDB 10.11.19 · Laravel 12.69.3 · Node 24 |

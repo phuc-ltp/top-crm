@@ -1,4 +1,4 @@
-# Hướng dẫn sử dụng OrangeCRM
+# Hướng dẫn sử dụng TOP CRM
 
 ## 1. Mở hệ thống và đăng nhập
 
@@ -86,7 +86,14 @@ Hiển thị doanh thu đã thu, giá trị pipeline, số khách hàng, lead, t
 
 ## 11. Đổi mật khẩu và hồ sơ
 
-Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu. Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
+Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
+
+**Bảo mật tài khoản** (ảnh đại diện → Bảo mật tài khoản):
+- **Xác thực 2 lớp:** nhập mật khẩu → quét mã QR bằng Google Authenticator / Microsoft Authenticator → nhập mã 6 số. Lưu 8 mã khôi phục ở nơi an toàn (dùng khi mất điện thoại). Từ đó mỗi lần đăng nhập cần thêm mã 6 số.
+- **Lịch sử đăng nhập:** xem các lần đăng nhập đúng/sai gần đây. Thấy lạ thì đổi mật khẩu và đăng xuất các thiết bị khác ở **Phiên đăng nhập**.
+- **Xác minh email:** bấm Gửi email xác minh.
+
+**Giao diện:** nút mặt trăng/mặt trời trên thanh trên cùng để đổi sáng/tối (lưu theo tài khoản); ô **Tìm chức năng...** ở menu trái để tìm nhanh trang cần mở; chọn ngôn ngữ Việt/Anh ở góc trên phải. Thuộc nhiều tổ chức thì chuyển ở ô **Không gian làm việc** góc dưới menu trái.
 
 ## 12. Tắt hệ thống
 

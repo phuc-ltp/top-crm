@@ -41,7 +41,9 @@
 - [x] 1.7 Layout (17/10): ô tìm chức năng trong menu (không dấu, Enter mở mục đầu, Esc xóa), giao diện sáng/tối lưu theo tài khoản (users.theme, POST /preferences/theme, HTML vẽ sẵn theme của tài khoản nên không nháy màu trên thiết bị mới), sửa tràn ngang 2px ở 390px. Đã đo tràn ngang 22 trang ở 1920/1366/820/390: không trang nào tràn. LayoutTest 7 test, 156 test pass.
 - [x] 1.8 Bảo mật tài khoản (17/10): quy định mật khẩu chung (10–128 ký tự, hoa/thường/số; PasswordPolicy + Password::defaults), xác thực 2 lớp TOTP tự viết theo RFC 6238 (đã kiểm với bộ mẫu RFC) + QR (bacon/bacon-qr-code 3.0) + 8 mã khôi phục băm, chống dùng lại mã, giới hạn 5 lần/5 phút theo tài khoản, áp dụng cả Google/Facebook; quản trị viên tắt 2FA cho nhân viên; tùy chọn bắt buộc 2FA cho quản trị (chỉ quản trị nền tảng đổi, mặc định tắt); lịch sử đăng nhập login_events (không lưu chuỗi gõ nhầm, tự xóa sau 180 ngày); cảnh báo thiết bị mới (chuông + email); xác minh email (không chặn đăng nhập vì chưa có SMTP). Trang /profile/security. AccountSecurityTest 20 test, 176 test pass. Tài liệu docs/ACCOUNT_SECURITY.md.
 - [x] 1.9 API bằng khóa (17/10): Laravel Sanctum 4.3.3, khóa gắn tổ chức (organization_id), 6 phạm vi (stats/customers/leads/opportunities read/write), quyền thực tế = quyền người dùng ∩ phạm vi, quyền mới api.use (Chủ sở hữu + Quản trị viên), thời hạn 30–365 ngày (không vĩnh viễn), tối đa 10 khóa/người/tổ chức, tiền tố topcrm_, chỉ lưu băm, khóa hiện 1 lần, thu hồi (quản trị thu hồi được khóa thành viên), tự ngừng khi mất quyền/khóa tài khoản/tạm ngưng/xóa. ApiContext + CurrentOrganization ưu tiên tổ chức của khóa; xác định tổ chức trước khi tìm bản ghi (priority trước SubstituteBindings, áp dụng cả web). Trang /profile/api-tokens. ApiTokenTest 14 test, 190 test pass. Thử thật bằng HTTP: 200/401/403 đúng. docs/API.md.
-- [ ] 1.10 Tài liệu
+- [x] 1.10 Tài liệu (17/10): ARCHITECTURE (viết lại), DATABASE (ERD mermaid, 50 bảng/97 FK), SECURITY (tổng hợp + checklist trước khi lên Internet), TESTING (190 test), CHANGELOG 1.0.0; cập nhật README, ADMIN_GUIDE (vai trò mới, tổ chức, bảo mật), USER_GUIDE, DATABASE_SETUP. File SQL tạo lại bằng scripts/generate-sql.ps1 (database tạm orangecrm_sqlgen, chỉ demo; đã import thử 2 lần). composer/npm audit 0 lỗ hổng. Gỡ email khỏi PROGRESS.md.
+
+**PHASE 1 HOÀN TẤT (17/10/2026).** Tiếp theo: Phase 2 — đầu tiên trình bày 2 cách cho bạn bè dùng thử (mạng nội bộ / Internet) để user chọn; tách cài đặt & phòng ban theo tổ chức; cấu hình SMTP.
 
 ## Sự cố MySQL (đã xử lý 14/10)
 - APPCRASH 0x80000003 (13/10 16:29, 14/10 11:35) của mysqld 10.4.32 — nguyên nhân chưa rõ; đã có watchdog (scripts/mysql-watchdog.ps1, bật từ START_CRM.bat).
@@ -56,7 +58,7 @@
 
 ## 15/10/2026
 - Lỗi "404 đen" user gặp thực chất là 419 (CSRF hết hạn: trang /setup mở > 2 giờ). ĐÃ SỬA: bootstrap/app.php bắt HttpException 419 → quay lại form giữ dữ liệu + cảnh báo; trang lỗi mang thương hiệu resources/views/errors/*.
-- ĐÃ TẠO Super Admin: Trịnh Phú Phúc · phuphuc40@gmail.com · username phuphuc (mật khẩu ngẫu nhiên đã báo user trong chat, user cần đổi).
+- ĐÃ TẠO Super Admin: Trịnh Phú Phúc · username phuphuc (mật khẩu ngẫu nhiên đã báo user trong chat, user cần đổi).
 - Design System + Dashboard mới: build OK, 79 test PASS, đã chụp light/dark/1600/1366/mobile qua CDP (scratchpad/cdp.ps1 đăng nhập thật).
 - Git: đã khởi tạo repo nhánh main, commit mốc 26c7c2f (user đã cài Git). .gitignore loại .env, storage/backups.
 - CÒN của bước 1.0: nâng cấp MariaDB 10.11 (đã duyệt) — CHƯA làm. Chờ user duyệt thiết kế rồi tiếp Phase 1 (1.1 bảo mật /setup → 1.10).
