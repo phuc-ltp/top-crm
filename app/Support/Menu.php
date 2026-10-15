@@ -55,8 +55,8 @@ class Menu
                     ['Vai trò & quyền', null, 'roles.index', 'users.manage', 'roles.*'],
                 ]],
                 ['Hệ thống', 'bi-gear-fill', null, null, null, [
-                    ['Cài đặt chung', null, 'settings.edit', 'settings.manage', 'settings.edit'],
-                    ['Đăng nhập & thương hiệu', null, 'settings.branding', 'settings.manage', 'settings.branding'],
+                    ['Cài đặt tổ chức', null, 'settings.edit', 'settings.manage', 'settings.edit'],
+                    ['Đăng nhập & thương hiệu', null, 'settings.branding', 'platform', 'settings.branding'],
                     ['Nhật ký hoạt động', null, 'activity-logs.index', 'activity_logs.view', 'activity-logs.*'],
                     ['Design System', null, 'design-system', 'settings.manage', 'design-system'],
                     ['Quản lý tổ chức', null, 'platform.organizations.index', 'platform', 'platform.*'],

@@ -63,5 +63,12 @@ class OrganizationProvisioner
                 Tag::firstOrCreate(['name' => $name], ['color' => $color]);
             }
         });
+
+        // Cài đặt riêng: tên công ty mặc định = tên tổ chức (không ghi đè nếu tổ chức đã tự đặt)
+        $name = $organization instanceof Organization ? $organization->name : Organization::whereKey($orgId)->value('name');
+        if ($name) {
+            \App\Models\OrganizationSetting::firstOrCreate(['organization_id' => $orgId, 'key' => 'company_name'], ['value' => $name]);
+            \App\Models\Setting::flushCache($orgId);
+        }
     }
 }

@@ -56,13 +56,13 @@ class UserController extends Controller
         $this->authorize('viewAny', User::class);
         $orgId = $this->orgId();
         $users = User::inOrganization(null, false)
-            ->with(['department:id,name', 'roles:id,name', 'organizations' => fn ($q) => $q->whereKey($orgId)])
+            ->with(['roles:id,name', 'organizations' => fn ($q) => $q->whereKey($orgId)])
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = $this->like($request->q);
                 $q->where(fn ($w) => $w->where('name', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term));
             })
             ->when($request->filled('role') && in_array($request->role, $this->organizationRoleNames(), true), fn ($q) => $q->role($request->role))
-            ->when($request->filled('department'), fn ($q) => $q->where('department_id', $request->department))
+            ->when($request->filled('department'), fn ($q) => $q->whereHas('organizations', fn ($o) => $o->whereKey($orgId)->where('organization_user.department_id', $request->department)))
             ->when($request->status === 'locked', fn ($q) => $q->where(fn ($w) => $w->where('status', 'locked')
                 ->orWhereHas('organizations', fn ($o) => $o->whereKey($orgId)->where('organization_user.status', 'suspended'))))
             ->when($request->status === 'active', fn ($q) => $q->where('status', 'active')
@@ -95,7 +95,7 @@ class UserController extends Controller
                 return back()->withInput()->withErrors(['email' => __('Người dùng này đã là thành viên của tổ chức.')]);
             }
             DB::transaction(function () use ($existing, $orgId, $data) {
-                $existing->organizations()->attach($orgId, ['status' => 'active', 'joined_at' => now()]);
+                $existing->organizations()->attach($orgId, ['status' => 'active', 'joined_at' => now(), 'department_id' => $data['department_id'] ?? null]);
                 $existing->unsetRelation('roles');
                 $existing->syncRoles([$data['role']]);
             });
@@ -109,7 +109,8 @@ class UserController extends Controller
         ], [], $this->attributes());
 
         $user = DB::transaction(function () use ($data) {
-            $user = User::create(collect($data)->except(['role', 'password_confirmation'])->all());   // tự là thành viên tổ chức hiện tại
+            $user = User::create(collect($data)->except(['role', 'password_confirmation', 'department_id'])->all());   // tự là thành viên tổ chức hiện tại
+            $user->assignDepartment($data['department_id'] ?? null);
             $user->syncRoles([$data['role']]);
 
             return $user;
@@ -121,7 +122,7 @@ class UserController extends Controller
     public function show(Request $request, User $user)
     {
         $this->authorize('view', $user);
-        $user->load(['department', 'roles']);
+        $user->load(['roles']);
         $logs = \App\Models\ActivityLog::where('user_id', $user->id)->latest('created_at')->limit(15)->get();
         $stats = [
             'customers' => \App\Models\Customer::where('assigned_to', $user->id)->count(),
@@ -163,7 +164,8 @@ class UserController extends Controller
         }
 
         DB::transaction(function () use ($request, $user, $data) {
-            $account = collect($data)->except(['role', 'status'])->all();
+            $account = collect($data)->except(['role', 'status', 'department_id'])->all();
+            $user->assignDepartment($data['department_id'] ?? null);   // phòng ban trong tổ chức này
             if ($request->user()->isPlatformAdmin()) {
                 $account['status'] = $data['status'];   // khóa / mở toàn hệ thống
             } else {

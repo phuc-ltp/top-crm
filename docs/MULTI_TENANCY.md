@@ -47,7 +47,12 @@ TOP CRM dùng mô hình **một CSDL dùng chung + cột `organization_id`**: m�
 - Cờ "có dữ liệu demo" được cache riêng theo tổ chức.
 - Kiểm thử: `tests/Feature/WorkspaceTest.php` (17 test).
 
+## Bước 2.1: Cài đặt & phòng ban theo tổ chức
+- **Cài đặt riêng** (`organization_settings`, khóa trong `Setting::ORGANIZATION_KEYS`): tên/email/điện thoại/địa chỉ/logo công ty, màu thương hiệu, múi giờ hiển thị, tiền tệ, định dạng ngày, thuế mặc định, bật/tắt từng loại thông báo. `Setting::get()` / `allCached()` tự lấy theo tổ chức đang làm việc; `Setting::put()` tự ghi vào tổ chức đó. Khóa của tổ chức **không** dự phòng sang giá trị chung (tổ chức mới không mượn thông tin của tổ chức khác). Tổ chức mới: tên công ty = tên tổ chức.
+- **Cài đặt chung toàn hệ thống** (bảng `settings`): trang đăng nhập & thương hiệu nền tảng, Google/Facebook, trang pháp lý, cờ khởi tạo, bắt buộc 2FA — **chỉ quản trị nền tảng** chỉnh. Trang đăng nhập (chưa có tổ chức) dùng cài đặt của tổ chức mặc định.
+- **Múi giờ:** dùng để hiển thị ngày giờ (`vn_date(..., true)`, `crm_timezone()`); dữ liệu vẫn lưu theo giờ máy chủ; ngày thuần không đổi múi giờ.
+- **Phòng ban theo tư cách thành viên:** `organization_user.department_id`; `User::departmentIdIn()`, `$user->department` (tổ chức đang làm việc), `assignDepartment()`. Cột `users.department_id` cũ giữ lại (không còn dùng) để hoàn tác.
+- Kiểm thử: `tests/Feature/OrganizationSettingsTest.php` (9 test).
+
 ## Còn lại (các bước sau)
-- Cài đặt (tên công ty, thương hiệu...) vẫn dùng chung toàn hệ thống. Cài đặt riêng cho từng tổ chức làm cùng bước 1.6.
-- Phòng ban của người dùng (`users.department_id`) hiện là một giá trị chung cho mọi tổ chức. Nên chuyển sang lưu theo từng tư cách thành viên.
 - Mã nghiệp vụ (KH00001...) hiện sinh theo id toàn hệ thống, vẫn duy nhất. Đánh số riêng cho từng tổ chức có thể làm sau.

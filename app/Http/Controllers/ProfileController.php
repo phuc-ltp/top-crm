@@ -13,7 +13,7 @@ class ProfileController extends Controller
 {
     public function edit(Request $request)
     {
-        return view('profile.edit', ['user' => $request->user()->load('department', 'roles')]);
+        return view('profile.edit', ['user' => $request->user()->load('roles')]);
     }
 
     public function update(Request $request, UploadService $uploads)
@@ -65,7 +65,7 @@ class ProfileController extends Controller
                 'id' => $s->id,
                 'ip' => $s->ip_address,
                 'agent' => \App\Support\Security\UserAgent::describe($s->user_agent),
-                'last_active' => \Illuminate\Support\Carbon::createFromTimestamp($s->last_activity)->timezone(config('app.timezone')),
+                'last_active' => \Illuminate\Support\Carbon::createFromTimestamp($s->last_activity)->timezone(crm_timezone()),
                 'current' => $s->id === $request->session()->getId(),
             ]);
 

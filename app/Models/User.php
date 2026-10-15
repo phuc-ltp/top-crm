@@ -22,7 +22,7 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
     ];
 
     protected $fillable = [
-        'name', 'email', 'username', 'password', 'phone', 'position', 'avatar', 'department_id', 'status', 'is_demo',
+        'name', 'email', 'username', 'password', 'phone', 'position', 'avatar', 'status', 'is_demo',   // phòng ban: theo tổ chức (assignDepartment)
     ];
 
     protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_last_step'];
@@ -51,7 +51,7 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
     /** Các tổ chức mà người dùng là thành viên. */
     public function organizations()
     {
-        return $this->belongsToMany(Organization::class)->withPivot(['status', 'joined_at'])->withTimestamps();
+        return $this->belongsToMany(Organization::class)->withPivot(['status', 'joined_at', 'department_id'])->withTimestamps();
     }
 
     public function currentOrganization()
@@ -101,9 +101,37 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
         static::deleted(fn (User $user) => $user->tokens()->delete());
     }
 
-    public function department()
+    /** Mã phòng ban của người dùng trong một tổ chức (mặc định: tổ chức đang làm việc). */
+    public function departmentIdIn(?int $organizationId = null): ?int
     {
-        return $this->belongsTo(Department::class);
+        $organizationId ??= app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+        $membership = $this->relationLoaded('organizations')
+            ? $this->organizations->firstWhere('id', $organizationId)
+            : $this->organizations()->whereKey($organizationId)->first();
+        $id = $membership?->pivot?->department_id;
+
+        return $id ? (int) $id : null;
+    }
+
+    /**
+     * Phòng ban trong tổ chức đang làm việc ($user->department). Phòng ban thuộc tổ chức khác không bao giờ được trả về
+     * vì Department có global scope theo tổ chức.
+     */
+    protected function department(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::get(function () {
+            $id = $this->departmentIdIn();
+
+            return $id ? Department::find($id) : null;
+        })->shouldCache();
+    }
+
+    /** Gán phòng ban cho người dùng trong một tổ chức (phải là thành viên). */
+    public function assignDepartment(?int $departmentId, ?int $organizationId = null): void
+    {
+        $organizationId ??= app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+        $this->organizations()->updateExistingPivot($organizationId, ['department_id' => $departmentId]);
+        $this->unsetRelation('organizations');
     }
 
     public function salesTargets()

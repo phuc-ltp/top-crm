@@ -7,4 +7,4 @@
 <p>Thông tin khách hàng là tài sản của doanh nghiệp. Không sao chép, xuất hoặc chia sẻ dữ liệu ra bên ngoài khi chưa được phép.</p>
 <h3>4. Thay đổi điều khoản</h3>
 <p>Doanh nghiệp có thể cập nhật điều khoản. Nội dung mới có hiệu lực kể từ khi được đăng trên trang này.</p>
-<p class="small mt-4" style="color: var(--ta-muted)"><i>Đây là nội dung mẫu. Quản trị viên có thể chỉnh sửa tại Cài đặt hệ thống → Trang đăng nhập & thương hiệu.</i></p>
+<p class="small mt-4" style="color: var(--ta-muted)"><i>Đây là nội dung mẫu. Quản trị viên có thể chỉnh sửa tại Cài đặt → Trang đăng nhập & thương hiệu.</i></p>

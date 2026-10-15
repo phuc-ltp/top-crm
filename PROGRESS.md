@@ -75,7 +75,7 @@
 - Cân nhắc nâng cấp MariaDB (10.4 hết hỗ trợ) — cần hỏi user trước.
 
 ## PHASE 2 — CRM Core (bắt đầu 17/10/2026, kế hoạch: docs/PHASE2_PLAN.md)
-- [ ] 2.1 Cài đặt & phòng ban theo tổ chức
+- [x] 2.1 Cài đặt & phòng ban theo tổ chức (17/10): organization_settings (14 khóa theo tổ chức, sao chép giá trị cũ → không đổi gì), Setting tự đọc/ghi theo tổ chức, trang thương hiệu/đăng nhập chỉ quản trị nền tảng, múi giờ có tác dụng thật (hiển thị giờ), tab "Chung" đã dịch; phòng ban theo organization_user.department_id (đã chuyển 8/8 người dùng). OrganizationSettingsTest 9 test, 199 test pass. Thử 3 vòng trên bản sao: dữ liệu khớp 100%.
 - [ ] 2.2 Hoạt động & dòng thời gian
 - [ ] 2.3 Khách hàng (trường mới, gộp, trường tùy biến, xlsx)
 - [ ] 2.4 Leads (giai đoạn cấu hình, form website, nhắc theo dõi)

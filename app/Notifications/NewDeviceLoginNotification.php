@@ -27,7 +27,7 @@ class NewDeviceLoginNotification extends Notification
             ->line(__('Tài khoản của bạn vừa được đăng nhập từ một thiết bị chưa từng sử dụng:'))
             ->line(__('Thiết bị').': '.$this->device)
             ->line(__('Địa chỉ IP').': '.$this->ip)
-            ->line(__('Thời gian').': '.$this->at->timezone(config('app.timezone'))->format('d/m/Y H:i'))
+            ->line(__('Thời gian').': '.$this->at->copy()->timezone(crm_timezone())->format(\App\Models\Setting::get('date_format', 'd/m/Y').' H:i'))
             ->action(__('Kiểm tra bảo mật tài khoản'), route('profile.security'))
             ->line(__('Nếu không phải bạn, hãy đổi mật khẩu ngay, đăng xuất các thiết bị khác và bật xác thực 2 lớp.'))
             ->salutation($company);

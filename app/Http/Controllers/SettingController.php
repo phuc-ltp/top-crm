@@ -19,7 +19,7 @@ class SettingController extends Controller
     {
         abort_unless($request->user()->can('settings.manage'), 403);
 
-        return view('settings.edit', ['s' => Setting::allCached()]);
+        return view('settings.edit', ['s' => Setting::allCached(), 'organization' => app(\App\Support\Tenancy\CurrentOrganization::class)->get()]);
     }
 
     public function update(Request $request, UploadService $uploads)
@@ -62,15 +62,16 @@ class SettingController extends Controller
             }
         }
         Setting::put(array_map(fn ($v) => (string) $v, $data));
-        ActivityLogger::log('updated', null, 'Cập nhật cài đặt hệ thống');
+        ActivityLogger::log('updated', null, 'Cập nhật cài đặt tổ chức');
 
-        return back()->with('success', __('Đã lưu cài đặt hệ thống.'));
+        return back()->with('success', __('Đã lưu cài đặt của tổ chức.'));
     }
 
     /** Trang đăng nhập & thương hiệu + đăng nhập mạng xã hội */
     public function branding(Request $request)
     {
-        abort_unless($request->user()->can('settings.manage'), 403);
+        // Trang đăng nhập, Google/Facebook, trang pháp lý dùng chung cho MỌI tổ chức → chỉ quản trị nền tảng
+        abort_unless($request->user()->can('platform'), 403);
 
         return view('settings.branding', [
             's' => Setting::allCached(),
@@ -84,7 +85,7 @@ class SettingController extends Controller
 
     public function updateBranding(Request $request, UploadService $uploads)
     {
-        abort_unless($request->user()->can('settings.manage'), 403);
+        abort_unless($request->user()->can('platform'), 403);
         $data = $request->validate([
             'brand_name' => ['required', 'string', 'max:30'],
             'brand_tagline' => ['nullable', 'string', 'max:60'],

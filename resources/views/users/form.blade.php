@@ -15,7 +15,7 @@
             <x-input name="username" :label="__('Tên đăng nhập (không bắt buộc)')" :value="$user->username" maxlength="50" pattern="[A-Za-z0-9._\-]{3,50}" col="col-md-6 mb-3" autocomplete="off" :disabled="! $managesAccount" :help="__('Có thể đăng nhập bằng email hoặc tên này. Chữ không dấu, số, . _ -')" />
             <x-input name="phone" :label="__('Số điện thoại')" :value="$user->phone" maxlength="30" col="col-md-6 mb-3" :disabled="! $managesAccount" />
             <x-input name="position" :label="__('Chức vụ')" :value="$user->position" maxlength="100" col="col-md-6 mb-3" :disabled="! $managesAccount" />
-            <x-select name="department_id" :label="__('Phòng ban')" :options="$departments" :value="$user->department_id" :placeholder="__('— Chọn —')" col="col-md-4 mb-3" />
+            <x-select name="department_id" :label="__('Phòng ban')" :options="$departments" :value="$user->exists ? $user->departmentIdIn() : null" :placeholder="__('— Chọn —')" col="col-md-4 mb-3" />
             <x-select name="role" :label="__('Vai trò')" :options="$roles" :value="$user->getRoleNames()->first()" required :placeholder="__('— Chọn vai trò —')" col="col-md-4 mb-3" />
             <x-select name="status" :label="__('Trạng thái')" :options="App\Models\User::STATUSES" :value="$statusValue" required col="col-md-4 mb-3" />
             @unless ($user->exists)
