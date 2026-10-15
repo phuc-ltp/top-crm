@@ -1181,5 +1181,8 @@
     "— Không chọn —": "— None —",
     "— Không liên kết —": "— Not linked —",
     "— Không —": "— None —",
-    "— Tự nhập —": "— Enter manually —"
+    "— Tự nhập —": "— Enter manually —",
+    "Tìm chức năng...": "Find a feature...",
+    "Tìm chức năng trong menu": "Find a feature in the menu",
+    "Không có chức năng phù hợp": "No matching features"
 }

@@ -277,10 +277,71 @@ function initThemeToggle() {
         const next = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-bs-theme', next);
         try { localStorage.setItem('crm.theme', next); } catch (e) { }
+        // Lưu vào tài khoản để mọi thiết bị dùng chung lựa chọn (lỗi mạng không ảnh hưởng giao diện hiện tại)
+        const url = document.querySelector('meta[name="crm-theme-url"]')?.content;
+        if (url) {
+            document.documentElement.setAttribute('data-user-theme', next);
+            fetch(url, {
+                method: 'POST', credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrf() },
+                body: JSON.stringify({ theme: next }),
+            }).catch(() => { });
+        }
         applyChartTheme();
         Object.values(charts).forEach((c) => { c.options.scales && Object.values(c.options.scales).forEach((s) => { if (s.grid) s.grid.color = Chart.defaults.scale.grid.color; if (s.ticks) s.ticks.color = Chart.defaults.color; }); c.update(); });
         document.dispatchEvent(new CustomEvent('crm:theme', { detail: next }));
     }));
+}
+
+/* ============ Tìm chức năng trong menu ============ */
+const fold = (s) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase().trim();
+function initNavSearch() {
+    const input = $('[data-nav-search]');
+    const nav = $('.crm-nav');
+    if (!input || !nav) return;
+    const empty = $('[data-nav-empty]', nav);
+    const groups = $$('.nav-group-toggle', nav).map((btn) => ({ btn, box: document.getElementById(btn.getAttribute('aria-controls')) }));
+    const topLinks = $$(':scope > .nav-link', nav);
+    const sections = $$(':scope > .nav-section', nav);
+    const initiallyOpen = new Map(groups.map((g) => [g, g.box?.classList.contains('show')]));
+
+    const apply = () => {
+        const q = fold(input.value);
+        let visible = 0;
+        topLinks.forEach((a) => { const ok = !q || fold(a.textContent).includes(q); a.classList.toggle('d-none', !ok); if (ok) visible++; });
+        groups.forEach((g) => {
+            if (!g.box) return;
+            const groupHit = q && fold(g.btn.textContent).includes(q);
+            let childHits = 0;
+            $$('.nav-link', g.box).forEach((a) => { const ok = !q || groupHit || fold(a.textContent).includes(q); a.classList.toggle('d-none', !ok); if (ok) childHits++; });
+            const show = !q || childHits > 0;
+            g.btn.classList.toggle('d-none', !show);
+            g.box.classList.toggle('d-none', !show);
+            if (show) visible++;
+            // Đang tìm: mở nhóm có kết quả; xóa tìm kiếm: trả nhóm về trạng thái ban đầu
+            const open = q ? childHits > 0 : initiallyOpen.get(g);
+            g.box.classList.toggle('show', !!open);
+            g.btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        // Ẩn tiêu đề nhóm khi không còn mục nào hiển thị phía dưới
+        sections.forEach((sec) => {
+            let el = sec.nextElementSibling, any = false;
+            while (el && !el.classList.contains('nav-section')) {
+                if ((el.classList.contains('nav-link') || el.classList.contains('nav-group-toggle')) && !el.classList.contains('d-none')) any = true;
+                el = el.nextElementSibling;
+            }
+            sec.classList.toggle('d-none', !any);
+        });
+        empty?.classList.toggle('d-none', visible > 0);
+    };
+    input.addEventListener('input', apply);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { input.value = ''; apply(); input.blur(); }
+        if (e.key === 'Enter') {
+            const first = $$('.nav-link', nav).find((a) => !a.classList.contains('d-none') && a.offsetParent !== null);
+            if (first) { e.preventDefault(); window.location.href = first.href; }
+        }
+    });
 }
 
 /* Ctrl/Cmd + K → ô tìm kiếm toàn cục */
@@ -381,6 +442,7 @@ function initLineItems() {
 document.addEventListener('DOMContentLoaded', () => {
     initSidebar();
     initThemeToggle();
+    initNavSearch();
     initForms();
     initGlobalSearch();
     initNotifications();
