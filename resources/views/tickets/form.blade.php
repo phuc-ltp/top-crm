@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $ticket->exists ? __('Sửa ticket') : __('Tạo ticket'))
 @section('content')
-    <x-page-header :title="$ticket->exists ? 'Sửa ticket '.$ticket->code : 'Tạo ticket hỗ trợ'" :breadcrumbs="['Hỗ trợ' => route('tickets.index'), ($ticket->exists ? $ticket->code : 'Tạo mới') => null]" />
+    <x-page-header :title="$ticket->exists ? __('Sửa ticket :code', ['code' => $ticket->code]) : __('Tạo ticket hỗ trợ')" :breadcrumbs="['Hỗ trợ' => route('tickets.index'), ($ticket->exists ? $ticket->code : 'Tạo mới') => null]" />
     <form method="POST" action="{{ $ticket->exists ? route('tickets.update', $ticket) : route('tickets.store') }}" class="needs-validation" novalidate>
         @csrf @if ($ticket->exists) @method('PUT') @endif
         <div class="row g-4">

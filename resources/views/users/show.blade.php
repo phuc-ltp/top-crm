@@ -26,6 +26,9 @@
                 </dl>
             </div></div>
             @can('update', $user)
+                @if (! $managesAccount)
+                    <div class="alert alert-info small"><i class="bi bi-people me-1"></i>{{ __('Tài khoản này thuộc nhiều tổ chức. Bạn quản lý vai trò và tư cách thành viên trong tổ chức của mình; thông tin đăng nhập do chủ tài khoản hoặc quản trị nền tảng thay đổi.') }}</div>
+                @else
                 <div class="card"><div class="card-header">{{ __('Đặt lại mật khẩu') }}</div><div class="card-body">
                     <form method="POST" action="{{ route('users.send-reset', $user) }}" class="mb-3">@csrf
                         <button class="btn btn-light w-100"><i class="bi bi-envelope me-1"></i>{{ __('Gửi liên kết đặt lại qua email') }}</button></form>
@@ -36,6 +39,7 @@
                         <button class="btn btn-outline-primary w-100">{{ __('Đặt mật khẩu') }}</button>
                     </form>
                 </div></div>
+                @endif
             @endcan
         </div>
         <div class="col-lg-8">

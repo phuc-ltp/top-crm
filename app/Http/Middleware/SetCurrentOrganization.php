@@ -23,10 +23,13 @@ class SetCurrentOrganization
             return $next($request);
         }
 
-        $memberships = $user->organizations()
-            ->wherePivot('status', 'active')
-            ->where('organizations.status', 'active')
-            ->pluck('organizations.id')->map(fn ($id) => (int) $id);
+        $memberships = $user->isPlatformAdmin()
+            ? Organization::where('status', 'active')->orderBy('id')->pluck('id')->map(fn ($id) => (int) $id)
+            : $user->organizations()
+                ->wherePivot('status', 'active')
+                ->where('organizations.status', 'active')
+                ->orderBy('organizations.id')
+                ->pluck('organizations.id')->map(fn ($id) => (int) $id);
 
         $orgId = (int) $user->current_organization_id;
         if (! $memberships->contains($orgId)) {

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('Chuyển đổi lead'))
 @section('content')
-    <x-page-header :title="'Chuyển đổi lead: '.$lead->name" :breadcrumbs="['Leads' => route('leads.index'), $lead->code => route('leads.show', $lead), 'Chuyển đổi' => null]" />
+    <x-page-header :title="__('Chuyển đổi lead: :name', ['name' => $lead->name])" :breadcrumbs="['Leads' => route('leads.index'), $lead->code => route('leads.show', $lead), 'Chuyển đổi' => null]" />
 
     <form method="POST" action="{{ route('leads.convert.store', $lead) }}" class="needs-validation" novalidate style="max-width: 820px">
         @csrf

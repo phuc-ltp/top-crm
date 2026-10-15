@@ -67,11 +67,34 @@
         @endforeach
     </nav>
     <div class="sidebar-bottom">
-        <a href="{{ $authUser->can('settings.manage') ? route('settings.edit') : route('profile.edit') }}" class="sidebar-card workspace" title="{{ __('Không gian làm việc') }}">
-            <span class="ic"><x-brand-logo :size="22" /></span>
-            <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $crmSettings['company_name'] }}</span><span class="s">{{ __('Không gian làm việc') }}</span></span>
-            <i class="bi bi-chevron-right small"></i>
-        </a>
+        <div class="dropup">
+            <button type="button" class="sidebar-card workspace" data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('Không gian làm việc') }}">
+                <span class="ic"><x-brand-logo :size="22" /></span>
+                <span class="min-w-0 flex-grow-1 text-start"><span class="t d-block text-truncate">{{ $currentOrganization?->name ?? $crmSettings['company_name'] }}</span><span class="s">{{ __('Không gian làm việc') }}</span></span>
+                <i class="bi bi-chevron-expand small"></i>
+            </button>
+            <ul class="dropdown-menu workspace-menu">
+                <li><h6 class="dropdown-header">{{ __('Chuyển tổ chức') }}</h6></li>
+                @foreach ($workspaces as $ws)
+                    <li>
+                        <form method="POST" action="{{ route('workspace.switch') }}">
+                            @csrf
+                            <input type="hidden" name="organization_id" value="{{ $ws->id }}">
+                            <button type="submit" class="dropdown-item d-flex align-items-center gap-2 {{ $ws->id === $currentOrganization?->id ? 'active' : '' }}" @if ($ws->id === $currentOrganization?->id) aria-current="true" @endif>
+                                <i class="bi {{ $ws->id === $currentOrganization?->id ? 'bi-check2' : 'bi-building' }}"></i><span class="text-truncate">{{ $ws->name }}</span>
+                            </button>
+                        </form>
+                    </li>
+                @endforeach
+                @can('settings.manage')
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ route('settings.edit') }}"><i class="bi bi-gear me-2"></i>{{ __('Cài đặt tổ chức') }}</a></li>
+                @endcan
+                @can('platform')
+                    <li><a class="dropdown-item" href="{{ route('platform.organizations.index') }}"><i class="bi bi-buildings me-2"></i>{{ __('Quản lý tổ chức') }}</a></li>
+                @endcan
+            </ul>
+        </div>
         <div class="dropup">
             <button class="sidebar-card" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <x-avatar :user="$authUser" />

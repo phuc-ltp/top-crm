@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $product->exists ? __('Sửa sản phẩm') : __('Thêm sản phẩm'))
 @section('content')
-    <x-page-header :title="$product->exists ? 'Sửa: '.$product->name : 'Thêm sản phẩm / dịch vụ'" :breadcrumbs="['Sản phẩm' => route('products.index'), ($product->exists ? 'Chỉnh sửa' : 'Thêm mới') => null]" />
+    <x-page-header :title="$product->exists ? __('Sửa: :name', ['name' => $product->name]) : __('Thêm sản phẩm / dịch vụ')" :breadcrumbs="['Sản phẩm' => route('products.index'), ($product->exists ? 'Chỉnh sửa' : 'Thêm mới') => null]" />
     <form method="POST" action="{{ $product->exists ? route('products.update', $product) : route('products.store') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
         @csrf @if ($product->exists) @method('PUT') @endif
         <div class="row g-4">

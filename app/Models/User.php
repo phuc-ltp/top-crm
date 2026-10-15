@@ -55,12 +55,24 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->belongsTo(Organization::class, 'current_organization_id');
     }
 
-    /** Chỉ người dùng là thành viên đang hoạt động của tổ chức (mặc định: tổ chức đang làm việc). */
-    public function scopeInOrganization($query, ?int $organizationId = null)
+    /**
+     * Thành viên của tổ chức (mặc định: tổ chức đang làm việc). $activeOnly = false để lấy cả thành viên bị tạm ngưng
+     * (dùng cho trang quản lý thành viên); danh sách chọn người phụ trách luôn chỉ lấy thành viên đang hoạt động.
+     */
+    public function scopeInOrganization($query, ?int $organizationId = null, bool $activeOnly = true)
     {
         $organizationId ??= app(\App\Support\Tenancy\CurrentOrganization::class)->id();
 
-        return $query->whereHas('organizations', fn ($q) => $q->whereKey($organizationId)->where('organization_user.status', 'active'));
+        return $query->whereHas('organizations', fn ($q) => $q->whereKey($organizationId)
+            ->when($activeOnly, fn ($q) => $q->where('organization_user.status', 'active'), fn ($q) => $q->whereIn('organization_user.status', ['active', 'suspended'])));
+    }
+
+    /** Trạng thái thành viên trong tổ chức (active / suspended / null nếu không thuộc tổ chức). */
+    public function membershipStatus(?int $organizationId = null): ?string
+    {
+        $organizationId ??= app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+
+        return $this->organizations()->whereKey($organizationId)->first()?->pivot?->status;
     }
 
     public function belongsToOrganization(int $organizationId): bool

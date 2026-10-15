@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $task->exists ? __('Sửa công việc') : __('Tạo công việc'))
 @section('content')
-    <x-page-header :title="$task->exists ? 'Sửa: '.$task->title : 'Tạo công việc'" :breadcrumbs="['Công việc' => route('tasks.index'), ($task->exists ? 'Chỉnh sửa' : 'Tạo mới') => null]" />
+    <x-page-header :title="$task->exists ? __('Sửa: :name', ['name' => $task->title]) : __('Tạo công việc')" :breadcrumbs="['Công việc' => route('tasks.index'), ($task->exists ? 'Chỉnh sửa' : 'Tạo mới') => null]" />
     <form method="POST" action="{{ $task->exists ? route('tasks.update', $task) : route('tasks.store') }}" class="needs-validation" novalidate>
         @csrf @if ($task->exists) @method('PUT') @endif
         <div class="row g-4">

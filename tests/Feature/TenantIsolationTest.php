@@ -37,7 +37,9 @@ class TenantIsolationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->userA = $this->admin();   // tổ chức mặc định (A), toàn quyền
+        // Chủ sở hữu tổ chức mặc định (A): toàn quyền trong tổ chức nhưng KHÔNG phải quản trị nền tảng
+        // (quản trị nền tảng được thấy mọi tổ chức theo thiết kế)
+        $this->userA = $this->userWithRole(\App\Support\PermissionCatalog::OWNER);
         $this->orgB = Organization::create(['name' => 'Công ty '.self::MARK, 'slug' => 'cong-ty-b']);
         app(\App\Support\Tenancy\RoleProvisioner::class)->provision($this->orgB->id);
 
