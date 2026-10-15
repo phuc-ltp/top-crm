@@ -16,4 +16,4 @@
         qua email <a href="mailto:{{ $crmSettings['company_email'] }}">{{ $crmSettings['company_email'] }}</a>
     @endif
 </p>
-<p class="small mt-4" style="color: var(--ta-muted)"><i>Đây là nội dung mẫu. Quản trị viên có thể chỉnh sửa tại Cài đặt hệ thống → Trang đăng nhập & thương hiệu.</i></p>
+<p class="small mt-4" style="color: var(--ta-muted)"><i>Đây là nội dung mẫu. Quản trị viên có thể chỉnh sửa tại Cài đặt → Trang đăng nhập & thương hiệu.</i></p>

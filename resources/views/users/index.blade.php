@@ -20,7 +20,7 @@
                     <td><div class="d-flex align-items-center gap-2"><x-avatar :user="$u" />
                         <div><a href="{{ route('users.show', $u) }}" class="row-link">{{ $u->name }}</a> @if ($u->is_demo)<span class="badge badge-soft-warning">Demo</span>@endif<div class="small text-muted">{{ $u->email }}</div></div></div></td>
                     <td>@foreach ($u->roles as $r)<span class="badge badge-soft-orange">{{ __($r->name) }}</span>@endforeach</td>
-                    <td class="small">{{ $u->department?->name ?? '—' }}<div class="text-muted">{{ $u->position }}</div></td>
+                    <td class="small">{{ $departments[$u->departmentIdIn()] ?? '—' }}<div class="text-muted">{{ $u->position }}</div></td>
                     @php($suspended = $u->status === 'locked' || $u->organizations->first()?->pivot?->status === 'suspended')
                     <td>{!! badge(App\Models\User::STATUSES, $suspended ? 'locked' : 'active') !!}@if ($u->status !== 'locked' && $suspended)<div class="small-xs text-muted">{{ __('Tạm ngưng trong tổ chức') }}</div>@endif</td>
                     <td class="small text-muted">{{ $u->last_login_at ? $u->last_login_at->diffForHumans() : __('Chưa đăng nhập') }}</td>

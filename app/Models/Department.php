@@ -12,8 +12,9 @@ class Department extends Model
 
     protected $fillable = ['name', 'code', 'description'];
 
+    /** Thành viên thuộc phòng ban (phòng ban gắn với tư cách thành viên trong tổ chức của phòng ban). */
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'organization_user', 'department_id', 'user_id');
     }
 }

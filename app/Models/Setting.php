@@ -48,17 +48,55 @@ class Setting extends Model
         'require_2fa_admins' => '0',
     ];
 
+    /**
+     * Cài đặt RIÊNG của từng tổ chức (bảng organization_settings). Các khóa còn lại dùng chung toàn hệ thống
+     * (trang đăng nhập, Google/Facebook, trang pháp lý, cờ khởi tạo, bắt buộc 2FA...).
+     * Khóa của tổ chức KHÔNG lấy giá trị dùng chung làm dự phòng (tránh tổ chức mới mượn thông tin của tổ chức khác).
+     */
+    public const ORGANIZATION_KEYS = [
+        'company_name', 'company_email', 'company_phone', 'company_address', 'company_logo', 'brand_color',
+        'timezone', 'currency', 'date_format', 'default_tax_rate',
+        'notify_lead_assigned', 'notify_task_due', 'notify_deal_stage', 'notify_ticket_new',
+    ];
+
     private const CACHE_KEY = 'crm.settings';
 
-    public static function allCached(): array
+    private static function orgCacheKey(int $organizationId): string
+    {
+        return self::CACHE_KEY.'.org.'.$organizationId;
+    }
+
+    private static function currentOrganizationId(): ?int
+    {
+        try {
+            return app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /** Toàn bộ cài đặt có hiệu lực cho tổ chức đang làm việc (hoặc tổ chức chỉ định). */
+    public static function allCached(?int $organizationId = null): array
     {
         try {
             $stored = Cache::rememberForever(self::CACHE_KEY, fn () => static::query()->pluck('value', 'key')->all());
         } catch (\Throwable) {
             $stored = [];
         }
+        $values = array_merge(self::DEFAULTS, array_filter(array_diff_key($stored, array_flip(self::ORGANIZATION_KEYS)), fn ($v) => $v !== null));
 
-        return array_merge(self::DEFAULTS, array_filter($stored, fn ($v) => $v !== null));
+        $organizationId ??= self::currentOrganizationId();
+        if ($organizationId) {
+            try {
+                $org = Cache::rememberForever(self::orgCacheKey($organizationId),
+                    fn () => OrganizationSetting::where('organization_id', $organizationId)->pluck('value', 'key')->all());
+            } catch (\Throwable) {
+                $org = [];
+            }
+            $values = array_merge($values, array_filter(array_intersect_key($org, array_flip(self::ORGANIZATION_KEYS)), fn ($v) => $v !== null));
+        }
+
+        return $values;
     }
 
     public static function get(string $key, $default = null)
@@ -66,12 +104,24 @@ class Setting extends Model
         return static::allCached()[$key] ?? $default;
     }
 
-    public static function put(array $values, string $group = 'general'): void
+    /** Lưu cài đặt: khóa của tổ chức ghi cho tổ chức đang làm việc (hoặc chỉ định), khóa chung ghi toàn hệ thống. */
+    public static function put(array $values, string $group = 'general', ?int $organizationId = null): void
     {
+        $organizationId ??= self::currentOrganizationId();
         foreach ($values as $key => $value) {
-            static::updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group]);
+            if (in_array($key, self::ORGANIZATION_KEYS, true)) {
+                if (! $organizationId) {
+                    throw new \RuntimeException('Không xác định được tổ chức để lưu cài đặt '.$key);
+                }
+                OrganizationSetting::updateOrCreate(['organization_id' => $organizationId, 'key' => $key], ['value' => $value]);
+            } else {
+                static::updateOrCreate(['key' => $key], ['value' => $value, 'group' => $group]);
+            }
         }
         Cache::forget(self::CACHE_KEY);
+        if ($organizationId) {
+            Cache::forget(self::orgCacheKey($organizationId));
+        }
     }
 
     /** Giá trị bí mật (OAuth secret) được lưu mã hóa bằng APP_KEY. */
@@ -102,8 +152,11 @@ class Setting extends Model
         return static::get($provider.'_client_id') && static::secret($provider.'_client_secret');
     }
 
-    public static function flushCache(): void
+    public static function flushCache(?int $organizationId = null): void
     {
         Cache::forget(self::CACHE_KEY);
+        if ($organizationId ??= self::currentOrganizationId()) {
+            Cache::forget(self::orgCacheKey($organizationId));
+        }
     }
 }

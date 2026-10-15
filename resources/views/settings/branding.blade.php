@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', __('Trang đăng nhập & thương hiệu'))
 @section('content')
-    <x-page-header :title="__('Cài đặt hệ thống')" :breadcrumbs="['Cài đặt hệ thống' => route('settings.edit'), 'Trang đăng nhập & thương hiệu' => null]">
+    <x-page-header :title="__('Trang đăng nhập & thương hiệu')" :breadcrumbs="['Cài đặt tổ chức' => route('settings.edit'), 'Trang đăng nhập & thương hiệu' => null]" :subtitle="__('Dùng chung cho toàn hệ thống (mọi tổ chức). Chỉ quản trị nền tảng chỉnh sửa được.')">
         <a href="{{ route('pages.terms') }}" target="_blank" class="btn btn-light"><i class="bi bi-box-arrow-up-right me-1"></i>{{ __('Xem trang điều khoản') }}</a>
     </x-page-header>
     @include('settings._tabs')
@@ -29,7 +29,7 @@
                     <x-input name="copyright_owner" :label="__('Chủ sở hữu bản quyền')" :value="$s['copyright_owner']" maxlength="120" col="col-md-6 mb-3" />
                     <x-textarea name="page_terms" :label="__('Điều khoản sử dụng')" :value="$s['page_terms']" rows="5" col="col-12 mb-3" :help="__('Để trống để dùng nội dung mẫu có sẵn.')" />
                     <x-textarea name="page_privacy" :label="__('Chính sách bảo mật')" :value="$s['page_privacy']" rows="5" col="col-12 mb-3" :help="__('Để trống để dùng nội dung mẫu có sẵn.')" />
-                    <x-textarea name="page_support" :label="__('Hỗ trợ')" :value="$s['page_support']" rows="4" col="col-12 mb-0" :help="__('Để trống để tự hiện thông tin liên hệ từ phần Cài đặt chung.')" />
+                    <x-textarea name="page_support" :label="__('Hỗ trợ')" :value="$s['page_support']" rows="4" col="col-12 mb-0" :help="__('Để trống để tự hiện thông tin liên hệ của tổ chức mặc định.')" />
                 </div></div></div>
 
                 <div class="card"><div class="card-header"><span><i class="bi bi-person-badge me-2 text-orange"></i>{{ __('Đăng nhập bằng Google / Facebook') }}</span></div><div class="card-body">
@@ -61,7 +61,7 @@
                         <div class="form-check mb-3"><input class="form-check-input" type="checkbox" name="remove_background" value="1" id="remove_background"><label class="form-check-label" for="remove_background">{{ __('Dùng lại ảnh mặc định') }}</label></div>
                     @endif
                     <x-input name="login_background" type="file" accept="image/jpeg,image/png,image/webp" :help="__('JPG/PNG/WEBP, tối đa 4MB. Nên dùng ảnh dọc hoặc vuông, tông ấm.')" />
-                    <div class="small text-muted">{{ __('Logo dùng chung với phần') }} <a href="{{ route('settings.edit') }}">{{ __('Cài đặt chung') }}</a>.</div>
+                    <div class="small text-muted">{{ __('Logo lấy từ cài đặt của tổ chức mặc định.') }} <a href="{{ route('settings.edit') }}">{{ __('Cài đặt tổ chức') }}</a></div>
                 </div></div>
                 <button class="btn btn-primary w-100 mb-2"><i class="bi bi-check2 me-1"></i>{{ __('Lưu cài đặt') }}</button>
                 <div class="small text-muted"><i class="bi bi-info-circle"></i> {{ __('Để xem trang đăng nhập sau khi lưu, mở cửa sổ ẩn danh (Ctrl + Shift + N) và truy cập địa chỉ CRM.') }}</div>

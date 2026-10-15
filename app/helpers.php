@@ -33,16 +33,29 @@ if (! function_exists('money_short')) {
     }
 }
 
+if (! function_exists('crm_timezone')) {
+    /** Múi giờ hiển thị của tổ chức đang làm việc (chỉ chấp nhận giá trị trong danh sách cho phép). */
+    function crm_timezone(): string
+    {
+        $tz = (string) Setting::get('timezone', config('app.timezone'));
+
+        return in_array($tz, \App\Http\Controllers\SettingController::TIMEZONES, true) ? $tz : config('app.timezone');
+    }
+}
+
 if (! function_exists('vn_date')) {
     function vn_date($date, bool $withTime = false): string
     {
         if (! $date) {
             return '—';
         }
-        $date = $date instanceof Carbon ? $date : Carbon::parse($date);
+        $date = $date instanceof Carbon ? $date->copy() : Carbon::parse($date);
         $format = Setting::get('date_format', 'd/m/Y');
+        if (! $withTime) {
+            return $date->format($format);   // ngày thuần (không giờ) không đổi múi giờ để không lệch ngày
+        }
 
-        return $date->format($withTime ? $format.' H:i' : $format);
+        return $date->timezone(crm_timezone())->format($format.' H:i');
     }
 }
 

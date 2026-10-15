@@ -81,8 +81,8 @@ class SetupController extends Controller
             'name' => $data['name'], 'email' => mb_strtolower($data['email']),
             'username' => ! empty($data['username']) ? mb_strtolower($data['username']) : null, 'password' => $data['password'],
             'status' => 'active', 'position' => 'Quản trị hệ thống',
-            'department_id' => Department::where('code', 'BGD')->value('id'),
         ]);
+        $user->assignDepartment(Department::where('code', 'BGD')->value('id'));   // thành viên tổ chức mặc định (tự gắn khi tạo)
         // Người khởi tạo = quản trị nền tảng + chủ sở hữu tổ chức mặc định
         $user->forceFill(['is_platform_admin' => true])->save();
         app(\App\Support\Tenancy\RoleProvisioner::class)->provision(\App\Models\Organization::DEFAULT_ID);

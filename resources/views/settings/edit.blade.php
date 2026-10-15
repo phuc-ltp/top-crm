@@ -1,7 +1,8 @@
 @extends('layouts.app')
-@section('title', __('Cài đặt hệ thống'))
+@section('title', __('Cài đặt tổ chức'))
 @section('content')
-    <x-page-header :title="__('Cài đặt hệ thống')" :breadcrumbs="['Cài đặt hệ thống' => null]" />
+    <x-page-header :title="__('Cài đặt tổ chức')" :breadcrumbs="['Cài đặt tổ chức' => null]"
+                   :subtitle="__('Áp dụng riêng cho tổ chức :org. Các tổ chức khác có cài đặt của mình.', ['org' => $organization?->name])" />
     @include('settings._tabs')
     @php($C = App\Http\Controllers\SettingController::class)
     <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
@@ -21,7 +22,7 @@
                     <x-select name="currency" :label="__('Đơn vị tiền tệ')" :options="$C::CURRENCIES" :value="$s['currency']" required col="col-md-4 mb-3" />
                     <x-select name="date_format" :label="__('Định dạng ngày')" :options="$C::DATE_FORMATS" :value="$s['date_format']" required col="col-md-4 mb-3" />
                     <x-input name="default_tax_rate" type="number" :label="__('Thuế VAT mặc định (%)')" :value="$s['default_tax_rate']" required min="0" max="100" step="0.5" col="col-md-4 mb-3" />
-                    <div class="col-12 small text-muted"><i class="bi bi-info-circle"></i> {{ __('Múi giờ máy chủ được cấu hình trong tệp .env (APP_TIMEZONE, hiện tại: :tz).', ['tz' => config('app.timezone')]) }}</div>
+                    <div class="col-12 small text-muted"><i class="bi bi-info-circle"></i> {{ __('Múi giờ dùng để hiển thị ngày giờ trong tổ chức này. Dữ liệu vẫn được lưu theo giờ máy chủ (:tz).', ['tz' => config('app.timezone')]) }}</div>
                 </div></div></div>
 
                 <div class="card"><div class="card-header">{{ __('Cấu hình thông báo nội bộ') }}</div><div class="card-body">

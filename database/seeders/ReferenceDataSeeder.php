@@ -24,6 +24,9 @@ class ReferenceDataSeeder extends Seeder
         // Đổi tên thương hiệu cũ (chỉ khi người dùng chưa tự đặt tên khác)
         Setting::where('key', 'brand_color')->where('value', '#FF6B00')->update(['value' => '#D9823B']);
         Setting::where('key', 'company_name')->where('value', 'OrangeCRM Enterprise')->update(['value' => Setting::DEFAULTS['company_name']]);
+        // Cài đặt riêng của tổ chức: sửa các giá trị mặc định cũ tương tự
+        \App\Models\OrganizationSetting::where('key', 'brand_color')->where('value', '#FF6B00')->update(['value' => '#D9823B']);
+        \App\Models\OrganizationSetting::where('key', 'company_name')->where('value', 'OrangeCRM Enterprise')->update(['value' => Setting::DEFAULTS['company_name']]);
         Setting::flushCache();
     }
 }

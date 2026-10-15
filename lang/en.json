@@ -1323,5 +1323,11 @@
     "Tạo / sửa leads": "Create / edit leads",
     "Đọc cơ hội bán hàng": "Read opportunities",
     "Kết nối API": "API access",
-    "Sử dụng": "Use"
+    "Sử dụng": "Use",
+    "Dùng chung cho toàn hệ thống (mọi tổ chức). Chỉ quản trị nền tảng chỉnh sửa được.": "Shared by the whole system (all organizations). Only platform administrators can edit it.",
+    "Để trống để tự hiện thông tin liên hệ của tổ chức mặc định.": "Leave empty to show the contact details of the default organization.",
+    "Logo lấy từ cài đặt của tổ chức mặc định.": "The logo comes from the default organization settings.",
+    "Áp dụng riêng cho tổ chức :org. Các tổ chức khác có cài đặt của mình.": "Applies only to :org. Other organizations have their own settings.",
+    "Múi giờ dùng để hiển thị ngày giờ trong tổ chức này. Dữ liệu vẫn được lưu theo giờ máy chủ (:tz).": "The time zone used to display dates and times in this organization. Data is still stored in server time (:tz).",
+    "Đã lưu cài đặt của tổ chức.": "Organization settings saved."
 }

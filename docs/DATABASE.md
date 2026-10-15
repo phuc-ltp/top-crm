@@ -91,7 +91,8 @@ erDiagram
 | `organizations` | Doanh nghiệp dùng hệ thống (tên, slug, trạng thái active/suspended, chủ sở hữu). `id = 1` là tổ chức mặc định. |
 | `organization_user` | Tư cách thành viên: `status` active / invited / suspended, `joined_at`. |
 | `users` | Tài khoản (dùng chung giữa các tổ chức): email, username, mật khẩu bcrypt, `is_platform_admin`, `locale`, `theme`, `current_organization_id`, trạng thái, cột 2FA (`two_factor_secret` & `two_factor_recovery_codes` mã hóa bằng APP_KEY, `two_factor_confirmed_at`, `two_factor_last_step`), `email_verified_at`. |
-| `departments` | Phòng ban theo tổ chức. *Hạn chế:* `users.department_id` còn là một cột chung — sẽ chuyển sang theo tư cách thành viên ở Phase 2. |
+| `departments` | Phòng ban theo tổ chức. Phòng ban của người dùng lưu ở `organization_user.department_id` (từ bước 2.1; `users.department_id` cũ không còn dùng). |
+| `organization_settings` | Cài đặt riêng của từng tổ chức (khóa–giá trị, unique theo tổ chức). |
 | `roles`, `permissions`, `role_has_permissions`, `model_has_roles`, `model_has_permissions` | spatie/laravel-permission chế độ teams: `roles.organization_id`, `model_has_roles.organization_id`. |
 | `login_events` | Lịch sử đăng nhập (sự kiện, phương thức, IP, user-agent, băm cookie thiết bị, thiết bị mới). Tự xóa sau 180 ngày. |
 | `personal_access_tokens` | Khóa API Sanctum: chỉ lưu băm SHA-256, `abilities`, `organization_id`, `expires_at`, `last_used_at`, `last_used_ip`. |
@@ -124,7 +125,7 @@ erDiagram
 | `attachments` | Tệp đính kèm (lưu ngoài `public/`, tải qua controller có kiểm tra quyền) — đa hình. |
 | `activity_logs` | Nhật ký hoạt động theo tổ chức (không ghi trường nhạy cảm). |
 | `notifications` | Thông báo trong chuông (kênh database). |
-| `settings` | Cài đặt dạng khóa–giá trị. *Hạn chế:* hiện dùng chung toàn hệ thống — sẽ tách theo tổ chức ở Phase 2. Secret OAuth lưu mã hóa. |
+| `settings` | Cài đặt chung toàn hệ thống (trang đăng nhập, Google/Facebook, trang pháp lý, cờ khởi tạo, bắt buộc 2FA). Secret OAuth lưu mã hóa. |
 | `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs`, `migrations` | Hạ tầng Laravel. |
 
 ## 4. Quy trình thay đổi cấu trúc (bắt buộc)
