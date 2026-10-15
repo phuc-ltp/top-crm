@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class PipelineStage extends Model
 {
+    use BelongsToOrganization;
+
     protected $fillable = ['name', 'slug', 'position', 'probability', 'color', 'is_won', 'is_lost'];
 
     protected $casts = ['is_won' => 'boolean', 'is_lost' => 'boolean'];

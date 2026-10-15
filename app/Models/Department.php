@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
-    use LogsActivity;
+    use BelongsToOrganization, LogsActivity;
 
     protected $fillable = ['name', 'code', 'description'];
 

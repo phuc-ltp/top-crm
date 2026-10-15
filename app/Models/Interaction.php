@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class Interaction extends Model
 {
+    use BelongsToOrganization;
+
     public const TYPES = [
         'note' => ['Ghi chú', 'bi-sticky'],
         'call' => ['Cuộc gọi', 'bi-telephone'],

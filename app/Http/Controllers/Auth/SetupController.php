@@ -84,6 +84,8 @@ class SetupController extends Controller
             'department_id' => Department::where('code', 'BGD')->value('id'),
         ]);
         $user->assignRole('Super Admin');
+        // Người khởi tạo hệ thống là chủ sở hữu tổ chức mặc định
+        \App\Models\Organization::whereKey(\App\Models\Organization::DEFAULT_ID)->whereNull('owner_id')->update(['owner_id' => $user->id]);
 
         return $user;
     }

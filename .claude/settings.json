@@ -7,7 +7,22 @@
       "Bash(php -r '$p=\"lang/en.json\"; $j=json_decode\\(file_get_contents\\($p\\),true\\); $j[\"Thẻ\"]=\"Tags\"; $j[\"Ngày\"]=\"Date\"; $j[\"Ghi chú\"]=\"Note\"; file_put_contents\\($p, json_encode\\($j, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES\\).\"\\\\n\"\\); echo $j[\"Thẻ\"],\" \",$j[\"Ngày\"],\"\\\\n\";')",
       "Bash(sed -i \"s/\\\\['14px', __\\('Thẻ'\\)\\\\]/['14px', __\\('Thẻ \\\\/ bảng'\\)]/\" resources/views/design-system.blade.php)",
       "Bash(php -r '$p=\"lang/en.json\"; $j=json_decode\\(file_get_contents\\($p\\),true\\); $j[\"Ghi chú\"]=\"Notes\"; file_put_contents\\($p, json_encode\\($j, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES\\).\"\\\\n\"\\);')",
-      "Bash(sed -i 's/\">SL<\\\\/th>/\">{{ __\\('\"'\"'SL'\"'\"'\\) }}<\\\\/th>/g; s/<th class=\"text-end\">SL<\\\\/th>/<th class=\"text-end\">{{ __\\('\"'\"'SL'\"'\"'\\) }}<\\\\/th>/g' resources/views/pdf/document.blade.php resources/views/sales/form.blade.php resources/views/sales/show.blade.php)"
+      "Bash(sed -i 's/\">SL<\\\\/th>/\">{{ __\\('\"'\"'SL'\"'\"'\\) }}<\\\\/th>/g; s/<th class=\"text-end\">SL<\\\\/th>/<th class=\"text-end\">{{ __\\('\"'\"'SL'\"'\"'\\) }}<\\\\/th>/g' resources/views/pdf/document.blade.php resources/views/sales/form.blade.php resources/views/sales/show.blade.php)",
+      "Bash(C:/xampp/mysql/bin/mysql.exe -uroot -N -e 'SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema='\\\\''orangecrm_db'\\\\'' ORDER BY table_name;')",
+      "Bash(php \"C:/Users/Admin/AppData/Local/Temp/claude/c--phuc-crm/cae695ba-b058-4ac6-bdbf-ab7a898dcccc/scratchpad/add_trait.php\" . Customer)",
+      "Bash(php -r 'foreach \\([\"Department\",\"LeadSource\",\"Tag\",\"PipelineStage\",\"ProductCategory\",\"Product\",\"Customer\",\"Contact\",\"Lead\",\"Campaign\",\"Opportunity\",\"Quotation\",\"SalesOrder\",\"Invoice\",\"Payment\",\"Task\",\"SupportTicket\",\"Interaction\",\"Attachment\",\"SalesTarget\",\"ActivityLog\"] as $m\\) { $s=file_get_contents\\(\"app/Models/$m.php\"\\); $ok = str_contains\\($s, \"use App\\\\\\\\Models\\\\\\\\Concerns\\\\\\\\BelongsToOrganization;\"\\) && preg_match\\(\"/^    use [A-Za-z, ]*BelongsToOrganization/m\", $s\\); echo $ok ? \"\" : \"THIẾU $m\\\\n\"; } echo \"OK\\\\n\";')",
+      "Bash(grep -n 'protected $fillable\\\\|protected function casts\\\\|protected $casts\\\\|public function department\\\\|booted\\\\|public function isActive' app/Models/User.php)",
+      "Bash(C:/xampp/mysql/bin/mysqldump.exe -uroot --single-transaction orangecrm_db)",
+      "Bash(C:/xampp/mysql/bin/mysql.exe -uroot -e 'DROP DATABASE IF EXISTS orangecrm_migtest; CREATE DATABASE orangecrm_migtest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci')",
+      "Bash(C:/xampp/mysql/bin/mysql.exe -uroot orangecrm_migtest)",
+      "Bash(export DB_DATABASE=orangecrm_migtest)",
+      "Bash(C:/xampp/mysql/bin/mysql.exe -uroot -N -e 'USE orangecrm_migtest; SELECT table_name, COUNT\\(*\\) FROM information_schema.columns WHERE table_schema='\\\\''orangecrm_migtest'\\\\'' AND column_name='\\\\''organization_id'\\\\'' GROUP BY table_name')",
+      "Bash(grep -vE \"^\\\\s+[0-9]+\\\\s+vendor|^\\\\s*$\")",
+      "Bash(C:/xampp/mysql/bin/mysqldump.exe -uroot --no-data --skip-comments --skip-dump-date orangecrm_migtest)",
+      "Bash(php -r '$p=\"lang/en.json\"; $j=json_decode\\(file_get_contents\\($p\\),true\\); $j[\"Tạm ngưng\"]=\"Suspended\"; uksort\\($j, fn\\($a,$b\\)=>strcmp\\(mb_strtolower\\($a\\),mb_strtolower\\($b\\)\\)\\); file_put_contents\\($p, json_encode\\($j, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES\\).\"\\\\n\"\\);')",
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -uroot -e \"DROP DATABASE IF EXISTS orangecrm_migtest\")",
+      "Bash(DB_DATABASE=orangecrm_preview php artisan migrate --force)",
+      "Bash(php -r '$f=\"PROGRESS.md\"; $c=file_get_contents\\($f\\); $c=str_replace\\(\"- [ ] 1.3 Organizations  - [ ] 1.4 Tenant scoping\",\"- [x] 1.3 Organizations \\(15/10\\): bảng organizations/organization_user, users.current_organization_id, organization_id trên 21 bảng \\(backfill = 1\\), unique theo tổ chức, trait BelongsToOrganization + CurrentOrganization \\(tự gán, không fillable\\). Thử 3 vòng migrate/rollback trên bản sao, cấu trúc sau rollback giống hệt. Đã chạy trên CSDL thật \\(tổ chức 1 \\\\\"TOP CRM\\\\\", owner = phuphuc\\). Tài liệu: docs/MULTI_TENANCY.md.\\\\n- [ ] 1.4 Tenant scoping\", $c\\); file_put_contents\\($f,$c\\);')"
     ]
   }
 }

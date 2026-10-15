@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Attachment extends Model
 {
+    use BelongsToOrganization;
+
     protected $fillable = ['user_id', 'original_name', 'path', 'mime_type', 'size'];
 
     protected static function booted(): void

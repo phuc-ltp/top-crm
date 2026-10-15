@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\HasCode;
 use App\Models\Concerns\IsSalesDocument;
 use App\Models\Concerns\LogsActivity;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Invoice extends Model
 {
-    use HasCode, IsSalesDocument, LogsActivity, SoftDeletes;
+    use BelongsToOrganization, HasCode, IsSalesDocument, LogsActivity, SoftDeletes;
 
     protected static string $permissionModule = 'invoices';
 

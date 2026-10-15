@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\HasCode;
 use App\Models\Concerns\HasOwnership;
 use App\Models\Concerns\LogsActivity;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lead extends Model
 {
-    use HasCode, HasFactory, HasOwnership, LogsActivity, SoftDeletes;
+    use BelongsToOrganization, HasCode, HasFactory, HasOwnership, LogsActivity, SoftDeletes;
 
     protected static string $permissionModule = 'leads';
 

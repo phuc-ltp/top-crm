@@ -34,7 +34,8 @@
 - [x] 1.1 Bảo mật /setup (15/10): cờ vĩnh viễn settings.app_initialized_at (App\Support\AppInitialization; migration 2026_10_15_100000 ghi cờ cho hệ thống đã có admin) + Cache::lock + claim() dựa UNIQUE key trong transaction; crm:create-admin cũng ghi cờ. Đã thử song song thật (12 yêu cầu/4 máy chủ → 1 admin) và 2 kết nối CSDL độc lập. SESSION_ENCRYPT=true (.env + .env.example). 86 test pass.
 - [x] 1.2 Đa ngôn ngữ vi/en (15/10): toàn bộ giao diện (~1.100 câu trong lang/en.json), bộ chọn ngôn ngữ thật, users.locale, email theo ngôn ngữ người nhận, trang pháp lý tiếng Anh. Hướng dẫn: docs/I18N.md. Chưa dịch: nội dung nhật ký/thông báo đã lưu (dữ liệu). 97 test pass.
 - GHI CHÚ cho 1.8: chính sách mật khẩu chưa thống nhất (setup 10 ký tự + hoa/thường/số; đổi/đặt lại chỉ 8 ký tự) → dùng Password::defaults().
-- [ ] 1.3 Organizations  - [ ] 1.4 Tenant scoping  - [ ] 1.5 RBAC 15 vai trò
+- [x] 1.3 Organizations (15/10): bảng organizations/organization_user, users.current_organization_id, organization_id trên 21 bảng (backfill = 1), unique theo tổ chức, trait BelongsToOrganization + CurrentOrganization (tự gán, không fillable). Thử 3 vòng migrate/rollback trên bản sao, cấu trúc sau rollback giống hệt. Đã chạy trên CSDL thật (tổ chức 1 "TOP CRM", owner = phuphuc). Tài liệu: docs/MULTI_TENANCY.md.
+- [ ] 1.4 Tenant scoping  - [ ] 1.5 RBAC 15 vai trò
 - [ ] 1.6 Chuyển tổ chức/thành viên  - [ ] 1.7 Layout  - [ ] 1.8 2FA/xác minh email  - [ ] 1.9 Sanctum API  - [ ] 1.10 Tài liệu
 
 ## Sự cố MySQL (đã xử lý 14/10)

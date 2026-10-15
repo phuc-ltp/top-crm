@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class LeadSource extends Model
 {
+    use BelongsToOrganization;
+
     protected $fillable = ['name', 'is_active'];
 
     protected $casts = ['is_active' => 'boolean'];

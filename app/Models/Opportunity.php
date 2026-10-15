@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\HasCode;
 use App\Models\Concerns\HasOwnership;
 use App\Models\Concerns\LogsActivity;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Opportunity extends Model
 {
-    use HasCode, HasOwnership, LogsActivity, SoftDeletes;
+    use BelongsToOrganization, HasCode, HasOwnership, LogsActivity, SoftDeletes;
 
     protected static string $permissionModule = 'opportunities';
 

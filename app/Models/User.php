@@ -44,6 +44,36 @@ class User extends Authenticatable implements HasLocalePreference
         $this->attributes['username'] = $value === '' ? null : mb_strtolower($value);
     }
 
+    /** Các tổ chức mà người dùng là thành viên. */
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class)->withPivot(['status', 'joined_at'])->withTimestamps();
+    }
+
+    public function currentOrganization()
+    {
+        return $this->belongsTo(Organization::class, 'current_organization_id');
+    }
+
+    public function belongsToOrganization(int $organizationId): bool
+    {
+        return $this->organizations()->whereKey($organizationId)->wherePivot('status', 'active')->exists();
+    }
+
+    protected static function booted(): void
+    {
+        // Tài khoản mới tự trở thành thành viên của tổ chức đang làm việc
+        static::created(function (User $user) {
+            $orgId = app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+            if ($orgId && ! $user->organizations()->whereKey($orgId)->exists()) {
+                $user->organizations()->attach($orgId, ['status' => 'active', 'joined_at' => now()]);
+            }
+            if ($orgId && ! $user->current_organization_id) {
+                $user->forceFill(['current_organization_id' => $orgId])->saveQuietly();
+            }
+        });
+    }
+
     public function department()
     {
         return $this->belongsTo(Department::class);

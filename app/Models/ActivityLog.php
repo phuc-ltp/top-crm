@@ -2,11 +2,20 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class ActivityLog extends Model
 {
+    use BelongsToOrganization;
+
     public $timestamps = false;
+
+    /** Nhật ký cấp nền tảng (vd: đăng nhập thất bại) có thể không gắn với tổ chức nào. */
+    public function organizationIsOptional(): bool
+    {
+        return true;
+    }
 
     public const ACTIONS = [
         'created' => ['Tạo mới', 'success'],

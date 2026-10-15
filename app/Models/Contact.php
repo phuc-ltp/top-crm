@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\HasOwnership;
 use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Contact extends Model
 {
-    use HasOwnership, LogsActivity, SoftDeletes;
+    use BelongsToOrganization, HasOwnership, LogsActivity, SoftDeletes;
 
     protected static string $permissionModule = 'contacts';
 

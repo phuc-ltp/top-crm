@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToOrganization;
 use App\Models\Concerns\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-    use LogsActivity;
+    use BelongsToOrganization, LogsActivity;
 
     public const METHODS = [
         'cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'card' => 'Thẻ ngân hàng', 'other' => 'Khác',

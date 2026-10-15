@@ -17,7 +17,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Tổ chức đang làm việc — một thể hiện cho mỗi yêu cầu / mỗi job
+        $this->app->scoped(\App\Support\Tenancy\CurrentOrganization::class);
     }
 
     public function boot(): void
