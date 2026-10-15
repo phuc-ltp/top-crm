@@ -165,7 +165,7 @@ class CustomerController extends Controller
         $this->authorize('assign', Customer::class);
         $data = $request->validate([
             'ids' => ['required', 'array', 'max:500'], 'ids.*' => ['integer'],
-            'assigned_to' => ['required', Rule::exists('users', 'id')->where('status', 'active')],
+            'assigned_to' => ['required', Rule::exists('users', 'id')->where('status', 'active'), \App\Support\Tenancy\TenantRule::member()],
         ], [], ['ids' => __('Khách hàng được chọn')]);
 
         $count = Customer::visibleTo($request->user())->whereIn('id', $data['ids'])->update(['assigned_to' => $data['assigned_to'], 'updated_by' => $request->user()->id]);

@@ -55,7 +55,7 @@ class SupportTicketController extends Controller
 
         // Thông báo ticket mới cho người được giao, hoặc cho nhân viên CSKH nếu chưa giao
         $recipients = $ticket->assignee ? collect([$ticket->assignee])
-            : User::role(['Customer Support'])->active()->get();
+            : User::inOrganization()->role(['Customer Support'])->active()->get();
         foreach ($recipients as $u) {
             if ($u->id !== $request->user()->id) {
                 CrmNotification::send($u, 'ticket_new', 'Ticket mới '.$ticket->code.': '.$ticket->subject, route('tickets.show', $ticket), 'bi-headset');
@@ -142,13 +142,13 @@ class SupportTicketController extends Controller
     private function validated(Request $request, ?SupportTicket $existing = null): array
     {
         $data = $request->validate([
-            'customer_id' => ['required', 'exists:customers,id'],
-            'contact_id' => ['nullable', 'exists:contacts,id'],
+            'customer_id' => ['required', \App\Support\Tenancy\TenantRule::exists('customers')],
+            'contact_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('contacts')],
             'subject' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:10000'],
             'priority' => ['required', Rule::in(array_keys(SupportTicket::PRIORITIES))],
             'status' => ['required', Rule::in(array_keys(SupportTicket::STATUSES))],
-            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
         ], [], ['subject' => __('Chủ đề'), 'description' => __('Mô tả')]);
 
         // Ticket gắn với khách hàng mà người tạo được phép xem (CSKH có quyền xem tất cả khách hàng)

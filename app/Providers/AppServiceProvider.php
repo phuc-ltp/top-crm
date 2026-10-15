@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // {user} trên route chỉ tìm trong thành viên của tổ chức đang làm việc (ngoài tổ chức → 404)
+        \Illuminate\Support\Facades\Route::bind('user', fn ($value) => \App\Models\User::inOrganization()->findOrFail($value));
+
         // Tên ngắn cho quan hệ đa hình (lưu trong DB thay vì tên class đầy đủ)
         Relation::morphMap([
             'user' => \App\Models\User::class,

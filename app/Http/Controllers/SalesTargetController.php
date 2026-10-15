@@ -48,7 +48,7 @@ class SalesTargetController extends Controller
     {
         abort_unless($this->canManage($request), 403);
         $data = $request->validate([
-            'user_id' => ['required', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'user_id' => ['required', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'year' => ['required', 'integer', 'between:2000,2100'],
             'month' => ['required', 'integer', 'between:1,12'],
             'target_amount' => ['required', 'numeric', 'min:0', 'max:999999999999'],

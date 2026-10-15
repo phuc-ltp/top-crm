@@ -26,7 +26,7 @@ class QuotationController extends SalesDocumentController
         return [
             'valid_until' => ['nullable', 'date', 'after_or_equal:issue_date'],
             'status' => ['required', Rule::in(array_keys(Quotation::STATUSES))],
-            'opportunity_id' => ['nullable', 'exists:opportunities,id'],
+            'opportunity_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('opportunities')],
         ];
     }
 

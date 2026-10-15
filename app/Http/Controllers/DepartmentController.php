@@ -45,7 +45,7 @@ class DepartmentController extends Controller
     {
         return $request->validate([
             'name' => ['required', 'string', 'max:150'],
-            'code' => ['required', 'string', 'max:30', 'alpha_dash', Rule::unique('departments', 'code')->ignore($department?->id)],
+            'code' => ['required', 'string', 'max:30', 'alpha_dash', \App\Support\Tenancy\TenantRule::unique('departments', 'code')->ignore($department?->id)],
             'description' => ['nullable', 'string', 'max:500'],
         ], [], ['name' => __('Tên phòng ban'), 'code' => __('Mã phòng ban')]);
     }

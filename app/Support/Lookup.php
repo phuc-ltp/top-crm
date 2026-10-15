@@ -17,7 +17,7 @@ class Lookup
 {
     public static function users(bool $activeOnly = true): array
     {
-        return User::query()->when($activeOnly, fn ($q) => $q->active())->orderBy('name')->pluck('name', 'id')->all();
+        return User::inOrganization()->when($activeOnly, fn ($q) => $q->active())->orderBy('name')->pluck('name', 'id')->all();
     }
 
     public static function sources(): array

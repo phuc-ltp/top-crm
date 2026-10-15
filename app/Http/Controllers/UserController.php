@@ -25,7 +25,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewAny', User::class);
-        $users = User::with(['department:id,name', 'roles:id,name'])
+        $users = User::inOrganization()->with(['department:id,name', 'roles:id,name'])
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = $this->like($request->q);
                 $q->where(fn ($w) => $w->where('name', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term));
@@ -164,7 +164,7 @@ class UserController extends Controller
             'username' => ['nullable', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z0-9._\-]+$/', Rule::unique('users', 'username')->ignore($user?->id)],
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\-\s().]{6,30}$/'],
             'position' => ['nullable', 'string', 'max:100'],
-            'department_id' => ['nullable', 'exists:departments,id'],
+            'department_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('departments')],
             'status' => ['required', Rule::in(array_keys(User::STATUSES))],
             'role' => ['required', Rule::in(array_keys($this->assignableRoles($request)))],
         ];

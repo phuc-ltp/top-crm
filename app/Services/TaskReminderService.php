@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Organization;
 use App\Models\Task;
+use App\Support\Tenancy\CurrentOrganization;
 use App\Notifications\CrmNotification;
 
 class TaskReminderService
@@ -12,6 +14,19 @@ class TaskReminderService
      * - Công việc quá hạn còn mở: chuyển trạng thái "overdue" và thông báo.
      */
     public function run(): array
+    {
+        // Chạy riêng trong từng tổ chức đang hoạt động (dữ liệu công việc được giới hạn theo tổ chức)
+        $totals = ['due_soon' => 0, 'overdue' => 0];
+        foreach (Organization::where('status', 'active')->pluck('id') as $orgId) {
+            $result = app(CurrentOrganization::class)->run((int) $orgId, fn () => $this->runForCurrentOrganization());
+            $totals['due_soon'] += $result['due_soon'];
+            $totals['overdue'] += $result['overdue'];
+        }
+
+        return $totals;
+    }
+
+    private function runForCurrentOrganization(): array
     {
         $dueSoon = 0;
         $overdue = 0;

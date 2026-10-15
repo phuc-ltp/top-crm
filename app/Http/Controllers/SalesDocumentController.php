@@ -210,14 +210,14 @@ abstract class SalesDocumentController extends Controller
     protected function validated(Request $request, ?Model $existing = null): array
     {
         $data = $request->validate(array_merge([
-            'customer_id' => ['required', 'exists:customers,id'],
+            'customer_id' => ['required', \App\Support\Tenancy\TenantRule::exists('customers')],
             $this->dateField => ['required', 'date'],
             'discount_amount' => ['nullable', 'numeric', 'min:0'],
             'tax_rate' => ['required', 'numeric', 'min:0', 'max:100'],
             'notes' => ['nullable', 'string', 'max:5000'],
-            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'items' => ['required', 'array', 'min:1', 'max:100'],
-            'items.*.product_id' => ['nullable', 'exists:products,id'],
+            'items.*.product_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('products')],
             'items.*.description' => ['nullable', 'string', 'max:255'],
             'items.*.quantity' => ['required', 'numeric', 'min:0.01', 'max:1000000'],
             'items.*.unit_price' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],

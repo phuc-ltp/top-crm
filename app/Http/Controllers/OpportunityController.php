@@ -139,7 +139,7 @@ class OpportunityController extends Controller
     {
         $this->authorize('update', $opportunity);
         $data = $request->validate([
-            'pipeline_stage_id' => ['required', 'exists:pipeline_stages,id'],
+            'pipeline_stage_id' => ['required', \App\Support\Tenancy\TenantRule::exists('pipeline_stages')],
             'position' => ['required', 'integer', 'min:0'],
             'lost_reason' => ['nullable', 'string', 'max:500'],
         ]);
@@ -171,13 +171,13 @@ class OpportunityController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'customer_id' => ['required', 'exists:customers,id'],
-            'contact_id' => ['nullable', 'exists:contacts,id'],
-            'pipeline_stage_id' => ['required', 'exists:pipeline_stages,id'],
+            'customer_id' => ['required', \App\Support\Tenancy\TenantRule::exists('customers')],
+            'contact_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('contacts')],
+            'pipeline_stage_id' => ['required', \App\Support\Tenancy\TenantRule::exists('pipeline_stages')],
             'value' => ['required', 'numeric', 'min:0', 'max:999999999999'],
             'probability' => ['required', 'integer', 'min:0', 'max:100'],
             'expected_close_date' => ['nullable', 'date'],
-            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'lost_reason' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:5000'],
         ], [], ['title' => __('Tên cơ hội')]);

@@ -23,12 +23,12 @@ class CustomerRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:500'],
             'company' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in(array_keys(Customer::TYPES))],
-            'lead_source_id' => ['nullable', 'exists:lead_sources,id'],
+            'lead_source_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('lead_sources')],
             'status' => ['required', Rule::in(array_keys(Customer::STATUSES))],
-            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'notes' => ['nullable', 'string', 'max:5000'],
             'tags' => ['nullable', 'array'],
-            'tags.*' => ['integer', 'exists:tags,id'],
+            'tags.*' => ['integer', \App\Support\Tenancy\TenantRule::exists('tags')],
             'confirm_duplicate' => ['nullable', 'boolean'],
         ];
     }
