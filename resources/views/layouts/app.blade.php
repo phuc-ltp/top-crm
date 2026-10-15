@@ -1,17 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="light">
+@php($userTheme = in_array(auth()->user()?->theme, ['light', 'dark'], true) ? auth()->user()->theme : null)
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="{{ $userTheme ?? 'light' }}" data-user-theme="{{ $userTheme ?? 'system' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="crm-theme-url" content="{{ route('preferences.theme') }}">
     <title>@yield('title', __('Tổng quan')) · {{ $crmSettings['company_name'] }}</title>
-    {{-- Áp dụng giao diện sáng/tối trước khi vẽ trang (tránh nháy màu) --}}
+    {{-- Áp dụng giao diện sáng/tối trước khi vẽ trang (tránh nháy màu). Ưu tiên lựa chọn lưu trong tài khoản. --}}
     <script>
         (function () {
+            var saved = document.documentElement.getAttribute('data-user-theme');
             try {
-                var t = localStorage.getItem('crm.theme');
-                if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                document.documentElement.setAttribute('data-bs-theme', t === 'dark' ? 'dark' : 'light');
+                var t = saved === 'light' || saved === 'dark' ? saved : localStorage.getItem('crm.theme');
+                if (t !== 'light' && t !== 'dark') t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                if (saved === 'light' || saved === 'dark') localStorage.setItem('crm.theme', saved);
+                document.documentElement.setAttribute('data-bs-theme', t);
             } catch (e) {}
         })();
     </script>
@@ -42,7 +46,12 @@
         <x-brand-logo :size="40" />
         <span class="brand-text"><span class="sidebar-brand-name">{{ $crmSettings['brand_name'] }}</span> CRM<small>{{ \Illuminate\Support\Str::title(mb_strtolower($crmSettings['brand_tagline'])) }}</small></span>
     </a>
+    <div class="nav-search" role="search">
+        <i class="bi bi-search" aria-hidden="true"></i>
+        <input type="search" id="navSearch" placeholder="{{ __('Tìm chức năng...') }}" aria-label="{{ __('Tìm chức năng trong menu') }}" autocomplete="off" data-nav-search>
+    </div>
     <nav class="crm-nav">
+        <div class="nav-empty d-none" data-nav-empty>{{ __('Không có chức năng phù hợp') }}</div>
         @foreach (\App\Support\Menu::for($authUser) as $section)
             @if ($section['title'])<div class="nav-section">{{ $section['title'] }}</div>@endif
             @foreach ($section['items'] as $item)

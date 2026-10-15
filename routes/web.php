@@ -75,6 +75,9 @@ Route::middleware('auth')->group(function () {
     // Chuyển tổ chức (không gian làm việc)
     Route::post('/workspace/switch', [\App\Http\Controllers\WorkspaceController::class, 'switch'])->name('workspace.switch')->middleware('throttle:30,1');
 
+    // Giao diện sáng / tối của người dùng
+    Route::post('/preferences/theme', [\App\Http\Controllers\ThemeController::class, 'update'])->name('preferences.theme')->middleware('throttle:30,1');
+
     // Khu vực quản trị nền tảng — chỉ quản trị nền tảng
     Route::middleware('can:platform')->prefix('platform')->name('platform.')->group(function () {
         Route::resource('organizations', \App\Http\Controllers\Platform\OrganizationController::class)->except(['show', 'destroy']);

@@ -240,6 +240,13 @@ body.crm-app { background: var(--crm-bg); min-height: 100vh; }
 .crm-sidebar .brand-text { font-weight: 800; font-size: 1.22rem; line-height: 1.05; letter-spacing: -.01em; color: #fff; }
 .crm-sidebar .sidebar-brand-name { background: linear-gradient(180deg, #FFC48E, #F0883A 60%, #D4661C); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .crm-sidebar .brand small { display: block; font-size: .68rem; font-weight: 500; color: var(--crm-sidebar-muted); letter-spacing: 0; margin-top: 3px; }
+.nav-search { position: relative; padding: 0 12px 6px; flex-shrink: 0; }
+.nav-search > i { position: absolute; left: 25px; top: calc(50% - 3px); transform: translateY(-50%); color: var(--crm-sidebar-muted); font-size: .8rem; pointer-events: none; }
+.nav-search input { width: 100%; height: 36px; padding: 0 12px 0 34px; border-radius: 11px; border: 1px solid var(--crm-sidebar-line); background: var(--crm-sidebar-2); color: #fff; font-size: .82rem; outline: none; transition: border-color .15s, background .15s; }
+.nav-search input::placeholder { color: var(--crm-sidebar-muted); }
+.nav-search input:focus { border-color: rgba(var(--crm-primary-rgb), .7); background: rgba(255, 255, 255, .12); box-shadow: 0 0 0 3px rgba(var(--crm-primary-rgb), .25); }
+.nav-search input::-webkit-search-cancel-button { filter: invert(1); opacity: .6; }
+.crm-nav .nav-empty { color: var(--crm-sidebar-muted); font-size: .8rem; padding: 14px 12px; text-align: center; }
 .crm-nav { flex: 1; overflow-y: auto; padding: 6px 12px; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .15) transparent; }
 .crm-nav .nav-section { font-size: .64rem; text-transform: uppercase; letter-spacing: .1em; color: var(--crm-sidebar-muted); padding: 14px 12px 6px; white-space: nowrap; opacity: .8; }
 .crm-nav .nav-link, .crm-nav .nav-group-toggle {
@@ -320,7 +327,7 @@ body.sidebar-collapsed .crm-main { margin-left: calc(var(--crm-sidebar-collapsed
 body.sidebar-collapsed .crm-nav .nav-link > span, body.sidebar-collapsed .crm-nav .nav-group-toggle > span,
 body.sidebar-collapsed .crm-nav .nav-group-toggle .chev, body.sidebar-collapsed .crm-nav .nav-section,
 body.sidebar-collapsed .crm-sidebar .brand-text, body.sidebar-collapsed .crm-nav .nav-sub,
-body.sidebar-collapsed .sidebar-card .min-w-0, body.sidebar-collapsed .sidebar-card > .bi { display: none !important; }
+body.sidebar-collapsed .sidebar-card .min-w-0, body.sidebar-collapsed .sidebar-card > .bi, body.sidebar-collapsed .nav-search { display: none !important; }
 body.sidebar-collapsed .crm-nav .nav-link, body.sidebar-collapsed .crm-nav .nav-group-toggle, body.sidebar-collapsed .sidebar-card { justify-content: center; }
 body.sidebar-collapsed .crm-sidebar .brand, body.sidebar-collapsed .mac-lights { justify-content: center; padding-left: 0; padding-right: 0; }
 
@@ -334,11 +341,11 @@ body.sidebar-collapsed .crm-sidebar .brand, body.sidebar-collapsed .mac-lights {
     body.sidebar-open .crm-sidebar { transform: translateX(0); }
     body.sidebar-open .crm-backdrop { display: block; position: fixed; inset: 0; background: rgba(10, 6, 4, .45); z-index: 1035; }
     body.sidebar-collapsed .crm-nav .nav-link > span, body.sidebar-collapsed .crm-nav .nav-group-toggle > span, body.sidebar-collapsed .crm-nav .nav-section,
-    body.sidebar-collapsed .crm-sidebar .brand-text, body.sidebar-collapsed .crm-nav .nav-sub { display: revert !important; }
+    body.sidebar-collapsed .crm-sidebar .brand-text, body.sidebar-collapsed .crm-nav .nav-sub, body.sidebar-collapsed .nav-search { display: revert !important; }
     .crm-content { padding: 12px 14px 16px; }
     .crm-footer { justify-content: center; text-align: center; }
 }
-@media (max-width: 575.98px) { .crm-content { padding: 10px; } .topbar-lang .lang-text, .btn-create .txt { display: none; } .btn-create { width: 40px; padding: 0; justify-content: center; } }
+@media (max-width: 575.98px) { .crm-content { padding: 12px; } /* = nửa khoảng cách cột mặc định (1.5rem) để .row không tràn ngang */ .topbar-lang .lang-text, .btn-create .txt { display: none; } .btn-create { width: 40px; padding: 0; justify-content: center; } }
 
 /* ---------- Tiêu đề trang ---------- */
 .page-header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
