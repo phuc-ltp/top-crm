@@ -192,6 +192,7 @@ class UserController extends Controller
             DB::transaction(function () use ($user, $orgId) {
                 $user->syncRoles([]);   // gỡ vai trò trong tổ chức hiện tại
                 $user->organizations()->detach($orgId);
+                $user->tokens()->where('organization_id', $orgId)->delete();   // thu hồi khóa API của tổ chức này
                 if ((int) $user->current_organization_id === $orgId) {
                     $user->forceFill(['current_organization_id' => null])->saveQuietly();
                 }

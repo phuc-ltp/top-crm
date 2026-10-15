@@ -3,6 +3,7 @@
 @section('content')
     <x-page-header :title="__('Bảo mật tài khoản')" :breadcrumbs="['Hồ sơ cá nhân' => route('profile.edit'), 'Bảo mật tài khoản' => null]">
         <a href="{{ route('profile.sessions') }}" class="btn btn-light"><i class="bi bi-laptop me-1"></i>{{ __('Phiên đăng nhập') }}</a>
+        @can('api.use')<a href="{{ route('api-tokens.index') }}" class="btn btn-light"><i class="bi bi-key me-1"></i>{{ __('Khóa API') }}</a>@endcan
         <a href="{{ route('profile.edit') }}#password" class="btn btn-light"><i class="bi bi-key me-1"></i>{{ __('Đổi mật khẩu') }}</a>
     </x-page-header>
 

@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasLocalePreference, \Illuminate\Contracts\Auth\MustVerifyEmail
 {
-    use \Illuminate\Auth\MustVerifyEmail, HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
+    use \Illuminate\Auth\MustVerifyEmail, \Laravel\Sanctum\HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
     public const STATUSES = [
         'active' => ['Đang hoạt động', 'success'],
@@ -96,6 +96,9 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
                 $user->forceFill(['current_organization_id' => $orgId])->saveQuietly();
             }
         });
+
+        // Xóa tài khoản (kể cả xóa mềm) → thu hồi mọi khóa API của tài khoản
+        static::deleted(fn (User $user) => $user->tokens()->delete());
     }
 
     public function department()

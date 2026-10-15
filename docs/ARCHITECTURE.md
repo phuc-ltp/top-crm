@@ -98,18 +98,9 @@ Lead ──(chuyển đổi)──► Customer + Opportunity ──(kéo thả)�
 
 ## 5. REST API
 
-Tiền tố `/api/v1`, xác thực bằng phiên đăng nhập web + CSRF, giới hạn 120 yêu cầu/phút. Phản hồi dạng `{success, message, data, meta}`.
+Tiền tố `/api/v1`, xác thực bằng khóa API (Laravel Sanctum, `Authorization: Bearer topcrm_...`) hoặc phiên đăng nhập web cùng tên miền. Mỗi khóa gắn với một tổ chức; quyền thực tế = quyền người tạo ∩ phạm vi khóa. Giới hạn 120 yêu cầu/phút mỗi khóa. Phản hồi dạng `{success, message, data, meta}`.
 
-| Method | Endpoint |
-|---|---|
-| GET | `/api/v1/stats?period=this_month` |
-| GET/POST | `/api/v1/customers` |
-| GET/PUT/DELETE | `/api/v1/customers/{id}` |
-| GET/POST | `/api/v1/leads` |
-| GET/PUT | `/api/v1/leads/{id}` |
-| GET | `/api/v1/opportunities`, `/api/v1/opportunities/{id}` |
-
-Muốn dùng API từ ứng dụng bên ngoài, cần bổ sung `laravel/sanctum` để xác thực bằng token.
+Chi tiết endpoint, phạm vi và mã lỗi: [API.md](API.md).
 
 ## 6. Hiệu năng
 

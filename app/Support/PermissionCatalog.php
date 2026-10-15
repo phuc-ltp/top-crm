@@ -25,11 +25,12 @@ class PermissionCatalog
         'users' => ['label' => 'Người dùng & vai trò', 'actions' => ['view', 'create', 'update', 'delete', 'manage']],
         'activity_logs' => ['label' => 'Nhật ký hoạt động', 'actions' => ['view']],
         'settings' => ['label' => 'Cài đặt hệ thống', 'actions' => ['manage']],
+        'api' => ['label' => 'Kết nối API', 'actions' => ['use']],
     ];
 
     public const ACTION_LABELS = [
         'view' => 'Xem', 'view_all' => 'Xem tất cả', 'create' => 'Tạo', 'update' => 'Sửa', 'delete' => 'Xóa',
-        'export' => 'Xuất', 'assign' => 'Phân công', 'approve' => 'Duyệt', 'manage' => 'Quản trị',
+        'export' => 'Xuất', 'assign' => 'Phân công', 'approve' => 'Duyệt', 'manage' => 'Quản trị', 'use' => 'Sử dụng',
     ];
 
     /** Vai trò cấp nền tảng: không phải vai trò spatie mà là cờ users.is_platform_admin (toàn quyền mọi tổ chức). */
