@@ -73,3 +73,13 @@
 - User sẽ gửi code/thiết kế giao diện điện thoại → ghép vào resources/css/auth-mobile.css theo docs/MOBILE_UI.md.
 - Người dùng tự tạo Super Admin tại http://localhost/orangecrm/setup.
 - Cân nhắc nâng cấp MariaDB (10.4 hết hỗ trợ) — cần hỏi user trước.
+
+## PHASE 2 — CRM Core (bắt đầu 17/10/2026, kế hoạch: docs/PHASE2_PLAN.md)
+- [ ] 2.1 Cài đặt & phòng ban theo tổ chức
+- [ ] 2.2 Hoạt động & dòng thời gian
+- [ ] 2.3 Khách hàng (trường mới, gộp, trường tùy biến, xlsx)
+- [ ] 2.4 Leads (giai đoạn cấu hình, form website, nhắc theo dõi)
+- [ ] 2.5 Nhiều pipeline & deal (sản phẩm, dự báo)
+- [ ] 2.6 Tìm kiếm toàn cục
+- [ ] 2.7 Dashboard 20 chỉ số
+- [ ] 2.8 Hoàn thiện, v2.0.0
