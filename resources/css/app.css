@@ -265,7 +265,9 @@ body.crm-app { background: var(--crm-bg); min-height: 100vh; }
 .sidebar-card .ic { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--crm-primary-grad); color: #fff; flex-shrink: 0; }
 .sidebar-card .t { font-weight: 600; font-size: .84rem; color: #fff; line-height: 1.2; }
 .sidebar-card .s { font-size: .7rem; color: var(--crm-sidebar-muted); }
-@media (max-height: 820px) { .sidebar-card.workspace { display: none; } }
+/* Màn hình thấp: thu gọn (không ẩn — đây là nút chuyển tổ chức) */
+@media (max-height: 820px) { .sidebar-card.workspace { padding: 6px 10px; } .sidebar-card.workspace .s { display: none; } .sidebar-card.workspace .ic { width: 30px; height: 30px; } }
+.workspace-menu { min-width: 240px; max-height: 60vh; overflow-y: auto; }
 
 /* ---------- Bố cục: Cửa sổ chính kính sáng ---------- */
 .crm-main { margin-left: calc(var(--crm-sidebar-width) + var(--crm-gap) * 2); padding: var(--crm-gap) var(--crm-gap) var(--crm-gap) 0; min-height: 100vh; transition: margin-left .2s ease; min-width: 0; }

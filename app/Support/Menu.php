@@ -59,6 +59,7 @@ class Menu
                     ['Đăng nhập & thương hiệu', null, 'settings.branding', 'settings.manage', 'settings.branding'],
                     ['Nhật ký hoạt động', null, 'activity-logs.index', 'activity_logs.view', 'activity-logs.*'],
                     ['Design System', null, 'design-system', 'settings.manage', 'design-system'],
+                    ['Quản lý tổ chức', null, 'platform.organizations.index', 'platform', 'platform.*'],
                 ]],
             ],
         ];

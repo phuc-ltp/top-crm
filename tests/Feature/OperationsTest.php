@@ -114,7 +114,7 @@ class OperationsTest extends TestCase
         $this->assertTrue($user->hasRole('Sales Employee'));
 
         $this->post(route('users.toggle-status', $user));
-        $this->assertSame('locked', $user->fresh()->status);
+        $this->assertSame('suspended', $user->membershipStatus(), 'Khóa = tạm ngưng thành viên trong tổ chức');
         $this->put(route('users.password', $user), ['password' => 'Moi12345', 'password_confirmation' => 'Moi12345'])->assertSessionHas('success');
         $this->post(route('users.send-reset', $user))->assertSessionHas('success');
         $this->delete(route('users.destroy', $user))->assertRedirect();

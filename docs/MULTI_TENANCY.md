@@ -35,8 +35,19 @@ TOP CRM dùng mô hình **một CSDL dùng chung + cột `organization_id`**: m�
 - Tác vụ nền `crm:task-reminders` chạy lần lượt trong từng tổ chức đang hoạt động.
 - Kiểm thử: `tests/Feature/TenantIsolationTest.php` (15 test) mô phỏng tổ chức A cố truy cập dữ liệu tổ chức B qua danh sách, trang chi tiết, sửa/xóa, kéo thả Kanban, tìm kiếm, 7 loại xuất file, báo cáo, dashboard, API, form tham chiếu, giao việc, checklist/ghi chú, đổi tổ chức. Chạy trên mã cũ (chưa có bộ lọc) thì 13 test thất bại, chứng tỏ bộ test phát hiện được rò rỉ.
 
+## Chuyển tổ chức & quản lý thành viên (bước 1.6)
+- **Chuyển tổ chức:** ô "Không gian làm việc" ở thanh bên liệt kê các tổ chức mà người dùng là thành viên đang hoạt động (`POST /workspace/switch`). Quản trị nền tảng vào được mọi tổ chức đang hoạt động để hỗ trợ.
+- **Quản lý tổ chức** (`/platform/organizations`, chỉ quản trị nền tảng): danh sách, tạo tổ chức mới kèm chủ sở hữu (tài khoản có sẵn theo email, hoặc tạo mới), sửa tên/mã, tạm ngưng/kích hoạt. Không tạm ngưng được tổ chức mặc định.
+- **Khởi tạo tổ chức** (`OrganizationProvisioner`): 14 vai trò, 5 phòng ban, 9 nguồn khách hàng, 6 giai đoạn bán hàng, danh mục sản phẩm, thẻ. An toàn khi chạy lại và không ghi đè thứ tổ chức đã tự chỉnh.
+- **Thành viên dùng chung nhiều tổ chức:**
+  - Thêm bằng email đã có tài khoản thì chỉ thêm tư cách thành viên và vai trò, không đổi mật khẩu hay thông tin của họ.
+  - "Khóa" = tạm ngưng thành viên trong tổ chức hiện tại (tài khoản vẫn dùng được ở tổ chức khác).
+  - "Xóa" người còn thuộc tổ chức khác = gỡ khỏi tổ chức (giữ tài khoản). Chỉ xóa mềm tài khoản khi họ chỉ thuộc một tổ chức.
+  - **Chống chiếm tài khoản xuyên tổ chức:** quản trị tổ chức không đổi được email/tên/mật khẩu của tài khoản thuộc nhiều tổ chức; chỉ chủ tài khoản hoặc quản trị nền tảng làm được.
+- Cờ "có dữ liệu demo" được cache riêng theo tổ chức.
+- Kiểm thử: `tests/Feature/WorkspaceTest.php` (17 test).
+
 ## Còn lại (các bước sau)
 - Cài đặt (tên công ty, thương hiệu...) vẫn dùng chung toàn hệ thống. Cài đặt riêng cho từng tổ chức làm cùng bước 1.6.
-- Tạo tổ chức mới cần khởi tạo dữ liệu mặc định riêng (giai đoạn, nguồn, phòng ban) ở bước 1.6.
-- Email người dùng hiện duy nhất toàn hệ thống. Mời người đã có tài khoản vào tổ chức khác làm ở bước 1.6.
+- Phòng ban của người dùng (`users.department_id`) hiện là một giá trị chung cho mọi tổ chức. Nên chuyển sang lưu theo từng tư cách thành viên.
 - Mã nghiệp vụ (KH00001...) hiện sinh theo id toàn hệ thống, vẫn duy nhất. Đánh số riêng cho từng tổ chức có thể làm sau.

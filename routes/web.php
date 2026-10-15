@@ -72,6 +72,14 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+    // Chuyển tổ chức (không gian làm việc)
+    Route::post('/workspace/switch', [\App\Http\Controllers\WorkspaceController::class, 'switch'])->name('workspace.switch')->middleware('throttle:30,1');
+
+    // Khu vực quản trị nền tảng — chỉ quản trị nền tảng
+    Route::middleware('can:platform')->prefix('platform')->name('platform.')->group(function () {
+        Route::resource('organizations', \App\Http\Controllers\Platform\OrganizationController::class)->except(['show', 'destroy']);
+    });
+
     Route::get('/', fn () => redirect()->route('dashboard'));
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');

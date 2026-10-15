@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $lead->exists ? __('Sửa lead') : __('Tạo lead'))
 @section('content')
-    <x-page-header :title="$lead->exists ? 'Sửa lead: '.$lead->name : 'Tạo lead'" :breadcrumbs="['Leads' => route('leads.index'), ($lead->exists ? 'Chỉnh sửa' : 'Tạo mới') => null]" />
+    <x-page-header :title="$lead->exists ? __('Sửa lead: :name', ['name' => $lead->name]) : __('Tạo lead')" :breadcrumbs="['Leads' => route('leads.index'), ($lead->exists ? 'Chỉnh sửa' : 'Tạo mới') => null]" />
     <form method="POST" action="{{ $lead->exists ? route('leads.update', $lead) : route('leads.store') }}" class="needs-validation" novalidate>
         @csrf @if ($lead->exists) @method('PUT') @endif
         <div class="row g-4">

@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // {user} trên route chỉ tìm trong thành viên của tổ chức đang làm việc (ngoài tổ chức → 404)
-        \Illuminate\Support\Facades\Route::bind('user', fn ($value) => \App\Models\User::inOrganization()->findOrFail($value));
+        \Illuminate\Support\Facades\Route::bind('user', fn ($value) => \App\Models\User::inOrganization(null, false)->findOrFail($value));
 
         // Tên ngắn cho quan hệ đa hình (lưu trong DB thay vì tên class đầy đủ)
         Relation::morphMap([
@@ -44,6 +44,9 @@ class AppServiceProvider extends ServiceProvider
             'department' => \App\Models\Department::class,
         ]);
 
+        // Khu vực quản trị nền tảng (danh sách tổ chức...) — chỉ quản trị nền tảng
+        Gate::define('platform', fn ($user) => $user->isPlatformAdmin());
+
         // Quản trị nền tảng có toàn quyền trên mọi tổ chức
         Gate::before(fn ($user) => $user->isPlatformAdmin() ? true : null);
 
@@ -62,8 +65,12 @@ class AppServiceProvider extends ServiceProvider
             $user = auth()->user();
             $view->with('crmSettings', Setting::allCached());
             $view->with('unreadNotifications', $user ? $user->unreadNotifications()->count() : 0);
-            $view->with('hasDemoData', \Illuminate\Support\Facades\Cache::remember('crm.has_demo', 600,
+            $orgId = app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+            // Cache theo từng tổ chức (cờ dữ liệu demo của tổ chức này không lộ sang tổ chức khác)
+            $view->with('hasDemoData', \Illuminate\Support\Facades\Cache::remember('crm.has_demo.'.$orgId, 600,
                 fn () => \App\Models\Customer::withTrashed()->where('is_demo', true)->exists()));
+            $view->with('currentOrganization', $orgId ? \App\Models\Organization::find($orgId) : null);
+            $view->with('workspaces', $user ? \App\Http\Controllers\WorkspaceController::availableFor($user) : collect());
         });
         View::composer(['layouts.auth', 'auth.*', 'pages.*', 'dashboard'], fn ($view) => $view->with('crmSettings', Setting::allCached()));
     }

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $opportunity->exists ? __('Sửa cơ hội') : __('Tạo cơ hội'))
 @section('content')
-    <x-page-header :title="$opportunity->exists ? 'Sửa: '.$opportunity->title : 'Tạo cơ hội bán hàng'" :breadcrumbs="['Pipeline' => route('opportunities.index'), ($opportunity->exists ? 'Chỉnh sửa' : 'Tạo mới') => null]" />
+    <x-page-header :title="$opportunity->exists ? __('Sửa: :name', ['name' => $opportunity->title]) : __('Tạo cơ hội bán hàng')" :breadcrumbs="['Pipeline' => route('opportunities.index'), ($opportunity->exists ? 'Chỉnh sửa' : 'Tạo mới') => null]" />
     <form method="POST" action="{{ $opportunity->exists ? route('opportunities.update', $opportunity) : route('opportunities.store') }}" class="needs-validation" novalidate>
         @csrf @if ($opportunity->exists) @method('PUT') @endif
         <div class="row g-4">

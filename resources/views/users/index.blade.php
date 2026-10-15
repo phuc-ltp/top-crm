@@ -21,13 +21,14 @@
                         <div><a href="{{ route('users.show', $u) }}" class="row-link">{{ $u->name }}</a> @if ($u->is_demo)<span class="badge badge-soft-warning">Demo</span>@endif<div class="small text-muted">{{ $u->email }}</div></div></div></td>
                     <td>@foreach ($u->roles as $r)<span class="badge badge-soft-orange">{{ __($r->name) }}</span>@endforeach</td>
                     <td class="small">{{ $u->department?->name ?? '—' }}<div class="text-muted">{{ $u->position }}</div></td>
-                    <td>{!! badge(App\Models\User::STATUSES, $u->status) !!}</td>
+                    @php($suspended = $u->status === 'locked' || $u->organizations->first()?->pivot?->status === 'suspended')
+                    <td>{!! badge(App\Models\User::STATUSES, $suspended ? 'locked' : 'active') !!}@if ($u->status !== 'locked' && $suspended)<div class="small-xs text-muted">{{ __('Tạm ngưng trong tổ chức') }}</div>@endif</td>
                     <td class="small text-muted">{{ $u->last_login_at ? $u->last_login_at->diffForHumans() : __('Chưa đăng nhập') }}</td>
                     <td class="table-actions">
                         @can('update', $u)
                             @if ($u->id !== auth()->id())
-                                <form method="POST" action="{{ route('users.toggle-status', $u) }}" class="d-inline" data-confirm="{{ $u->status === 'active' ? __('Khóa tài khoản :name?', ['name' => $u->name]) : __('Mở khóa tài khoản :name?', ['name' => $u->name]) }}" data-confirm-button="{{ __('Xác nhận') }}">@csrf
-                                    <button class="btn btn-light btn-icon btn-sm" title="{{ $u->status === 'active' ? __('Khóa') : __('Mở khóa') }}"><i class="bi {{ $u->status === 'active' ? 'bi-lock' : 'bi-unlock' }}"></i></button></form>
+                                <form method="POST" action="{{ route('users.toggle-status', $u) }}" class="d-inline" data-confirm="{{ ! $suspended ? __('Tạm ngưng :name trong tổ chức?', ['name' => $u->name]) : __('Mở lại :name trong tổ chức?', ['name' => $u->name]) }}" data-confirm-button="{{ __('Xác nhận') }}">@csrf
+                                    <button class="btn btn-light btn-icon btn-sm" title="{{ ! $suspended ? __('Khóa') : __('Mở khóa') }}"><i class="bi {{ ! $suspended ? 'bi-lock' : 'bi-unlock' }}"></i></button></form>
                             @endif
                             <a href="{{ route('users.edit', $u) }}" class="btn btn-light btn-icon btn-sm" title="{{ __('Sửa') }}"><i class="bi bi-pencil"></i></a>
                         @endcan
