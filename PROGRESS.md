@@ -83,3 +83,8 @@
 - [ ] 2.6 Tìm kiếm toàn cục
 - [ ] 2.7 Dashboard 20 chỉ số
 - [ ] 2.8 Hoàn thiện, v2.0.0
+
+## TẠM DỪNG 17/10/2026 (theo yêu cầu user) — khi user nhắn "tiếp tục":
+1. Làm bước 2.3 Khách hàng (trường mới: quốc gia, phân khúc, vòng đời, đồng ý marketing, kênh liên lạc; trường tùy biến theo tổ chức; gộp khách hàng có nhật ký; nhập .xlsx; lọc/sắp xếp nâng cao).
+2. Còn chờ user: tên công ty cho tổ chức dữ liệu thật (Cách B) + xác nhận user làm chủ sở hữu.
+3. Quy trình mỗi bước: worktree .worktrees/<tên> (copy vendor), test đủ, thử migration trên bản sao orangecrm_migcheck (3 vòng + so schema, xóa bản sao), sao lưu SAO_LUU, merge main, migrate DB thật, push.
