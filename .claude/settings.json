@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i 's|        return array_filter\\($labels, fn \\($l\\) => preg_match\\('\\\\''/\\\\[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ\\\\]/iu'\\\\'', $l\\)\\);|        return array_filter\\($labels, fn \\($l\\) => preg_match\\('\\\\''/\\\\\\\\p{L}/u'\\\\'', $l\\)\\);|' tests/Feature/LocaleTest.php)",
+      "Bash(grep -n 'return array_filter\\($labels' tests/Feature/LocaleTest.php)",
+      "Bash(php C:/Users/Admin/AppData/Local/Temp/claude/c--phuc-crm/cae695ba-b058-4ac6-bdbf-ab7a898dcccc/scratchpad/merge_en.php . C:/Users/Admin/AppData/Local/Temp/claude/c--phuc-crm/cae695ba-b058-4ac6-bdbf-ab7a898dcccc/scratchpad/en_add3.php)",
+      "Bash(php -r '$p=\"lang/en.json\"; $j=json_decode\\(file_get_contents\\($p\\),true\\); $j[\"Thẻ\"]=\"Tags\"; $j[\"Ngày\"]=\"Date\"; $j[\"Ghi chú\"]=\"Note\"; file_put_contents\\($p, json_encode\\($j, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES\\).\"\\\\n\"\\); echo $j[\"Thẻ\"],\" \",$j[\"Ngày\"],\"\\\\n\";')",
+      "Bash(sed -i \"s/\\\\['14px', __\\('Thẻ'\\)\\\\]/['14px', __\\('Thẻ \\\\/ bảng'\\)]/\" resources/views/design-system.blade.php)",
+      "Bash(php -r '$p=\"lang/en.json\"; $j=json_decode\\(file_get_contents\\($p\\),true\\); $j[\"Ghi chú\"]=\"Notes\"; file_put_contents\\($p, json_encode\\($j, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES\\).\"\\\\n\"\\);')",
+      "Bash(sed -i 's/\">SL<\\\\/th>/\">{{ __\\('\"'\"'SL'\"'\"'\\) }}<\\\\/th>/g; s/<th class=\"text-end\">SL<\\\\/th>/<th class=\"text-end\">{{ __\\('\"'\"'SL'\"'\"'\\) }}<\\\\/th>/g' resources/views/pdf/document.blade.php resources/views/sales/form.blade.php resources/views/sales/show.blade.php)"
+    ]
+  }
+}

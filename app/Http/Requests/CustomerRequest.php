@@ -35,6 +35,6 @@ class CustomerRequest extends FormRequest
 
     public function attributes(): array
     {
-        return ['name' => 'Tên khách hàng'];
+        return ['name' => __('Tên khách hàng')];
     }
 }

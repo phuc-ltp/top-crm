@@ -21,19 +21,19 @@
 <div class="head">
     <div class="muted">{{ $settings['company_name'] }}</div>
     <h1>{{ mb_strtoupper($report['title']) }}</h1>
-    <div class="muted">Kỳ báo cáo: {{ $report['from']->format('d/m/Y') }} – {{ $report['to']->format('d/m/Y') }} · Xuất lúc {{ now()->format('d/m/Y H:i') }} bởi {{ auth()->user()->name }}</div>
+    <div class="muted">{{ __('Kỳ báo cáo: :from – :to · Xuất lúc :time bởi :user', ['from' => $report['from']->format('d/m/Y'), 'to' => $report['to']->format('d/m/Y'), 'time' => now()->format('d/m/Y H:i'), 'user' => auth()->user()->name]) }}</div>
 </div>
 <table class="summary"><tr>
     @foreach ($report['summary'] as [$label, $value])<td><div class="muted">{{ $label }}</div><div class="v">{{ $value }}</div></td>@endforeach
 </tr></table>
-<p class="muted"><strong>Định nghĩa:</strong> {{ $report['definition'] }}</p>
+<p class="muted"><strong>{{ __('Định nghĩa:') }}</strong> {{ $report['definition'] }}</p>
 <table class="data">
     <thead><tr>@foreach ($report['headings'] as $i => $h)<th class="{{ in_array($i, $report['money_cols']) ? 'right' : '' }}">{{ $h }}</th>@endforeach</tr></thead>
     <tbody>
     @forelse ($report['rows'] as $row)
         <tr>@foreach (array_values($row) as $i => $cell)<td class="{{ in_array($i, $report['money_cols']) ? 'right' : '' }}">{{ in_array($i, $report['money_cols']) ? money($cell) : $cell }}</td>@endforeach</tr>
     @empty
-        <tr><td colspan="{{ count($report['headings']) }}">Không có dữ liệu.</td></tr>
+        <tr><td colspan="{{ count($report['headings']) }}">{{ __('Không có dữ liệu.') }}</td></tr>
     @endforelse
     </tbody>
 </table>

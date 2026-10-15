@@ -86,7 +86,7 @@ class OpportunityController extends Controller
             return $opportunity;
         });
 
-        return redirect()->route('opportunities.show', $opportunity)->with('success', 'Đã tạo cơ hội '.$opportunity->code.'.');
+        return redirect()->route('opportunities.show', $opportunity)->with('success', __('Đã tạo cơ hội :code.', ['code' => $opportunity->code]));
     }
 
     public function show(Opportunity $opportunity)
@@ -123,7 +123,7 @@ class OpportunityController extends Controller
             }
         });
 
-        return redirect()->route('opportunities.show', $opportunity)->with('success', 'Đã cập nhật cơ hội.');
+        return redirect()->route('opportunities.show', $opportunity)->with('success', __('Đã cập nhật cơ hội.'));
     }
 
     public function destroy(Opportunity $opportunity)
@@ -131,7 +131,7 @@ class OpportunityController extends Controller
         $this->authorize('delete', $opportunity);
         $opportunity->delete();
 
-        return redirect()->route('opportunities.index')->with('success', 'Đã xóa cơ hội.');
+        return redirect()->route('opportunities.index')->with('success', __('Đã xóa cơ hội.'));
     }
 
     /** AJAX: kéo thả thẻ Kanban */
@@ -149,7 +149,7 @@ class OpportunityController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Đã chuyển "'.$opportunity->title.'" sang "'.$stage->name.'".',
+            'message' => __('Đã chuyển ":title" sang ":stage".', ['title' => $opportunity->title, 'stage' => __($stage->name)]),
             'probability' => $opportunity->probability,
             'data' => ['id' => $opportunity->id, 'stage_id' => $stage->id, 'position' => $opportunity->position],
         ]);
@@ -159,12 +159,12 @@ class OpportunityController extends Controller
     {
         $this->authorize('export', Opportunity::class);
         $rows = $this->filtered($request)->orderBy('id')->limit(20000)->get()->map(fn (Opportunity $o) => [
-            $o->code, $o->title, $o->customer?->name, $o->stage?->name, (float) $o->value, $o->probability.'%',
+            $o->code, $o->title, $o->customer?->name, $o->stage?->label, (float) $o->value, $o->probability.'%',
             $o->weighted_value, vn_date($o->expected_close_date), $o->assignee?->name, vn_date($o->created_at),
         ]);
 
-        return $exporter->download('co_hoi', ['Mã', 'Cơ hội', 'Khách hàng', 'Giai đoạn', 'Giá trị', 'Xác suất', 'Giá trị trọng số',
-            'Dự kiến chốt', 'Phụ trách', 'Ngày tạo'], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('co_hoi', [__('Mã'), __('Cơ hội'), __('Khách hàng'), __('Giai đoạn'), __('Giá trị'), __('Xác suất'), __('Giá trị trọng số'),
+            __('Dự kiến chốt'), __('Phụ trách'), __('Ngày tạo')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function validated(Request $request, ?Opportunity $existing = null): array
@@ -180,12 +180,12 @@ class OpportunityController extends Controller
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
             'lost_reason' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:5000'],
-        ], [], ['title' => 'Tên cơ hội']);
+        ], [], ['title' => __('Tên cơ hội')]);
 
-        abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, 'Bạn không có quyền với khách hàng này.');
+        abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, __('Bạn không có quyền với khách hàng này.'));
         if (! empty($data['contact_id'])) {
             $contactOk = Contact::whereKey($data['contact_id'])->where('customer_id', $data['customer_id'])->exists();
-            abort_unless($contactOk, 422, 'Người liên hệ không thuộc khách hàng đã chọn.');
+            abort_unless($contactOk, 422, __('Người liên hệ không thuộc khách hàng đã chọn.'));
         }
         if (! $request->user()->can('opportunities.assign')) {
             $data['assigned_to'] = $existing ? $existing->assigned_to : $request->user()->id;

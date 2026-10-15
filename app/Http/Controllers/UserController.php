@@ -59,7 +59,7 @@ class UserController extends Controller
             return $user;
         });
 
-        return redirect()->route('users.show', $user)->with('success', 'Đã tạo tài khoản '.$user->email.'. Hãy gửi mật khẩu cho nhân viên qua kênh an toàn.');
+        return redirect()->route('users.show', $user)->with('success', __('Đã tạo tài khoản :email. Hãy gửi mật khẩu cho nhân viên qua kênh an toàn.', ['email' => $user->email]));
     }
 
     public function show(User $user)
@@ -90,10 +90,10 @@ class UserController extends Controller
         $data = $request->validate($this->rules($request, $user), [], $this->attributes());
 
         if ($user->id === $request->user()->id && $data['status'] === 'locked') {
-            return back()->withInput()->with('error', 'Bạn không thể tự khóa tài khoản của mình.');
+            return back()->withInput()->with('error', __('Bạn không thể tự khóa tài khoản của mình.'));
         }
         if ($user->id === $request->user()->id && $user->isSuperAdmin() && $data['role'] !== 'Super Admin') {
-            return back()->withInput()->with('error', 'Bạn không thể tự bỏ vai trò Super Admin của mình.');
+            return back()->withInput()->with('error', __('Bạn không thể tự bỏ vai trò Super Admin của mình.'));
         }
 
         DB::transaction(function () use ($user, $data) {
@@ -102,31 +102,31 @@ class UserController extends Controller
         });
         ActivityLogger::log('updated', $user, 'Cập nhật tài khoản '.$user->email.' (vai trò: '.$data['role'].')');
 
-        return redirect()->route('users.show', $user)->with('success', 'Đã cập nhật tài khoản.');
+        return redirect()->route('users.show', $user)->with('success', __('Đã cập nhật tài khoản.'));
     }
 
     public function destroy(Request $request, User $user)
     {
         $this->authorize('delete', $user);
-        abort_if($user->id === $request->user()->id, 422, 'Không thể xóa chính mình.');
+        abort_if($user->id === $request->user()->id, 422, __('Không thể xóa chính mình.'));
         $user->update(['status' => 'locked']);
         $user->delete(); // xóa mềm, dữ liệu liên quan được giữ nguyên
         DB::table('sessions')->where('user_id', $user->id)->delete();
 
-        return redirect()->route('users.index')->with('success', 'Đã xóa tài khoản '.$user->email.'.');
+        return redirect()->route('users.index')->with('success', __('Đã xóa tài khoản :email.', ['email' => $user->email]));
     }
 
     public function toggleStatus(Request $request, User $user)
     {
         $this->authorize('update', $user);
-        abort_if($user->id === $request->user()->id, 422, 'Bạn không thể tự khóa tài khoản của mình.');
+        abort_if($user->id === $request->user()->id, 422, __('Bạn không thể tự khóa tài khoản của mình.'));
 
         $user->update(['status' => $user->status === 'active' ? 'locked' : 'active']);
         if ($user->status === 'locked') {
             DB::table('sessions')->where('user_id', $user->id)->delete(); // đăng xuất ngay
         }
 
-        return back()->with('success', $user->status === 'active' ? 'Đã mở khóa tài khoản.' : 'Đã khóa tài khoản và đăng xuất mọi phiên.');
+        return back()->with('success', $user->status === 'active' ? __('Đã mở khóa tài khoản.') : __('Đã khóa tài khoản và đăng xuất mọi phiên.'));
     }
 
     /** Gửi liên kết đặt lại mật khẩu qua email (quy trình chuẩn, an toàn). */
@@ -137,8 +137,8 @@ class UserController extends Controller
         ActivityLogger::log('updated', $user, 'Gửi liên kết đặt lại mật khẩu cho '.$user->email);
 
         $message = $status === Password::RESET_LINK_SENT
-            ? (config('mail.default') === 'log' ? 'Đã tạo liên kết đặt lại. Máy chủ chưa cấu hình email nên liên kết được ghi vào storage/logs/laravel.log.' : 'Đã gửi email đặt lại mật khẩu.')
-            : 'Không gửi được: '.__($status);
+            ? (config('mail.default') === 'log' ? __('Đã tạo liên kết đặt lại. Máy chủ chưa cấu hình email nên liên kết được ghi vào storage/logs/laravel.log.') : __('Đã gửi email đặt lại mật khẩu.'))
+            : __('Không gửi được: :reason', ['reason' => __($status)]);
 
         return back()->with($status === Password::RESET_LINK_SENT ? 'success' : 'error', $message);
     }
@@ -147,13 +147,13 @@ class UserController extends Controller
     public function setPassword(Request $request, User $user)
     {
         $this->authorize('update', $user);
-        $request->validate(['password' => ['required', 'confirmed', PasswordRule::min(8)->letters()->numbers()]], [], ['password' => 'Mật khẩu mới']);
+        $request->validate(['password' => ['required', 'confirmed', PasswordRule::min(8)->letters()->numbers()]], [], ['password' => __('Mật khẩu mới')]);
 
         $user->forceFill(['password' => $request->password, 'remember_token' => null])->save();
         DB::table('sessions')->where('user_id', $user->id)->delete();
         ActivityLogger::log('updated', $user, 'Quản trị viên đặt lại mật khẩu cho '.$user->email);
 
-        return back()->with('success', 'Đã đặt mật khẩu mới. Nhân viên nên đổi mật khẩu sau khi đăng nhập.');
+        return back()->with('success', __('Đã đặt mật khẩu mới. Nhân viên nên đổi mật khẩu sau khi đăng nhập.'));
     }
 
     private function rules(Request $request, ?User $user = null): array
@@ -172,6 +172,6 @@ class UserController extends Controller
 
     private function attributes(): array
     {
-        return ['name' => 'Họ tên', 'role' => 'Vai trò', 'department_id' => 'Phòng ban'];
+        return ['name' => __('Họ tên'), 'role' => __('Vai trò'), 'department_id' => __('Phòng ban')];
     }
 }

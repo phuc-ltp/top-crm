@@ -48,12 +48,12 @@ class CustomerApiController extends ApiController
             $data['assigned_to'] = $request->user()->id;
         }
         if (! $request->boolean('confirm_duplicate') && ($dups = $this->service->findDuplicates($data['email'] ?? null, $data['phone'] ?? null))->isNotEmpty()) {
-            return response()->json(['success' => false, 'message' => 'Khách hàng có thể bị trùng. Gửi confirm_duplicate=1 để vẫn tạo.',
+            return response()->json(['success' => false, 'message' => __('Khách hàng có thể bị trùng. Gửi confirm_duplicate=1 để vẫn tạo.'),
                 'duplicates' => $dups->map(fn ($d) => ['code' => $d->code, 'name' => $d->name])], 409);
         }
         $customer = $this->service->save(new Customer, $data, $request->user());
 
-        return $this->ok(self::transform($customer->load(['source', 'assignee', 'tags'])), 'Đã tạo khách hàng.', 201);
+        return $this->ok(self::transform($customer->load(['source', 'assignee', 'tags'])), __('Đã tạo khách hàng.'), 201);
     }
 
     public function update(CustomerRequest $request, Customer $customer)
@@ -65,7 +65,7 @@ class CustomerApiController extends ApiController
         }
         $this->service->save($customer, $data, $request->user());
 
-        return $this->ok(self::transform($customer->fresh(['source', 'assignee', 'tags'])), 'Đã cập nhật khách hàng.');
+        return $this->ok(self::transform($customer->fresh(['source', 'assignee', 'tags'])), __('Đã cập nhật khách hàng.'));
     }
 
     public function destroy(Customer $customer)
@@ -73,6 +73,6 @@ class CustomerApiController extends ApiController
         $this->authorize('delete', $customer);
         $customer->delete();
 
-        return $this->ok(null, 'Đã lưu trữ khách hàng.');
+        return $this->ok(null, __('Đã lưu trữ khách hàng.'));
     }
 }

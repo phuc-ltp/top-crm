@@ -79,9 +79,9 @@ class Lead extends Model
     public function getScoreLevelAttribute(): array
     {
         return match (true) {
-            $this->score >= 70 => ['Nóng', 'danger'],
-            $this->score >= 40 => ['Ấm', 'warning'],
-            default => ['Lạnh', 'info'],
+            $this->score >= 70 => [__('Nóng'), 'danger'],
+            $this->score >= 40 => [__('Ấm'), 'warning'],
+            default => [__('Lạnh'), 'info'],
         };
     }
 }

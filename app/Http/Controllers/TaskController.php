@@ -97,7 +97,7 @@ class TaskController extends Controller
 
         $this->notifyAssignee($task, null, $request);
 
-        return redirect()->route('tasks.show', $task)->with('success', 'Đã tạo công việc.');
+        return redirect()->route('tasks.show', $task)->with('success', __('Đã tạo công việc.'));
     }
 
     public function show(Task $task)
@@ -123,7 +123,7 @@ class TaskController extends Controller
         $task->update($this->validated($request, $task));
         $this->notifyAssignee($task, $previous, $request);
 
-        return redirect()->route('tasks.show', $task)->with('success', 'Đã cập nhật công việc.');
+        return redirect()->route('tasks.show', $task)->with('success', __('Đã cập nhật công việc.'));
     }
 
     public function destroy(Task $task)
@@ -131,7 +131,7 @@ class TaskController extends Controller
         $this->authorize('delete', $task);
         $task->delete();
 
-        return redirect()->route('tasks.index')->with('success', 'Đã xóa công việc.');
+        return redirect()->route('tasks.index')->with('success', __('Đã xóa công việc.'));
     }
 
     public function updateStatus(Request $request, Task $task)
@@ -141,19 +141,19 @@ class TaskController extends Controller
         $task->update(['status' => $data['status'], 'completed_at' => $data['status'] === 'completed' ? now() : null]);
 
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Đã cập nhật trạng thái.']);
+            return response()->json(['success' => true, 'message' => __('Đã cập nhật trạng thái.')]);
         }
 
-        return back()->with('success', 'Trạng thái: '.label_of(Task::STATUSES, $data['status']).'.');
+        return back()->with('success', __('Trạng thái: :status.', ['status' => label_of(Task::STATUSES, $data['status'])]));
     }
 
     public function addChecklist(Request $request, Task $task)
     {
         $this->authorize('update', $task);
-        $data = $request->validate(['content' => ['required', 'string', 'max:255']], [], ['content' => 'Nội dung']);
+        $data = $request->validate(['content' => ['required', 'string', 'max:255']], [], ['content' => __('Nội dung')]);
         $task->checklist()->create($data + ['position' => (int) $task->checklist()->max('position') + 1]);
 
-        return back()->with('success', 'Đã thêm mục checklist.');
+        return back()->with('success', __('Đã thêm mục checklist.'));
     }
 
     public function toggleChecklist(Request $request, Task $task, TaskChecklistItem $item)
@@ -175,13 +175,13 @@ class TaskController extends Controller
         abort_unless($item->task_id === $task->id, 404);
         $item->delete();
 
-        return back()->with('success', 'Đã xóa mục checklist.');
+        return back()->with('success', __('Đã xóa mục checklist.'));
     }
 
     public function addComment(Request $request, Task $task)
     {
         $this->authorize('view', $task);
-        $data = $request->validate(['body' => ['required', 'string', 'max:5000']], [], ['body' => 'Bình luận']);
+        $data = $request->validate(['body' => ['required', 'string', 'max:5000']], [], ['body' => __('Bình luận')]);
         $task->comments()->create($data + ['user_id' => $request->user()->id]);
 
         foreach ([$task->assignee, $task->creator] as $u) {
@@ -190,7 +190,7 @@ class TaskController extends Controller
             }
         }
 
-        return back()->with('success', 'Đã thêm bình luận.');
+        return back()->with('success', __('Đã thêm bình luận.'));
     }
 
     public function addAttachment(Request $request, Task $task, UploadService $uploads)
@@ -198,18 +198,18 @@ class TaskController extends Controller
         $this->authorize('update', $task);
         $request->validate([
             'file' => ['required', 'file', 'mimes:'.config('crm.attachment_mimes'), 'max:'.config('crm.attachment_max_kb')],
-        ], [], ['file' => 'Tệp đính kèm']);
+        ], [], ['file' => __('Tệp đính kèm')]);
 
         $uploads->attach($task, $request->file('file'));
 
-        return back()->with('success', 'Đã tải lên tệp đính kèm.');
+        return back()->with('success', __('Đã tải lên tệp đính kèm.'));
     }
 
     public function downloadAttachment(Task $task, Attachment $attachment)
     {
         $this->authorize('view', $task);
         abort_unless($attachment->attachable_type === 'task' && $attachment->attachable_id === $task->id, 404);
-        abort_unless(Storage::disk('local')->exists($attachment->path), 404, 'Tệp không còn tồn tại.');
+        abort_unless(Storage::disk('local')->exists($attachment->path), 404, __('Tệp không còn tồn tại.'));
 
         return Storage::disk('local')->download($attachment->path, $attachment->original_name);
     }
@@ -220,7 +220,7 @@ class TaskController extends Controller
         abort_unless($attachment->attachable_type === 'task' && $attachment->attachable_id === $task->id, 404);
         $attachment->delete();
 
-        return back()->with('success', 'Đã xóa tệp đính kèm.');
+        return back()->with('success', __('Đã xóa tệp đính kèm.'));
     }
 
     private function validated(Request $request, ?Task $existing = null): array
@@ -236,13 +236,13 @@ class TaskController extends Controller
             'related_id' => ['nullable', 'required_with:related_type', 'integer'],
             'checklist' => ['nullable', 'array', 'max:50'],
             'checklist.*' => ['nullable', 'string', 'max:255'],
-        ], [], ['title' => 'Tiêu đề công việc', 'related_id' => 'Đối tượng liên quan']);
+        ], [], ['title' => __('Tiêu đề công việc'), 'related_id' => __('Đối tượng liên quan')]);
         unset($data['checklist']);
 
         if (! empty($data['related_type'])) {
             $class = Relation::getMorphedModel($data['related_type']);
             $related = $class::find($data['related_id']);
-            abort_unless($related && $request->user()->can('view', $related), 422, 'Đối tượng liên quan không hợp lệ.');
+            abort_unless($related && $request->user()->can('view', $related), 422, __('Đối tượng liên quan không hợp lệ.'));
         } else {
             $data['related_type'] = null;
             $data['related_id'] = null;

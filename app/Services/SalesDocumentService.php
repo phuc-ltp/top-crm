@@ -42,7 +42,7 @@ class SalesDocumentService
 
             $lines[] = [
                 'product_id' => $product?->id,
-                'description' => trim((string) ($item['description'] ?? '')) ?: ($product?->name ?? 'Sản phẩm/dịch vụ'),
+                'description' => trim((string) ($item['description'] ?? '')) ?: ($product?->name ?? __('Sản phẩm/dịch vụ')),
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
                 'discount_percent' => $discount,
@@ -72,7 +72,7 @@ class SalesDocumentService
         $calc = $this->calculate($items, (float) ($attributes['discount_amount'] ?? 0), (float) ($attributes['tax_rate'] ?? 0));
 
         if (empty($calc['items'])) {
-            throw ValidationException::withMessages(['items' => 'Chứng từ phải có ít nhất một dòng sản phẩm hợp lệ.']);
+            throw ValidationException::withMessages(['items' => __('Chứng từ phải có ít nhất một dòng sản phẩm hợp lệ.')]);
         }
 
         return DB::transaction(function () use ($document, $attributes, $calc) {
@@ -93,7 +93,7 @@ class SalesDocumentService
     public function convertQuotationToOrder(Quotation $quotation, User $user): SalesOrder
     {
         if (in_array($quotation->status, ['rejected', 'expired'], true)) {
-            throw ValidationException::withMessages(['status' => 'Không thể tạo đơn hàng từ báo giá bị từ chối hoặc hết hạn.']);
+            throw ValidationException::withMessages(['status' => __('Không thể tạo đơn hàng từ báo giá bị từ chối hoặc hết hạn.')]);
         }
 
         return DB::transaction(function () use ($quotation, $user) {
@@ -119,10 +119,10 @@ class SalesDocumentService
     public function createInvoiceFromOrder(SalesOrder $order, User $user): Invoice
     {
         if ($order->status === 'cancelled') {
-            throw ValidationException::withMessages(['status' => 'Đơn hàng đã hủy, không thể lập hóa đơn.']);
+            throw ValidationException::withMessages(['status' => __('Đơn hàng đã hủy, không thể lập hóa đơn.')]);
         }
         if ($order->invoices()->where('status', '!=', 'cancelled')->exists()) {
-            throw ValidationException::withMessages(['status' => 'Đơn hàng này đã có hóa đơn.']);
+            throw ValidationException::withMessages(['status' => __('Đơn hàng này đã có hóa đơn.')]);
         }
 
         return $this->save(new Invoice, [

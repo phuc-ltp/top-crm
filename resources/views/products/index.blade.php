@@ -1,30 +1,30 @@
 @extends('layouts.app')
-@section('title', 'Sản phẩm & Dịch vụ')
+@section('title', __('Sản phẩm & Dịch vụ'))
 @section('content')
-    <x-page-header title="Sản phẩm & Dịch vụ" :breadcrumbs="['Sản phẩm' => null]">
-        @can('export', App\Models\Product::class)<a href="{{ route('products.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>Xuất Excel</a>@endcan
-        @can('create', App\Models\Product::class)<a href="{{ route('products.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Thêm sản phẩm</a>@endcan
+    <x-page-header :title="__('Sản phẩm & Dịch vụ')" :breadcrumbs="['Sản phẩm' => null]">
+        @can('export', App\Models\Product::class)<a href="{{ route('products.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>@endcan
+        @can('create', App\Models\Product::class)<a href="{{ route('products.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Thêm sản phẩm') }}</a>@endcan
     </x-page-header>
     <div class="card">
         <form method="GET" class="filter-bar" data-auto-submit>
             <div class="input-group search-input"><span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="Tên hoặc SKU..."></div>
-            <select name="category" class="form-select"><option value="">Mọi danh mục</option>
+                <input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="{{ __('Tên hoặc SKU...') }}"></div>
+            <select name="category" class="form-select"><option value="">{{ __('Mọi danh mục') }}</option>
                 @foreach ($categories as $id => $name)<option value="{{ $id }}" @selected(request('category') == $id)>{{ $name }}</option>@endforeach
             </select>
-            <select name="status" class="form-select"><option value="">Mọi trạng thái</option>
-                @foreach (App\Models\Product::STATUSES as $k => $s)<option value="{{ $k }}" @selected(request('status') === $k)>{{ $s[0] }}</option>@endforeach
+            <select name="status" class="form-select"><option value="">{{ __('Mọi trạng thái') }}</option>
+                @foreach (App\Models\Product::STATUSES as $k => $s)<option value="{{ $k }}" @selected(request('status') === $k)>{{ __($s[0]) }}</option>@endforeach
             </select>
-            <input type="number" name="min_price" value="{{ request('min_price') }}" class="form-control" placeholder="Giá từ" min="0" style="max-width:130px">
-            <input type="number" name="max_price" value="{{ request('max_price') }}" class="form-control" placeholder="Giá đến" min="0" style="max-width:130px">
-            <button class="btn btn-soft-primary"><i class="bi bi-funnel me-1"></i>Lọc</button>
+            <input type="number" name="min_price" value="{{ request('min_price') }}" class="form-control" placeholder="{{ __('Giá từ') }}" min="0" style="max-width:130px">
+            <input type="number" name="max_price" value="{{ request('max_price') }}" class="form-control" placeholder="{{ __('Giá đến') }}" min="0" style="max-width:130px">
+            <button class="btn btn-soft-primary"><i class="bi bi-funnel me-1"></i>{{ __('Lọc') }}</button>
         </form>
         @if ($products->isEmpty())
-            <x-empty-state icon="bi-box-seam" title="Chưa có sản phẩm" />
+            <x-empty-state icon="bi-box-seam" :title="__('Chưa có sản phẩm')" />
         @else
             <div class="table-responsive"><table class="table table-hover">
-                <thead><tr><th></th><th><x-sort-link column="sku" label="SKU" /></th><th><x-sort-link column="name" label="Tên sản phẩm" /></th><th>Danh mục</th>
-                    <th class="text-end"><x-sort-link column="price" label="Giá" /></th><th>Trạng thái</th><th><x-sort-link column="created_at" label="Ngày tạo" /></th><th class="text-end">Thao tác</th></tr></thead>
+                <thead><tr><th></th><th><x-sort-link column="sku" label="SKU" /></th><th><x-sort-link column="name" :label="__('Tên sản phẩm')" /></th><th>{{ __('Danh mục') }}</th>
+                    <th class="text-end"><x-sort-link column="price" :label="__('Giá')" /></th><th>{{ __('Trạng thái') }}</th><th><x-sort-link column="created_at" :label="__('Ngày tạo')" /></th><th class="text-end">{{ __('Thao tác') }}</th></tr></thead>
                 <tbody>
                 @foreach ($products as $p)
                     <tr>

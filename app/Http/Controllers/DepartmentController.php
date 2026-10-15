@@ -21,7 +21,7 @@ class DepartmentController extends Controller
         $this->authorize('manage', User::class);
         Department::create($this->validated($request));
 
-        return back()->with('success', 'Đã thêm phòng ban.');
+        return back()->with('success', __('Đã thêm phòng ban.'));
     }
 
     public function update(Request $request, Department $department)
@@ -29,16 +29,16 @@ class DepartmentController extends Controller
         $this->authorize('manage', User::class);
         $department->update($this->validated($request, $department));
 
-        return back()->with('success', 'Đã cập nhật phòng ban.');
+        return back()->with('success', __('Đã cập nhật phòng ban.'));
     }
 
     public function destroy(Department $department)
     {
         $this->authorize('manage', User::class);
-        abort_if($department->users()->exists(), 422, 'Phòng ban còn nhân viên, hãy chuyển họ sang phòng khác trước.');
+        abort_if($department->users()->exists(), 422, __('Phòng ban còn nhân viên, hãy chuyển họ sang phòng khác trước.'));
         $department->delete();
 
-        return back()->with('success', 'Đã xóa phòng ban.');
+        return back()->with('success', __('Đã xóa phòng ban.'));
     }
 
     private function validated(Request $request, ?Department $department = null): array
@@ -47,6 +47,6 @@ class DepartmentController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'code' => ['required', 'string', 'max:30', 'alpha_dash', Rule::unique('departments', 'code')->ignore($department?->id)],
             'description' => ['nullable', 'string', 'max:500'],
-        ], [], ['name' => 'Tên phòng ban', 'code' => 'Mã phòng ban']);
+        ], [], ['name' => __('Tên phòng ban'), 'code' => __('Mã phòng ban')]);
     }
 }

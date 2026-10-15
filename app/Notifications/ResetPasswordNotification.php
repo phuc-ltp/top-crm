@@ -13,12 +13,12 @@ class ResetPasswordNotification extends ResetPassword
         $minutes = config('auth.passwords.users.expire');
 
         return (new MailMessage)
-            ->subject('[OrangeCRM] Đặt lại mật khẩu')
-            ->greeting('Xin chào '.$notifiable->name.',')
-            ->line('Bạn nhận được email này vì hệ thống nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.')
-            ->action('Đặt lại mật khẩu', $url)
-            ->line("Liên kết sẽ hết hạn sau {$minutes} phút.")
-            ->line('Nếu bạn không yêu cầu, hãy bỏ qua email này.')
-            ->salutation('OrangeCRM Enterprise');
+            ->subject('['.\App\Models\Setting::get('company_name', 'TOP CRM').'] '.__('Đặt lại mật khẩu'))
+            ->greeting(__('Xin chào :name,', ['name' => $notifiable->name]))
+            ->line(__('Bạn nhận được email này vì hệ thống nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.'))
+            ->action(__('Đặt lại mật khẩu'), $url)
+            ->line(__('Liên kết sẽ hết hạn sau :minutes phút.', ['minutes' => $minutes]))
+            ->line(__('Nếu bạn không yêu cầu, hãy bỏ qua email này.'))
+            ->salutation(\App\Models\Setting::get('company_name', 'TOP CRM'));
     }
 }

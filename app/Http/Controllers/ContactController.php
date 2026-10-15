@@ -54,12 +54,12 @@ class ContactController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', Contact::class);
-        $data = $request->validate($this->rules(), [], ['full_name' => 'Họ tên']);
+        $data = $request->validate($this->rules(), [], ['full_name' => __('Họ tên')]);
         $this->ensureCustomerVisible($request, $data['customer_id'] ?? null);
 
         $contact = Contact::create($data + ['created_by' => $request->user()->id]);
 
-        return redirect()->route('contacts.show', $contact)->with('success', 'Đã thêm người liên hệ.');
+        return redirect()->route('contacts.show', $contact)->with('success', __('Đã thêm người liên hệ.'));
     }
 
     public function show(Contact $contact)
@@ -80,11 +80,11 @@ class ContactController extends Controller
     public function update(Request $request, Contact $contact)
     {
         $this->authorize('update', $contact);
-        $data = $request->validate($this->rules(), [], ['full_name' => 'Họ tên']);
+        $data = $request->validate($this->rules(), [], ['full_name' => __('Họ tên')]);
         $this->ensureCustomerVisible($request, $data['customer_id'] ?? null);
         $contact->update($data);
 
-        return redirect()->route('contacts.show', $contact)->with('success', 'Đã cập nhật người liên hệ.');
+        return redirect()->route('contacts.show', $contact)->with('success', __('Đã cập nhật người liên hệ.'));
     }
 
     public function destroy(Contact $contact)
@@ -92,7 +92,7 @@ class ContactController extends Controller
         $this->authorize('delete', $contact);
         $contact->delete();
 
-        return redirect()->route('contacts.index')->with('success', 'Đã xóa người liên hệ.');
+        return redirect()->route('contacts.index')->with('success', __('Đã xóa người liên hệ.'));
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -102,13 +102,13 @@ class ContactController extends Controller
             $c->full_name, $c->position, $c->email, $c->phone, $c->company, $c->customer?->name, vn_date($c->created_at),
         ]);
 
-        return $exporter->download('nguoi_lien_he', ['Họ tên', 'Chức vụ', 'Email', 'Điện thoại', 'Công ty', 'Khách hàng', 'Ngày tạo'], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('nguoi_lien_he', [__('Họ tên'), __('Chức vụ'), 'Email', __('Điện thoại'), __('Công ty'), __('Khách hàng'), __('Ngày tạo')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function ensureCustomerVisible(Request $request, $customerId): void
     {
         if ($customerId) {
-            abort_unless(Customer::visibleTo($request->user())->whereKey($customerId)->exists(), 403, 'Bạn không có quyền với khách hàng này.');
+            abort_unless(Customer::visibleTo($request->user())->whereKey($customerId)->exists(), 403, __('Bạn không có quyền với khách hàng này.'));
         }
     }
 }

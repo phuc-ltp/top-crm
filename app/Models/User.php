@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\LogsActivity;
 use App\Notifications\ResetPasswordNotification;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     use HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
@@ -79,6 +80,12 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /** Email/thông báo gửi cho người dùng dùng ngôn ngữ họ đã chọn (null = mặc định hệ thống). */
+    public function preferredLocale(): ?string
+    {
+        return $this->locale;
     }
 
     public function scopeActive($query)

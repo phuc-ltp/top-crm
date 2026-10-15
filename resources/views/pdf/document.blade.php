@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<title>{{ $cfg['label'] }} {{ $doc->number }}</title>
+<title>{{ $cfg['doc'] }} {{ $doc->number }}</title>
 <style>
     * { font-family: 'DejaVu Sans', sans-serif; }
     body { font-size: 11px; color: #1F2937; margin: 0; }
@@ -22,7 +22,7 @@
 </style>
 </head>
 <body>
-@if ($doc->is_demo)<div class="demo">DỮ LIỆU DEMO — KHÔNG CÓ GIÁ TRỊ THỰC TẾ</div>@endif
+@if ($doc->is_demo)<div class="demo">{{ __('DỮ LIỆU DEMO — KHÔNG CÓ GIÁ TRỊ THỰC TẾ') }}</div>@endif
 <table class="header">
     <tr>
         <td style="width:60%">
@@ -31,24 +31,24 @@
             <div class="muted">{{ $settings['company_phone'] }} @if ($settings['company_email']) · {{ $settings['company_email'] }} @endif</div>
         </td>
         <td>
-            <div class="title">{{ $cfg['label'] }}</div>
-            <div class="right">Số: <strong>{{ $doc->number }}</strong></div>
-            <div class="right">Ngày: {{ vn_date($doc->{$cfg['dateField']}) }}</div>
-            @if ($cfg['route'] === 'quotations' && $doc->valid_until)<div class="right">Hiệu lực đến: {{ vn_date($doc->valid_until) }}</div>@endif
-            @if ($cfg['route'] === 'invoices' && $doc->due_date)<div class="right">Hạn thanh toán: {{ vn_date($doc->due_date) }}</div>@endif
+            <div class="title">{{ $cfg['doc'] }}</div>
+            <div class="right">{{ __('Số:') }} <strong>{{ $doc->number }}</strong></div>
+            <div class="right">{{ __('Ngày: :date', ['date' => vn_date($doc->{$cfg['dateField']})]) }}</div>
+            @if ($cfg['route'] === 'quotations' && $doc->valid_until)<div class="right">{{ __('Hiệu lực đến: :date', ['date' => vn_date($doc->valid_until)]) }}</div>@endif
+            @if ($cfg['route'] === 'invoices' && $doc->due_date)<div class="right">{{ __('Hạn thanh toán: :date', ['date' => vn_date($doc->due_date)]) }}</div>@endif
         </td>
     </tr>
 </table>
 
 <div class="box" style="margin-bottom:16px">
-    <strong>Khách hàng:</strong> {{ $doc->customer?->name }} ({{ $doc->customer?->code }})<br>
-    @if ($doc->customer?->address)<span class="muted">Địa chỉ:</span> {{ $doc->customer->address }}<br>@endif
-    @if ($doc->customer?->phone)<span class="muted">Điện thoại:</span> {{ $doc->customer->phone }} @endif
-    @if ($doc->customer?->email)<span class="muted"> · Email:</span> {{ $doc->customer->email }}@endif
+    <strong>{{ __('Khách hàng:') }}</strong> {{ $doc->customer?->name }} ({{ $doc->customer?->code }})<br>
+    @if ($doc->customer?->address)<span class="muted">{{ __('Địa chỉ:') }}</span> {{ $doc->customer->address }}<br>@endif
+    @if ($doc->customer?->phone)<span class="muted">{{ __('Điện thoại:') }}</span> {{ $doc->customer->phone }} @endif
+    @if ($doc->customer?->email)<span class="muted"> · {{ __('Email:') }}</span> {{ $doc->customer->email }}@endif
 </div>
 
 <table class="items">
-    <thead><tr><th style="width:5%">#</th><th>Sản phẩm / dịch vụ</th><th class="right" style="width:9%">SL</th><th class="right" style="width:17%">Đơn giá</th><th class="right" style="width:9%">Giảm</th><th class="right" style="width:18%">Thành tiền</th></tr></thead>
+    <thead><tr><th style="width:5%">#</th><th>{{ __('Sản phẩm / dịch vụ') }}</th><th class="right" style="width:9%">{{ __('SL') }}</th><th class="right" style="width:17%">{{ __('Đơn giá') }}</th><th class="right" style="width:9%">{{ __('Giảm') }}</th><th class="right" style="width:18%">{{ __('Thành tiền') }}</th></tr></thead>
     <tbody>
     @foreach ($doc->items as $i => $item)
         <tr><td>{{ $i + 1 }}</td><td>{{ $item->description }}</td>
@@ -61,22 +61,22 @@
 
 <table style="margin-top:12px"><tr><td style="width:50%"></td><td>
     <table class="totals">
-        <tr><td class="muted">Tạm tính</td><td class="right">{{ money($doc->subtotal) }}</td></tr>
-        <tr><td class="muted">Chiết khấu</td><td class="right">- {{ money($doc->discount_amount) }}</td></tr>
-        <tr><td class="muted">Thuế VAT ({{ (float) $doc->tax_rate }}%)</td><td class="right">{{ money($doc->tax_amount) }}</td></tr>
-        <tr class="grand"><td>TỔNG CỘNG</td><td class="right">{{ money($doc->total) }}</td></tr>
+        <tr><td class="muted">{{ __('Tạm tính') }}</td><td class="right">{{ money($doc->subtotal) }}</td></tr>
+        <tr><td class="muted">{{ __('Chiết khấu') }}</td><td class="right">- {{ money($doc->discount_amount) }}</td></tr>
+        <tr><td class="muted">{{ __('Thuế VAT (:rate%)', ['rate' => (float) $doc->tax_rate]) }}</td><td class="right">{{ money($doc->tax_amount) }}</td></tr>
+        <tr class="grand"><td>{{ __('TỔNG CỘNG') }}</td><td class="right">{{ money($doc->total) }}</td></tr>
         @if ($cfg['route'] === 'invoices')
-            <tr><td class="muted">Đã thanh toán</td><td class="right">{{ money($doc->amount_paid) }}</td></tr>
-            <tr><td><strong>Còn phải thu</strong></td><td class="right"><strong>{{ money($doc->balance) }}</strong></td></tr>
+            <tr><td class="muted">{{ __('Đã thanh toán') }}</td><td class="right">{{ money($doc->amount_paid) }}</td></tr>
+            <tr><td><strong>{{ __('Còn phải thu') }}</strong></td><td class="right"><strong>{{ money($doc->balance) }}</strong></td></tr>
         @endif
     </table>
 </td></tr></table>
 
-@if ($doc->notes)<div style="margin-top:16px"><strong>Ghi chú / điều khoản:</strong><br>{!! nl2br(e($doc->notes)) !!}</div>@endif
+@if ($doc->notes)<div style="margin-top:16px"><strong>{{ __('Ghi chú / điều khoản:') }}</strong><br>{!! nl2br(e($doc->notes)) !!}</div>@endif
 
 <table class="sign"><tr>
-    <td><strong>Khách hàng</strong><br><span class="muted">(Ký, ghi rõ họ tên)</span></td>
-    <td><strong>Người lập</strong><br><span class="muted">(Ký, ghi rõ họ tên)</span><br><br><br>{{ $doc->creator?->name }}</td>
+    <td><strong>{{ __('labels.customer') }}</strong><br><span class="muted">{{ __('(Ký, ghi rõ họ tên)') }}</span></td>
+    <td><strong>{{ __('Người lập') }}</strong><br><span class="muted">{{ __('(Ký, ghi rõ họ tên)') }}</span><br><br><br>{{ $doc->creator?->name }}</td>
 </tr></table>
 </body>
 </html>

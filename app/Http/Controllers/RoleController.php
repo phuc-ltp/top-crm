@@ -33,13 +33,13 @@ class RoleController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100', Rule::unique('roles', 'name')],
             'permissions' => ['nullable', 'array'], 'permissions.*' => [Rule::in(PermissionCatalog::all())],
-        ], [], ['name' => 'Tên vai trò']);
+        ], [], ['name' => __('Tên vai trò')]);
 
         $role = Role::create(['name' => $data['name'], 'guard_name' => 'web']);
         $role->syncPermissions($data['permissions'] ?? []);
         ActivityLogger::log('created', null, 'Tạo vai trò '.$role->name);
 
-        return redirect()->route('roles.index')->with('success', 'Đã tạo vai trò '.$role->name.'.');
+        return redirect()->route('roles.index')->with('success', __('Đã tạo vai trò :name.', ['name' => $role->name]));
     }
 
     public function edit(Role $role)
@@ -55,13 +55,13 @@ class RoleController extends Controller
     public function update(Request $request, Role $role)
     {
         $this->authorize('manage', User::class);
-        abort_if($role->name === 'Super Admin', 422, 'Super Admin luôn có toàn quyền, không cần chỉnh.');
+        abort_if($role->name === 'Super Admin', 422, __('Super Admin luôn có toàn quyền, không cần chỉnh.'));
         $isDefault = in_array($role->name, PermissionCatalog::ROLES, true);
 
         $data = $request->validate([
             'name' => [$isDefault ? 'nullable' : 'required', 'string', 'max:100', Rule::unique('roles', 'name')->ignore($role->id)],
             'permissions' => ['nullable', 'array'], 'permissions.*' => [Rule::in(PermissionCatalog::all())],
-        ], [], ['name' => 'Tên vai trò']);
+        ], [], ['name' => __('Tên vai trò')]);
 
         if (! $isDefault && ! empty($data['name'])) {
             $role->update(['name' => $data['name']]);
@@ -75,16 +75,16 @@ class RoleController extends Controller
             'added' => array_values(array_diff($after, $before)), 'removed' => array_values(array_diff($before, $after)),
         ]);
 
-        return redirect()->route('roles.index')->with('success', 'Đã cập nhật quyền cho vai trò '.$role->name.'.');
+        return redirect()->route('roles.index')->with('success', __('Đã cập nhật quyền cho vai trò :name.', ['name' => $role->name]));
     }
 
     public function destroy(Role $role)
     {
         $this->authorize('manage', User::class);
-        abort_if(in_array($role->name, PermissionCatalog::ROLES, true), 422, 'Không thể xóa vai trò mặc định.');
-        abort_if($role->users()->exists(), 422, 'Vai trò đang được gán cho người dùng, hãy chuyển họ sang vai trò khác trước.');
+        abort_if(in_array($role->name, PermissionCatalog::ROLES, true), 422, __('Không thể xóa vai trò mặc định.'));
+        abort_if($role->users()->exists(), 422, __('Vai trò đang được gán cho người dùng, hãy chuyển họ sang vai trò khác trước.'));
         $role->delete();
 
-        return redirect()->route('roles.index')->with('success', 'Đã xóa vai trò.');
+        return redirect()->route('roles.index')->with('success', __('Đã xóa vai trò.'));
     }
 }

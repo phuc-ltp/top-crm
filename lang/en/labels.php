@@ -8,5 +8,10 @@ return [
     'task' => 'Task',
     'quotation' => 'Quotation',
     'order' => 'Order',
+    'invoice' => 'Invoice',
     'ticket' => 'Support ticket',
+    'day' => 'Day',
+    'week' => 'Week',
+    'month' => 'Month',
+    'year' => 'Year',
 ];

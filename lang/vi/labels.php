@@ -8,5 +8,11 @@ return [
     'task' => 'Công việc',
     'quotation' => 'Báo giá',
     'order' => 'Đơn hàng',
+    'invoice' => 'Hóa đơn',
     'ticket' => 'Ticket hỗ trợ',
+    // Độ chi tiết thời gian (tab biểu đồ) — tách khỏi "Ngày" dùng làm tiêu đề cột ngày tháng
+    'day' => 'Ngày',
+    'week' => 'Tuần',
+    'month' => 'Tháng',
+    'year' => 'Năm',
 ];

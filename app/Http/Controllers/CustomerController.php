@@ -71,13 +71,13 @@ class CustomerController extends Controller
             $duplicates = $this->service->findDuplicates($data['email'] ?? null, $data['phone'] ?? null);
             if ($duplicates->isNotEmpty()) {
                 return back()->withInput()->with('duplicates', $duplicates)
-                    ->with('warning', 'Phát hiện khách hàng có thể bị trùng. Kiểm tra lại hoặc chọn "Vẫn tạo khách hàng".');
+                    ->with('warning', __('Phát hiện khách hàng có thể bị trùng. Kiểm tra lại hoặc chọn "Vẫn tạo khách hàng".'));
             }
         }
 
         $customer = $this->service->save(new Customer, $data, $request->user());
 
-        return redirect()->route('customers.show', $customer)->with('success', 'Đã tạo khách hàng '.$customer->name.'.');
+        return redirect()->route('customers.show', $customer)->with('success', __('Đã tạo khách hàng :name.', ['name' => $customer->name]));
     }
 
     public function show(Customer $customer)
@@ -118,13 +118,13 @@ class CustomerController extends Controller
             $duplicates = $this->service->findDuplicates($data['email'] ?? null, $data['phone'] ?? null, $customer->id);
             if ($duplicates->isNotEmpty()) {
                 return back()->withInput()->with('duplicates', $duplicates)
-                    ->with('warning', 'Email hoặc số điện thoại trùng với khách hàng khác.');
+                    ->with('warning', __('Email hoặc số điện thoại trùng với khách hàng khác.'));
             }
         }
 
         $this->service->save($customer, $data + ['tags' => $request->input('tags', [])], $request->user());
 
-        return redirect()->route('customers.show', $customer)->with('success', 'Đã cập nhật khách hàng.');
+        return redirect()->route('customers.show', $customer)->with('success', __('Đã cập nhật khách hàng.'));
     }
 
     public function destroy(Request $request, $id)
@@ -136,12 +136,12 @@ class CustomerController extends Controller
             // Khôi phục từ lưu trữ
             $customer->restore();
 
-            return back()->with('success', 'Đã khôi phục khách hàng '.$customer->name.'.');
+            return back()->with('success', __('Đã khôi phục khách hàng :name.', ['name' => $customer->name]));
         }
 
         $customer->delete(); // xóa mềm (lưu trữ)
 
-        return redirect()->route('customers.index')->with('success', 'Đã lưu trữ khách hàng '.$customer->name.'. Có thể khôi phục trong mục "Đã lưu trữ".');
+        return redirect()->route('customers.index')->with('success', __('Đã lưu trữ khách hàng :name. Có thể khôi phục trong mục "Đã lưu trữ".', ['name' => $customer->name]));
     }
 
     public function checkDuplicate(Request $request)
@@ -166,7 +166,7 @@ class CustomerController extends Controller
         $data = $request->validate([
             'ids' => ['required', 'array', 'max:500'], 'ids.*' => ['integer'],
             'assigned_to' => ['required', Rule::exists('users', 'id')->where('status', 'active')],
-        ], [], ['ids' => 'Khách hàng được chọn']);
+        ], [], ['ids' => __('Khách hàng được chọn')]);
 
         $count = Customer::visibleTo($request->user())->whereIn('id', $data['ids'])->update(['assigned_to' => $data['assigned_to'], 'updated_by' => $request->user()->id]);
         $assignee = User::find($data['assigned_to']);
@@ -175,7 +175,7 @@ class CustomerController extends Controller
             CrmNotification::send($assignee, 'assigned', "Bạn được phân công phụ trách $count khách hàng", route('customers.index', ['assigned_to' => $assignee->id]), 'bi-people');
         }
 
-        return back()->with('success', "Đã phân công $count khách hàng cho {$assignee->name}.");
+        return back()->with('success', __('Đã phân công :count khách hàng cho :name.', ['count' => $count, 'name' => $assignee->name]));
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -184,13 +184,13 @@ class CustomerController extends Controller
 
         $rows = $this->filtered($request)->orderBy('id')->limit(20000)->get()->map(fn (Customer $c) => [
             $c->code, $c->name, $c->phone, $c->email, $c->address, $c->company, Customer::TYPES[$c->type] ?? $c->type,
-            $c->source?->name, label_of(Customer::STATUSES, $c->status), $c->assignee?->name,
+            $c->source?->label, label_of(Customer::STATUSES, $c->status), $c->assignee?->name,
             $c->tags->pluck('name')->implode(', '), vn_date($c->created_at, true), vn_date($c->updated_at, true),
         ]);
 
         return $exporter->download('khach_hang', [
-            'Mã KH', 'Tên khách hàng', 'Điện thoại', 'Email', 'Địa chỉ', 'Công ty', 'Loại', 'Nguồn', 'Trạng thái',
-            'Phụ trách', 'Thẻ', 'Ngày tạo', 'Cập nhật',
+            __('Mã KH'), __('Tên khách hàng'), __('Điện thoại'), 'Email', __('Địa chỉ'), __('Công ty'), __('Loại'), __('Nguồn'), __('Trạng thái'),
+            __('Phụ trách'), __('Thẻ'), __('Ngày tạo'), __('Cập nhật'),
         ], $rows, $request->input('format', 'xlsx'));
     }
 
@@ -216,12 +216,12 @@ class CustomerController extends Controller
     public function import(Request $request, CustomerImportService $importer)
     {
         $this->authorize('create', Customer::class);
-        $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:5120']], [], ['file' => 'Tệp CSV']);
+        $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:5120']], [], ['file' => __('Tệp CSV')]);
 
         $result = $importer->import($request->file('file'), $request->user());
 
         return redirect()->route('customers.import')->with('import_result', $result)
-            ->with($result['created'] > 0 ? 'success' : 'warning', "Đã nhập {$result['created']} khách hàng, bỏ qua {$result['skipped']} dòng.");
+            ->with($result['created'] > 0 ? 'success' : 'warning', __('Đã nhập :created khách hàng, bỏ qua :skipped dòng.', ['created' => $result['created'], 'skipped' => $result['skipped']]));
     }
 
     private function formData(): array

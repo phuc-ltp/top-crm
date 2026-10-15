@@ -65,6 +65,6 @@ class QuotationController extends SalesDocumentController
 
         $order = $this->documents->convertQuotationToOrder($quotation->load('items'), $request->user());
 
-        return redirect()->route('orders.show', $order)->with('success', 'Đã tạo đơn hàng '.$order->number.' từ báo giá '.$quotation->number.'.');
+        return redirect()->route('orders.show', $order)->with('success', __('Đã tạo đơn hàng :order từ báo giá :quote.', ['order' => $order->number, 'quote' => $quotation->number]));
     }
 }

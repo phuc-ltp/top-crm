@@ -32,6 +32,15 @@ class JsTranslations
         'Thành công',
         'Đang xử lý',
         'Thất bại',
+        // Dùng trong script của từng trang
+        'Cảnh báo trùng:',
+        'phụ trách:',
+        'Sửa phòng ban',
+        'Thêm phòng ban',
+        'Nội dung mục checklist',
+        'Đã lưu thành công.',
+        'Bạn chắc chắn muốn xóa bản ghi này?',
+        'Xóa',
     ];
 
     /** @return array<string,string> bản dịch theo ngôn ngữ hiện tại (rỗng nếu là tiếng Việt) */

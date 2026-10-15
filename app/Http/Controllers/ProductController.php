@@ -49,7 +49,7 @@ class ProductController extends Controller
         }
         $product = Product::create($data);
 
-        return redirect()->route('products.show', $product)->with('success', 'Đã thêm sản phẩm '.$product->name.'.');
+        return redirect()->route('products.show', $product)->with('success', __('Đã thêm sản phẩm :name.', ['name' => $product->name]));
     }
 
     public function show(Product $product)
@@ -82,7 +82,7 @@ class ProductController extends Controller
         }
         $product->update($data);
 
-        return redirect()->route('products.show', $product)->with('success', 'Đã cập nhật sản phẩm.');
+        return redirect()->route('products.show', $product)->with('success', __('Đã cập nhật sản phẩm.'));
     }
 
     public function destroy(Product $product)
@@ -90,7 +90,7 @@ class ProductController extends Controller
         $this->authorize('delete', $product);
         $product->delete(); // xóa mềm, chứng từ cũ vẫn giữ tham chiếu
 
-        return redirect()->route('products.index')->with('success', 'Đã xóa sản phẩm '.$product->name.'.');
+        return redirect()->route('products.index')->with('success', __('Đã xóa sản phẩm :name.', ['name' => $product->name]));
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -100,7 +100,7 @@ class ProductController extends Controller
             $p->id, $p->sku, $p->name, $p->category?->name, (float) $p->price, $p->unit, label_of(Product::STATUSES, $p->status), vn_date($p->created_at),
         ]);
 
-        return $exporter->download('san_pham', ['ID', 'SKU', 'Tên sản phẩm', 'Danh mục', 'Giá', 'Đơn vị', 'Trạng thái', 'Ngày tạo'], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('san_pham', ['ID', 'SKU', __('Tên sản phẩm'), __('Danh mục'), __('Giá'), __('Đơn vị'), __('Trạng thái'), __('Ngày tạo')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function validated(Request $request, ?Product $product = null): array
@@ -115,7 +115,7 @@ class ProductController extends Controller
             'status' => ['required', Rule::in(array_keys(Product::STATUSES))],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'remove_image' => ['nullable', 'boolean'],
-        ], ['sku.regex' => 'Mã SKU chỉ gồm chữ, số, dấu gạch ngang, gạch dưới, dấu chấm.'], ['name' => 'Tên sản phẩm']);
+        ], ['sku.regex' => __('Mã SKU chỉ gồm chữ, số, dấu gạch ngang, gạch dưới, dấu chấm.')], ['name' => __('Tên sản phẩm')]);
         unset($data['image'], $data['remove_image']);
 
         return $data;

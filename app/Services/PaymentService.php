@@ -16,16 +16,16 @@ class PaymentService
             $invoice = Invoice::whereKey($invoice->id)->lockForUpdate()->firstOrFail();
 
             if ($invoice->status !== 'issued') {
-                throw ValidationException::withMessages(['amount' => 'Chỉ ghi nhận thanh toán cho hóa đơn đã phát hành.']);
+                throw ValidationException::withMessages(['amount' => __('Chỉ ghi nhận thanh toán cho hóa đơn đã phát hành.')]);
             }
 
             $amount = round((float) $data['amount'], 2);
             if ($amount <= 0) {
-                throw ValidationException::withMessages(['amount' => 'Số tiền phải lớn hơn 0.']);
+                throw ValidationException::withMessages(['amount' => __('Số tiền phải lớn hơn 0.')]);
             }
             if ($amount > $invoice->balance + 0.001) {
                 throw ValidationException::withMessages([
-                    'amount' => 'Số tiền vượt quá số còn phải thu ('.number_format($invoice->balance, 0, ',', '.').' ₫).',
+                    'amount' => __('Số tiền vượt quá số còn phải thu (:amount).', ['amount' => number_format($invoice->balance, 0, ',', '.').' ₫']),
                 ]);
             }
 

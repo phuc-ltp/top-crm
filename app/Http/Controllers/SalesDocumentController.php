@@ -44,13 +44,21 @@ abstract class SalesDocumentController extends Controller
         return true;
     }
 
+    /** Tên chứng từ số ít, viết thường, đã dịch (vd: báo giá / quotation). */
+    protected function docName(): string
+    {
+        return mb_strtolower($this->config()['doc']);
+    }
+
     protected function config(): array
     {
         $class = $this->modelClass();
 
         return [
             'route' => $this->route,
-            'label' => $this->label,
+            'label' => __($this->label),
+            // Tên số ít đã dịch (vd: Báo giá / Quotation) để ghép câu "Tạo :doc"
+            'doc' => __('labels.'.rtrim($this->route === 'orders' ? 'order' : $this->route, 's')),
             'dateField' => $this->dateField,
             'statuses' => $class::STATUSES,
             'class' => $class,
@@ -110,7 +118,7 @@ abstract class SalesDocumentController extends Controller
 
         $doc = $this->documents->save(new $class, $attributes, $items);
 
-        return redirect()->route($this->route.'.show', $doc)->with('success', 'Đã tạo '.mb_strtolower($this->label).' '.$doc->number.'.');
+        return redirect()->route($this->route.'.show', $doc)->with('success', __('Đã tạo :doc :number.', ['doc' => $this->docName(), 'number' => $doc->number]));
     }
 
     public function show(Request $request, $id)
@@ -131,7 +139,7 @@ abstract class SalesDocumentController extends Controller
     {
         $doc = $this->find($id);
         $this->authorize('update', $doc);
-        abort_unless($this->editable($doc), 403, $this->label.' ở trạng thái hiện tại không thể chỉnh sửa.');
+        abort_unless($this->editable($doc), 403, __(':doc ở trạng thái hiện tại không thể chỉnh sửa.', ['doc' => $this->config()['doc']]));
         $doc->load('items');
 
         return view('sales.form', $this->formData($request) + [
@@ -144,22 +152,22 @@ abstract class SalesDocumentController extends Controller
     {
         $doc = $this->find($id);
         $this->authorize('update', $doc);
-        abort_unless($this->editable($doc), 403, $this->label.' ở trạng thái hiện tại không thể chỉnh sửa.');
+        abort_unless($this->editable($doc), 403, __(':doc ở trạng thái hiện tại không thể chỉnh sửa.', ['doc' => $this->config()['doc']]));
         [$attributes, $items] = $this->validated($request, $doc);
 
         $this->documents->save($doc, $attributes, $items);
 
-        return redirect()->route($this->route.'.show', $doc)->with('success', 'Đã cập nhật '.mb_strtolower($this->label).'.');
+        return redirect()->route($this->route.'.show', $doc)->with('success', __('Đã cập nhật :doc.', ['doc' => $this->docName()]));
     }
 
     public function destroy($id)
     {
         $doc = $this->find($id);
         $this->authorize('delete', $doc);
-        abort_unless($this->editable($doc), 403, 'Không thể xóa '.mb_strtolower($this->label).' ở trạng thái hiện tại.');
+        abort_unless($this->editable($doc), 403, __('Không thể xóa :doc ở trạng thái hiện tại.', ['doc' => $this->docName()]));
         $doc->delete();
 
-        return redirect()->route($this->route.'.index')->with('success', 'Đã xóa '.mb_strtolower($this->label).' '.$doc->number.'.');
+        return redirect()->route($this->route.'.index')->with('success', __('Đã xóa :doc :number.', ['doc' => $this->docName(), 'number' => $doc->number]));
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -171,9 +179,9 @@ abstract class SalesDocumentController extends Controller
             (float) $d->subtotal, (float) $d->discount_amount, (float) $d->tax_amount, (float) $d->total, $d->assignee?->name,
         ], isset($d->payment_status) ? [label_of($class::PAYMENT_STATUSES, $d->payment_status), (float) $d->amount_paid] : []));
 
-        $headings = ['Số', 'Ngày', 'Khách hàng', 'Trạng thái', 'Tạm tính', 'Chiết khấu', 'Thuế', 'Tổng cộng', 'Phụ trách'];
+        $headings = [__('Số'), __('Ngày'), __('Khách hàng'), __('Trạng thái'), __('Tạm tính'), __('Chiết khấu'), __('Thuế'), __('Tổng cộng'), __('Phụ trách')];
         if ($this->route === 'invoices') {
-            $headings = array_merge($headings, ['Thanh toán', 'Đã thu']);
+            $headings = array_merge($headings, [__('Thanh toán'), __('Đã thu')]);
         }
 
         return $exporter->download($this->route, $headings, $rows, $request->input('format', 'xlsx'));
@@ -214,9 +222,9 @@ abstract class SalesDocumentController extends Controller
             'items.*.quantity' => ['required', 'numeric', 'min:0.01', 'max:1000000'],
             'items.*.unit_price' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
             'items.*.discount_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
-        ], $this->extraRules()), [], [$this->dateField => 'Ngày']);
+        ], $this->extraRules()), [], [$this->dateField => __('Ngày')]);
 
-        abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, 'Bạn không có quyền với khách hàng này.');
+        abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, __('Bạn không có quyền với khách hàng này.'));
 
         $items = $data['items'];
         unset($data['items']);

@@ -50,7 +50,7 @@ class CampaignController extends Controller
         $this->authorize('create', Campaign::class);
         $campaign = Campaign::create($this->validated($request) + ['created_by' => $request->user()->id]);
 
-        return redirect()->route('campaigns.show', $campaign)->with('success', 'Đã tạo chiến dịch '.$campaign->name.'.');
+        return redirect()->route('campaigns.show', $campaign)->with('success', __('Đã tạo chiến dịch :name.', ['name' => $campaign->name]));
     }
 
     public function show(Request $request, Campaign $campaign)
@@ -77,7 +77,7 @@ class CampaignController extends Controller
         $this->authorize('update', $campaign);
         $campaign->update($this->validated($request));
 
-        return redirect()->route('campaigns.show', $campaign)->with('success', 'Đã cập nhật chiến dịch.');
+        return redirect()->route('campaigns.show', $campaign)->with('success', __('Đã cập nhật chiến dịch.'));
     }
 
     public function destroy(Campaign $campaign)
@@ -85,7 +85,7 @@ class CampaignController extends Controller
         $this->authorize('delete', $campaign);
         $campaign->delete();
 
-        return redirect()->route('campaigns.index')->with('success', 'Đã xóa chiến dịch.');
+        return redirect()->route('campaigns.index')->with('success', __('Đã xóa chiến dịch.'));
     }
 
     public function attachLeads(Request $request, Campaign $campaign)
@@ -95,7 +95,7 @@ class CampaignController extends Controller
         $ids = Lead::visibleTo($request->user())->whereIn('id', $data['lead_ids'])->pluck('id');
         $campaign->leads()->syncWithoutDetaching($ids->mapWithKeys(fn ($id) => [$id => ['created_at' => now()]])->all());
 
-        return back()->with('success', 'Đã gắn '.$ids->count().' lead vào chiến dịch.');
+        return back()->with('success', __('Đã gắn :count lead vào chiến dịch.', ['count' => $ids->count()]));
     }
 
     public function detachLead(Campaign $campaign, Lead $lead)
@@ -103,7 +103,7 @@ class CampaignController extends Controller
         $this->authorize('update', $campaign);
         $campaign->leads()->detach($lead->id);
 
-        return back()->with('success', 'Đã gỡ lead khỏi chiến dịch.');
+        return back()->with('success', __('Đã gỡ lead khỏi chiến dịch.'));
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -114,8 +114,8 @@ class CampaignController extends Controller
             $c->target_leads, $c->actual_leads, $c->converted_leads, $c->conversion_rate.'%', $c->cost_per_lead, label_of(Campaign::STATUSES, $c->status),
         ]);
 
-        return $exporter->download('chien_dich', ['Chiến dịch', 'Loại', 'Bắt đầu', 'Kết thúc', 'Ngân sách', 'Lead mục tiêu', 'Lead thực tế',
-            'Đã chuyển đổi', 'Tỷ lệ chuyển đổi', 'Chi phí/lead', 'Trạng thái'], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('chien_dich', [__('Chiến dịch'), __('Loại'), __('Bắt đầu'), __('Kết thúc'), __('Ngân sách'), __('Lead mục tiêu'), __('Lead thực tế'),
+            __('Đã chuyển đổi'), __('Tỷ lệ chuyển đổi'), __('Chi phí/lead'), __('Trạng thái')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function validated(Request $request): array
@@ -130,6 +130,6 @@ class CampaignController extends Controller
             'status' => ['required', Rule::in(array_keys(Campaign::STATUSES))],
             'description' => ['nullable', 'string', 'max:5000'],
             'owner_id' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
-        ], [], ['name' => 'Tên chiến dịch', 'owner_id' => 'Người phụ trách']);
+        ], [], ['name' => __('Tên chiến dịch'), 'owner_id' => __('Người phụ trách')]);
     }
 }

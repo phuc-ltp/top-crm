@@ -85,7 +85,7 @@ class LeadService
     public function convert(Lead $lead, array $options, User $actor): array
     {
         if ($lead->isConverted()) {
-            throw ValidationException::withMessages(['lead' => 'Lead này đã được chuyển đổi trước đó.']);
+            throw ValidationException::withMessages(['lead' => __('Lead này đã được chuyển đổi trước đó.')]);
         }
 
         return DB::transaction(function () use ($lead, $options, $actor) {
@@ -103,7 +103,7 @@ class LeadService
                     'lead_source_id' => $lead->lead_source_id,
                     'status' => 'active',
                     'assigned_to' => $lead->assigned_to ?? $actor->id,
-                    'notes' => 'Chuyển đổi từ Lead '.$lead->code.($lead->notes ? "\n".$lead->notes : ''),
+                    'notes' => __('Chuyển đổi từ Lead :code', ['code' => $lead->code]).($lead->notes ? "\n".$lead->notes : ''),
                     'is_demo' => $lead->is_demo,
                 ], $actor);
             }
@@ -112,7 +112,7 @@ class LeadService
             if (! empty($options['create_opportunity'])) {
                 $stage = PipelineStage::ordered()->where('is_won', false)->where('is_lost', false)->firstOrFail();
                 $opportunity = Opportunity::create([
-                    'title' => $options['opportunity_title'] ?? ('Cơ hội từ '.$lead->name),
+                    'title' => $options['opportunity_title'] ?? __('Cơ hội từ :name', ['name' => $lead->name]),
                     'customer_id' => $customer->id,
                     'lead_id' => $lead->id,
                     'pipeline_stage_id' => $stage->id,

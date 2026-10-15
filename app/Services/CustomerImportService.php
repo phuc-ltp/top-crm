@@ -41,13 +41,13 @@ class CustomerImportService
 
         $header = fgetcsv($handle, 0, $delimiter);
         if (! $header) {
-            return ['created' => 0, 'skipped' => 0, 'errors' => ['Tệp trống hoặc không đọc được.']];
+            return ['created' => 0, 'skipped' => 0, 'errors' => [__('Tệp trống hoặc không đọc được.')]];
         }
         $map = $this->mapHeader($header);
         if (! isset($map['name'])) {
             fclose($handle);
 
-            return ['created' => 0, 'skipped' => 0, 'errors' => ['Không tìm thấy cột "name" (Tên khách hàng). Hãy dùng tệp mẫu.']];
+            return ['created' => 0, 'skipped' => 0, 'errors' => [__('Không tìm thấy cột "name" (Tên khách hàng). Hãy dùng tệp mẫu.')]];
         }
 
         $sources = LeadSource::pluck('id', 'name')->mapWithKeys(fn ($id, $name) => [mb_strtolower($name) => $id]);
@@ -61,7 +61,7 @@ class CustomerImportService
             while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                 $line++;
                 if ($line - 1 > self::MAX_ROWS) {
-                    $errors[] = 'Chỉ nhập tối đa '.self::MAX_ROWS.' dòng mỗi lần.';
+                    $errors[] = __('Chỉ nhập tối đa :max dòng mỗi lần.', ['max' => self::MAX_ROWS]);
                     break;
                 }
                 if (count(array_filter($row, fn ($v) => trim((string) $v) !== '')) === 0) {
@@ -91,14 +91,14 @@ class CustomerImportService
                 ]);
                 if ($validator->fails()) {
                     $skipped++;
-                    $errors[] = "Dòng $line: ".$validator->errors()->first();
+                    $errors[] = __('Dòng :line: :error', ['line' => $line, 'error' => $validator->errors()->first()]);
 
                     continue;
                 }
 
                 if ($this->customers->findDuplicates($data['email'], $data['phone'])->isNotEmpty()) {
                     $skipped++;
-                    $errors[] = "Dòng $line: trùng email/điện thoại với khách hàng đã có ({$data['name']}).";
+                    $errors[] = __('Dòng :line: trùng email/điện thoại với khách hàng đã có (:name).', ['line' => $line, 'name' => $data['name']]);
 
                     continue;
                 }
@@ -112,7 +112,7 @@ class CustomerImportService
             fclose($handle);
             report($e);
 
-            return ['created' => 0, 'skipped' => $skipped, 'errors' => ['Lỗi khi nhập dữ liệu, không có bản ghi nào được lưu: '.$e->getMessage()]];
+            return ['created' => 0, 'skipped' => $skipped, 'errors' => [__('Lỗi khi nhập dữ liệu, không có bản ghi nào được lưu: :error', ['error' => $e->getMessage()])]];
         }
         fclose($handle);
 

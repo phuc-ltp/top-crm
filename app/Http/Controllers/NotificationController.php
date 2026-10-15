@@ -46,9 +46,9 @@ class NotificationController extends Controller
         $request->user()->unreadNotifications->markAsRead();
 
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'message' => 'Đã đánh dấu tất cả là đã đọc.']);
+            return response()->json(['success' => true, 'message' => __('Đã đánh dấu tất cả là đã đọc.')]);
         }
 
-        return back()->with('success', 'Đã đánh dấu tất cả là đã đọc.');
+        return back()->with('success', __('Đã đánh dấu tất cả là đã đọc.'));
     }
 }

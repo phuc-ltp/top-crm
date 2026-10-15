@@ -50,7 +50,7 @@ class InvoiceController extends SalesDocumentController
         [$data, $items] = parent::validated($request, $existing);
         $data['status'] = 'draft';
         if (! empty($data['sales_order_id'])) {
-            abort_unless(SalesOrder::where('id', $data['sales_order_id'])->where('customer_id', $data['customer_id'])->exists(), 422, 'Đơn hàng không thuộc khách hàng đã chọn.');
+            abort_unless(SalesOrder::where('id', $data['sales_order_id'])->where('customer_id', $data['customer_id'])->exists(), 422, __('Đơn hàng không thuộc khách hàng đã chọn.'));
         }
 
         return [$data, $items];
@@ -59,20 +59,20 @@ class InvoiceController extends SalesDocumentController
     public function issue(Invoice $invoice)
     {
         $this->authorize('update', $invoice);
-        abort_unless($invoice->status === 'draft', 422, 'Chỉ phát hành được hóa đơn nháp.');
+        abort_unless($invoice->status === 'draft', 422, __('Chỉ phát hành được hóa đơn nháp.'));
         $invoice->update(['status' => 'issued']);
 
-        return back()->with('success', 'Đã phát hành hóa đơn '.$invoice->number.'. Có thể ghi nhận thanh toán.');
+        return back()->with('success', __('Đã phát hành hóa đơn :number. Có thể ghi nhận thanh toán.', ['number' => $invoice->number]));
     }
 
     public function cancel(Request $request, Invoice $invoice)
     {
         $this->authorize('update', $invoice);
-        abort_if($invoice->status === 'cancelled', 422, 'Hóa đơn đã bị hủy.');
-        abort_if($invoice->payments()->exists(), 422, 'Hóa đơn đã có thanh toán. Hãy xóa các khoản thanh toán trước khi hủy.');
+        abort_if($invoice->status === 'cancelled', 422, __('Hóa đơn đã bị hủy.'));
+        abort_if($invoice->payments()->exists(), 422, __('Hóa đơn đã có thanh toán. Hãy xóa các khoản thanh toán trước khi hủy.'));
         $invoice->update(['status' => 'cancelled']);
         ActivityLogger::log('updated', $invoice, 'Hủy hóa đơn '.$invoice->number);
 
-        return back()->with('success', 'Đã hủy hóa đơn '.$invoice->number.'.');
+        return back()->with('success', __('Đã hủy hóa đơn :number.', ['number' => $invoice->number]));
     }
 }

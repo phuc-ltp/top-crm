@@ -62,7 +62,7 @@ class SupportTicketController extends Controller
             }
         }
 
-        return redirect()->route('tickets.show', $ticket)->with('success', 'Đã tạo ticket '.$ticket->code.'.');
+        return redirect()->route('tickets.show', $ticket)->with('success', __('Đã tạo ticket :code.', ['code' => $ticket->code]));
     }
 
     public function show(SupportTicket $ticket)
@@ -89,7 +89,7 @@ class SupportTicketController extends Controller
             CrmNotification::send($ticket->assignee, 'ticket_new', 'Bạn được giao ticket '.$ticket->code.': '.$ticket->subject, route('tickets.show', $ticket), 'bi-headset');
         }
 
-        return redirect()->route('tickets.show', $ticket)->with('success', 'Đã cập nhật ticket.');
+        return redirect()->route('tickets.show', $ticket)->with('success', __('Đã cập nhật ticket.'));
     }
 
     public function destroy(SupportTicket $ticket)
@@ -97,7 +97,7 @@ class SupportTicketController extends Controller
         $this->authorize('delete', $ticket);
         $ticket->delete();
 
-        return redirect()->route('tickets.index')->with('success', 'Đã xóa ticket.');
+        return redirect()->route('tickets.index')->with('success', __('Đã xóa ticket.'));
     }
 
     /** Phản hồi khách hàng hoặc ghi chú nội bộ; có thể đổi trạng thái cùng lúc. */
@@ -108,7 +108,7 @@ class SupportTicketController extends Controller
             'body' => ['required', 'string', 'max:10000'],
             'is_internal' => ['nullable', 'boolean'],
             'status' => ['nullable', Rule::in(array_keys(SupportTicket::STATUSES))],
-        ], [], ['body' => 'Nội dung']);
+        ], [], ['body' => __('Nội dung')]);
 
         $ticket->replies()->create(['body' => $data['body'], 'is_internal' => $request->boolean('is_internal'), 'user_id' => $request->user()->id]);
         if (! empty($data['status']) && $data['status'] !== $ticket->status) {
@@ -117,7 +117,7 @@ class SupportTicketController extends Controller
             $ticket->update(['status' => 'in_progress']);
         }
 
-        return back()->with('success', $request->boolean('is_internal') ? 'Đã thêm ghi chú nội bộ.' : 'Đã gửi phản hồi.');
+        return back()->with('success', $request->boolean('is_internal') ? __('Đã thêm ghi chú nội bộ.') : __('Đã gửi phản hồi.'));
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -128,7 +128,7 @@ class SupportTicketController extends Controller
             $t->assignee?->name, vn_date($t->created_at, true), vn_date($t->resolved_at, true),
         ]);
 
-        return $exporter->download('ticket_ho_tro', ['Mã', 'Khách hàng', 'Chủ đề', 'Ưu tiên', 'Trạng thái', 'Phụ trách', 'Tạo lúc', 'Giải quyết lúc'], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('ticket_ho_tro', [__('Mã'), __('Khách hàng'), __('Chủ đề'), __('Ưu tiên'), __('Trạng thái'), __('Phụ trách'), __('Tạo lúc'), __('Giải quyết lúc')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function statusTimestamps(string $status, ?SupportTicket $ticket): array
@@ -149,12 +149,12 @@ class SupportTicketController extends Controller
             'priority' => ['required', Rule::in(array_keys(SupportTicket::PRIORITIES))],
             'status' => ['required', Rule::in(array_keys(SupportTicket::STATUSES))],
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
-        ], [], ['subject' => 'Chủ đề', 'description' => 'Mô tả']);
+        ], [], ['subject' => __('Chủ đề'), 'description' => __('Mô tả')]);
 
         // Ticket gắn với khách hàng mà người tạo được phép xem (CSKH có quyền xem tất cả khách hàng)
-        abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, 'Bạn không có quyền với khách hàng này.');
+        abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, __('Bạn không có quyền với khách hàng này.'));
         if (! empty($data['contact_id'])) {
-            abort_unless(Contact::whereKey($data['contact_id'])->where('customer_id', $data['customer_id'])->exists(), 422, 'Người liên hệ không thuộc khách hàng đã chọn.');
+            abort_unless(Contact::whereKey($data['contact_id'])->where('customer_id', $data['customer_id'])->exists(), 422, __('Người liên hệ không thuộc khách hàng đã chọn.'));
         }
         if (! $request->user()->can('tickets.assign')) {
             $data['assigned_to'] = $existing ? $existing->assigned_to : null;

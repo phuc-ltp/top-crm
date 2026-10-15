@@ -10,7 +10,7 @@ class Payment extends Model
     use LogsActivity;
 
     public const METHODS = [
-        'cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'card' => 'Thẻ', 'other' => 'Khác',
+        'cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'card' => 'Thẻ ngân hàng', 'other' => 'Khác',
     ];
 
     protected $fillable = ['invoice_id', 'amount', 'payment_date', 'method', 'reference', 'notes', 'recorded_by', 'is_demo'];

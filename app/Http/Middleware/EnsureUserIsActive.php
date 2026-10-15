@@ -20,10 +20,10 @@ class EnsureUserIsActive
             $request->session()->regenerateToken();
 
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Tài khoản đã bị khóa.'], 403);
+                return response()->json(['message' => __('Tài khoản đã bị khóa.')], 403);
             }
 
-            return redirect()->route('login')->withErrors(['login' => 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.']);
+            return redirect()->route('login')->withErrors(['login' => __('Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.')]);
         }
 
         return $next($request);

@@ -27,7 +27,7 @@ class PaymentController extends Controller
         $payment = $this->payments->record($invoice, $data, $request->user());
         ActivityLogger::log('payment', $invoice, 'Ghi nhận thanh toán '.money($payment->amount).' cho hóa đơn '.$invoice->number);
 
-        return back()->with('success', 'Đã ghi nhận thanh toán '.money($payment->amount).'.');
+        return back()->with('success', __('Đã ghi nhận thanh toán :amount.', ['amount' => money($payment->amount)]));
     }
 
     public function destroy(Payment $payment)
@@ -36,6 +36,6 @@ class PaymentController extends Controller
         abort_unless(auth()->user()->can('invoices.delete'), 403);
         $this->payments->delete($payment);
 
-        return back()->with('success', 'Đã xóa khoản thanh toán.');
+        return back()->with('success', __('Đã xóa khoản thanh toán.'));
     }
 }

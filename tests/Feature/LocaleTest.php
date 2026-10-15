@@ -96,25 +96,66 @@ class LocaleTest extends TestCase
         $this->assertSame('1,5 tỷ ₫', money_short(1_500_000_000));
     }
 
-    /** Mọi câu trong phần giao diện đã chuyển đổi phải có bản dịch tiếng Anh. */
-    public function test_converted_screens_have_complete_english_translations(): void
+    /** Tệp mã nguồn có giao diện / thông báo cho người dùng. */
+    private function sourceFiles(): array
+    {
+        $files = [];
+        foreach ([resource_path('views'), resource_path('js'), app_path('Http'), app_path('Services'), app_path('Notifications'), app_path('Support')] as $dir) {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir)) as $f) {
+                if (preg_match('/\.(php|js)$/', $f)) $files[] = (string) $f;
+            }
+        }
+        $files[] = app_path('helpers.php');
+
+        return $files;
+    }
+
+    /**
+     * Nhãn hiển thị lấy từ hằng số (trạng thái, loại, danh mục quyền, loại báo cáo...) — được dịch động
+     * qua badge()/label_of()/__($label) nên không thấy được bằng cách dò __('...') trong mã.
+     */
+    private function constantLabels(): array
+    {
+        $labels = [];
+        $collect = function ($value) use (&$labels, &$collect) {
+            if (is_string($value)) {
+                $labels[] = $value;
+            } elseif (is_array($value)) {
+                // ['Nhãn', 'màu/icon'] -> chỉ lấy nhãn; mảng định nghĩa -> lấy 'label'
+                if (array_is_list($value) && isset($value[0]) && is_string($value[0]) && count($value) <= 3) {
+                    $labels[] = $value[0];
+                } elseif (isset($value['label'])) {
+                    $labels[] = $value['label'];
+                } else {
+                    foreach ($value as $v) $collect($v);
+                }
+            }
+        };
+        $skip = ['DEFAULTS', 'TIMEZONES', 'DATE_FORMATS', 'ROLES', 'ALIASES'];
+        $classes = array_map(fn ($f) => 'App\\Models\\'.basename($f, '.php'), glob(app_path('Models/*.php')));
+        $classes = array_merge($classes, [\App\Support\PermissionCatalog::class, \App\Services\ReportService::class, \App\Http\Controllers\SettingController::class]);
+        foreach ($classes as $class) {
+            foreach ((new \ReflectionClass($class))->getReflectionConstants() as $const) {
+                if ($const->isPublic() && ! in_array($const->getName(), $skip, true) && is_array($const->getValue())) {
+                    $collect($const->getValue());
+                }
+            }
+        }
+
+        // Bỏ mã kỹ thuật thuần (vd: VND) — chỉ giữ chuỗi có chữ cái và không phải toàn chữ in hoa
+        return array_filter($labels, fn ($l) => preg_match('/\p{L}/u', $l) && $l !== mb_strtoupper($l));
+    }
+
+    /** Mọi câu __('...') / t('...') trong toàn bộ giao diện phải có bản dịch tiếng Anh. */
+    public function test_all_screens_have_complete_english_translations(): void
     {
         $en = json_decode(file_get_contents(lang_path('en.json')), true, flags: JSON_THROW_ON_ERROR);
-        $files = array_merge(
-            glob(resource_path('views/layouts/*.blade.php')),
-            glob(resource_path('views/auth/*.blade.php')),
-            glob(resource_path('views/errors/*.blade.php')),
-            glob(resource_path('views/partials/{flash,locale-switcher}.blade.php'), GLOB_BRACE),
-            glob(resource_path('views/components/*.blade.php')),
-            [resource_path('views/dashboard.blade.php'), resource_path('views/dashboard/_schedule.blade.php')],
-            glob(app_path('Http/Controllers/Auth/*.php')),
-            [app_path('Http/Controllers/LocaleController.php'), app_path('Services/DashboardService.php'), app_path('helpers.php'), resource_path('js/app.js')],
-        );
         $keys = JsTranslations::KEYS;
-        foreach ($files as $file) {
-            preg_match_all("/\b(?:__|t)\(\s*'((?:[^'\\\\]|\\\\.)*)'/u", file_get_contents($file), $m);
+        foreach ($this->sourceFiles() as $file) {
+            preg_match_all('/(?<![\w>$])(?:__|t)\(\s*\'((?:[^\'\\\\]|\\\\.)*)\'/u', file_get_contents($file), $m);
             $keys = array_merge($keys, array_map('stripcslashes', $m[1]));
         }
+        $keys = array_merge($keys, $this->constantLabels());
         $menu = file_get_contents(app_path('Support/Menu.php'));
         preg_match_all("/\[\s*'([^']+)',\s*(?:'bi-[^']+'|null),/u", $menu, $m);
         preg_match_all("/^\s*'([^']+)' => \[\s*$/mu", $menu, $g);
@@ -125,6 +166,19 @@ class LocaleTest extends TestCase
             ->reject(fn ($k) => array_key_exists($k, $en))
             ->values()->all();
         $this->assertSame([], $missing, 'Thiếu bản dịch tiếng Anh trong lang/en.json');
+    }
+
+    /** Câu dùng trong JavaScript (t('...')) phải được khai báo để server chèn bản dịch vào trang. */
+    public function test_javascript_strings_are_registered(): void
+    {
+        $used = [];
+        foreach ($this->sourceFiles() as $file) {
+            if (! str_ends_with($file, '.blade.php') && ! str_ends_with($file, '.js')) continue;
+            preg_match_all('/(?<![\w>$])t\(\s*\'((?:[^\'\\\\]|\\\\.)*)\'/u', file_get_contents($file), $m);
+            $used = array_merge($used, array_map('stripcslashes', $m[1]));
+        }
+        $missing = array_values(array_diff(array_unique($used), JsTranslations::KEYS));
+        $this->assertSame([], $missing, 'Thêm các câu này vào App\Support\JsTranslations::KEYS');
     }
 
     public function test_english_json_has_no_empty_or_untranslated_values(): void

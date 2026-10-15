@@ -24,4 +24,10 @@ class PipelineStage extends Model
     {
         return $this->is_won || $this->is_lost;
     }
+
+    /** Tên hiển thị theo ngôn ngữ giao diện (tên mặc định của hệ thống có bản dịch; tên tự đặt giữ nguyên). */
+    public function getLabelAttribute(): string
+    {
+        return __($this->name);
+    }
 }

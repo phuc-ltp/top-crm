@@ -59,7 +59,7 @@ class SalesTargetController extends Controller
             ['target_amount' => $data['target_amount']],
         );
 
-        return redirect()->route('targets.index', ['year' => $data['year'], 'month' => $data['month']])->with('success', 'Đã lưu chỉ tiêu.');
+        return redirect()->route('targets.index', ['year' => $data['year'], 'month' => $data['month']])->with('success', __('Đã lưu chỉ tiêu.'));
     }
 
     public function destroy(Request $request, SalesTarget $target)
@@ -67,6 +67,6 @@ class SalesTargetController extends Controller
         abort_unless($this->canManage($request), 403);
         $target->delete();
 
-        return back()->with('success', 'Đã xóa chỉ tiêu.');
+        return back()->with('success', __('Đã xóa chỉ tiêu.'));
     }
 }

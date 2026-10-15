@@ -61,7 +61,7 @@ class LeadController extends Controller
         $data = $this->guardAssignment($request, $request->validated());
         $lead = $this->service->save(new Lead, $data, $request->user(), $request->boolean('auto_score', true));
 
-        return redirect()->route('leads.show', $lead)->with('success', 'Đã tạo lead '.$lead->name.' (điểm: '.$lead->score.').');
+        return redirect()->route('leads.show', $lead)->with('success', __('Đã tạo lead :name (điểm: :score).', ['name' => $lead->name, 'score' => $lead->score]));
     }
 
     public function show(Lead $lead)
@@ -86,7 +86,7 @@ class LeadController extends Controller
         $data['campaign_ids'] = $request->input('campaign_ids', []);
         $this->service->save($lead, $data, $request->user(), $request->boolean('auto_score'));
 
-        return redirect()->route('leads.show', $lead)->with('success', 'Đã cập nhật lead.');
+        return redirect()->route('leads.show', $lead)->with('success', __('Đã cập nhật lead.'));
     }
 
     public function destroy(Lead $lead)
@@ -94,13 +94,13 @@ class LeadController extends Controller
         $this->authorize('delete', $lead);
         $lead->delete();
 
-        return redirect()->route('leads.index')->with('success', 'Đã xóa lead '.$lead->name.'.');
+        return redirect()->route('leads.index')->with('success', __('Đã xóa lead :name.', ['name' => $lead->name]));
     }
 
     public function convertForm(Request $request, Lead $lead)
     {
         $this->authorize('update', $lead);
-        abort_if($lead->isConverted(), 409, 'Lead đã được chuyển đổi.');
+        abort_if($lead->isConverted(), 409, __('Lead đã được chuyển đổi.'));
 
         $matches = Customer::visibleTo($request->user())
             ->where(fn ($q) => $q->when($lead->email, fn ($w) => $w->orWhere('email', $lead->email))
@@ -125,7 +125,7 @@ class LeadController extends Controller
             'opportunity_title' => ['required_if:create_opportunity,1', 'nullable', 'string', 'max:255'],
             'opportunity_value' => ['nullable', 'numeric', 'min:0'],
             'expected_close_date' => ['nullable', 'date'],
-        ], [], ['customer_id' => 'Khách hàng', 'customer_name' => 'Tên khách hàng', 'opportunity_title' => 'Tên cơ hội']);
+        ], [], ['customer_id' => __('Khách hàng'), 'customer_name' => __('Tên khách hàng'), 'opportunity_title' => __('Tên cơ hội')]);
 
         if ($data['mode'] === 'new') {
             $data['customer_id'] = null;
@@ -137,19 +137,19 @@ class LeadController extends Controller
 
         $redirect = $result['opportunity'] ? route('opportunities.show', $result['opportunity']) : route('customers.show', $result['customer']);
 
-        return redirect($redirect)->with('success', 'Chuyển đổi lead thành công!');
+        return redirect($redirect)->with('success', __('Chuyển đổi lead thành công!'));
     }
 
     public function export(Request $request, ExportService $exporter)
     {
         $this->authorize('export', Lead::class);
         $rows = $this->filtered($request)->orderBy('id')->limit(20000)->get()->map(fn (Lead $l) => [
-            $l->code, $l->name, $l->company, $l->email, $l->phone, $l->source?->name, label_of(Lead::STATUSES, $l->status),
+            $l->code, $l->name, $l->company, $l->email, $l->phone, $l->source?->label, label_of(Lead::STATUSES, $l->status),
             $l->score, (float) $l->estimated_value, $l->assignee?->name, vn_date($l->created_at), vn_date($l->converted_at),
         ]);
 
-        return $exporter->download('leads', ['Mã', 'Tên', 'Công ty', 'Email', 'Điện thoại', 'Nguồn', 'Trạng thái', 'Điểm',
-            'Giá trị ước tính', 'Phụ trách', 'Ngày tạo', 'Ngày chuyển đổi'], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('leads', [__('Mã'), __('Tên'), __('Công ty'), 'Email', __('Điện thoại'), __('Nguồn'), __('Trạng thái'), __('Điểm'),
+            __('Giá trị ước tính'), __('Phụ trách'), __('Ngày tạo'), __('Ngày chuyển đổi')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function formData(): array

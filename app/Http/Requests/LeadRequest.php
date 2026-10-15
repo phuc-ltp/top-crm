@@ -36,6 +36,6 @@ class LeadRequest extends FormRequest
 
     public function attributes(): array
     {
-        return ['name' => 'Tên lead'];
+        return ['name' => __('Tên lead')];
     }
 }

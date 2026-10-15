@@ -19,4 +19,10 @@ class LeadSource extends Model
     {
         return $this->hasMany(Customer::class);
     }
+
+    /** Tên hiển thị theo ngôn ngữ giao diện (tên mặc định của hệ thống có bản dịch; tên tự đặt giữ nguyên). */
+    public function getLabelAttribute(): string
+    {
+        return __($this->name);
+    }
 }

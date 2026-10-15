@@ -48,7 +48,7 @@ class LeadApiController extends ApiController
         }
         $lead = $this->service->save(new Lead, $data, $request->user(), $request->boolean('auto_score', true));
 
-        return $this->ok($this->transform($lead->load(['source', 'assignee'])), 'Đã tạo lead.', 201);
+        return $this->ok($this->transform($lead->load(['source', 'assignee'])), __('Đã tạo lead.'), 201);
     }
 
     public function update(LeadRequest $request, Lead $lead)
@@ -60,6 +60,6 @@ class LeadApiController extends ApiController
         }
         $this->service->save($lead, $data, $request->user(), $request->boolean('auto_score'));
 
-        return $this->ok($this->transform($lead->fresh(['source', 'assignee'])), 'Đã cập nhật lead.');
+        return $this->ok($this->transform($lead->fresh(['source', 'assignee'])), __('Đã cập nhật lead.'));
     }
 }

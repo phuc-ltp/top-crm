@@ -27,7 +27,7 @@ class SearchController extends Controller
         };
 
         if ($user->can('customers.view')) {
-            $add('Khách hàng', 'bi-people', Customer::visibleTo($user)
+            $add(__('Khách hàng'), 'bi-people', Customer::visibleTo($user)
                 ->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('code', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term))
                 ->limit(5)->get()->map(fn ($c) => ['title' => $c->name, 'subtitle' => $c->code.' · '.($c->phone ?? $c->email), 'url' => route('customers.show', $c)]));
         }
@@ -37,21 +37,21 @@ class SearchController extends Controller
                 ->limit(5)->get()->map(fn ($l) => ['title' => $l->name, 'subtitle' => $l->code.' · '.label_of(Lead::STATUSES, $l->status), 'url' => route('leads.show', $l)]));
         }
         if ($user->can('opportunities.view')) {
-            $add('Cơ hội', 'bi-kanban', Opportunity::visibleTo($user)
+            $add(__('Cơ hội'), 'bi-kanban', Opportunity::visibleTo($user)
                 ->where(fn ($q) => $q->where('title', 'like', $term)->orWhere('code', 'like', $term))
                 ->limit(5)->get()->map(fn ($o) => ['title' => $o->title, 'subtitle' => $o->code.' · '.money($o->value), 'url' => route('opportunities.show', $o)]));
         }
         if ($user->can('contacts.view')) {
-            $add('Người liên hệ', 'bi-person-lines-fill', Contact::visibleTo($user)
+            $add(__('Người liên hệ'), 'bi-person-lines-fill', Contact::visibleTo($user)
                 ->where(fn ($q) => $q->where('full_name', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term))
                 ->limit(5)->get()->map(fn ($c) => ['title' => $c->full_name, 'subtitle' => $c->company ?? $c->email, 'url' => route('contacts.show', $c)]));
         }
         if ($user->can('invoices.view')) {
-            $add('Hóa đơn', 'bi-receipt', Invoice::visibleTo($user)->where('number', 'like', $term)
+            $add(__('Hóa đơn'), 'bi-receipt', Invoice::visibleTo($user)->where('number', 'like', $term)
                 ->limit(5)->get()->map(fn ($i) => ['title' => $i->number, 'subtitle' => money($i->total), 'url' => route('invoices.show', $i)]));
         }
         if ($user->can('tickets.view')) {
-            $add('Ticket hỗ trợ', 'bi-headset', SupportTicket::visibleTo($user)
+            $add(__('Ticket hỗ trợ'), 'bi-headset', SupportTicket::visibleTo($user)
                 ->where(fn ($q) => $q->where('subject', 'like', $term)->orWhere('code', 'like', $term))
                 ->limit(5)->get()->map(fn ($t) => ['title' => $t->subject, 'subtitle' => $t->code.' · '.label_of(SupportTicket::STATUSES, $t->status), 'url' => route('tickets.show', $t)]));
         }

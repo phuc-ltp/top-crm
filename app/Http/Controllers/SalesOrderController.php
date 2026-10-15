@@ -66,7 +66,7 @@ class SalesOrderController extends SalesDocumentController
     {
         $this->authorize('approve', SalesOrder::class);
         $this->authorize('view', $order);
-        abort_unless($order->status === 'pending', 422, 'Chỉ duyệt được đơn hàng đang chờ duyệt.');
+        abort_unless($order->status === 'pending', 422, __('Chỉ duyệt được đơn hàng đang chờ duyệt.'));
 
         $order->update(['status' => 'confirmed', 'approved_by' => $request->user()->id, 'approved_at' => now()]);
         ActivityLogger::log('approved', $order, 'Duyệt đơn hàng '.$order->number);
@@ -74,17 +74,17 @@ class SalesOrderController extends SalesDocumentController
             CrmNotification::send($order->assignee, 'order_approved', 'Đơn hàng '.$order->number.' đã được duyệt', route('orders.show', $order), 'bi-check2-circle');
         }
 
-        return back()->with('success', 'Đã duyệt đơn hàng '.$order->number.'.');
+        return back()->with('success', __('Đã duyệt đơn hàng :number.', ['number' => $order->number]));
     }
 
     public function createInvoice(Request $request, SalesOrder $order)
     {
         $this->authorize('view', $order);
         $this->authorize('create', Invoice::class);
-        abort_unless(in_array($order->status, ['confirmed', 'processing', 'completed'], true), 422, 'Đơn hàng cần được duyệt trước khi lập hóa đơn.');
+        abort_unless(in_array($order->status, ['confirmed', 'processing', 'completed'], true), 422, __('Đơn hàng cần được duyệt trước khi lập hóa đơn.'));
 
         $invoice = $this->documents->createInvoiceFromOrder($order->load('items'), $request->user());
 
-        return redirect()->route('invoices.show', $invoice)->with('success', 'Đã lập hóa đơn nháp '.$invoice->number.'. Hãy kiểm tra và bấm "Phát hành".');
+        return redirect()->route('invoices.show', $invoice)->with('success', __('Đã lập hóa đơn nháp :number. Hãy kiểm tra và bấm "Phát hành".', ['number' => $invoice->number]));
     }
 }

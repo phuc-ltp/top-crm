@@ -37,7 +37,7 @@ class SettingController extends Controller
             'default_tax_rate' => ['required', 'numeric', 'min:0', 'max:100'],
             'company_logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:1024'],
             'remove_logo' => ['nullable', 'boolean'],
-        ], ['brand_color.regex' => 'Màu thương hiệu phải có dạng #RRGGBB.'], ['company_name' => 'Tên công ty', 'brand_color' => 'Màu thương hiệu']);
+        ], ['brand_color.regex' => __('Màu thương hiệu phải có dạng #RRGGBB.')], ['company_name' => __('Tên công ty'), 'brand_color' => __('Màu thương hiệu')]);
 
         $current = Setting::allCached();
         if ($request->hasFile('company_logo')) {
@@ -56,7 +56,7 @@ class SettingController extends Controller
         Setting::put(array_map(fn ($v) => (string) $v, $data));
         ActivityLogger::log('updated', null, 'Cập nhật cài đặt hệ thống');
 
-        return back()->with('success', 'Đã lưu cài đặt hệ thống.');
+        return back()->with('success', __('Đã lưu cài đặt hệ thống.'));
     }
 
     /** Trang đăng nhập & thương hiệu + đăng nhập mạng xã hội */
@@ -98,7 +98,7 @@ class SettingController extends Controller
             'facebook_client_secret' => ['nullable', 'string', 'max:255'],
             'clear_google' => ['nullable', 'boolean'],
             'clear_facebook' => ['nullable', 'boolean'],
-        ], [], ['brand_name' => 'Tên thương hiệu', 'login_headline' => 'Tiêu đề', 'copyright_text' => 'Dòng bản quyền', 'login_background' => 'Ảnh nền']);
+        ], [], ['brand_name' => __('Tên thương hiệu'), 'login_headline' => __('Tiêu đề'), 'copyright_text' => __('Dòng bản quyền'), 'login_background' => __('Ảnh nền')]);
 
         $current = Setting::allCached();
         if ($request->hasFile('login_background')) {
@@ -126,6 +126,6 @@ class SettingController extends Controller
         Setting::put(array_map(fn ($v) => (string) ($v ?? ''), $data), 'branding');
         ActivityLogger::log('updated', null, 'Cập nhật trang đăng nhập & thương hiệu');
 
-        return back()->with('success', 'Đã lưu cài đặt trang đăng nhập & thương hiệu.');
+        return back()->with('success', __('Đã lưu cài đặt trang đăng nhập & thương hiệu.'));
     }
 }

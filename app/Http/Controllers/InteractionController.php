@@ -26,7 +26,7 @@ class InteractionController extends Controller
 
         $subject->interactions()->create($data + ['user_id' => $request->user()->id, 'occurred_at' => $data['occurred_at'] ?? now()]);
 
-        return back()->with('success', 'Đã thêm ghi chú/tương tác.');
+        return back()->with('success', __('Đã thêm ghi chú/tương tác.'));
     }
 
     public function destroy(Request $request, Interaction $interaction)
@@ -34,6 +34,6 @@ class InteractionController extends Controller
         abort_unless($interaction->user_id === $request->user()->id || $request->user()->hasRole('Super Admin'), 403);
         $interaction->delete();
 
-        return back()->with('success', 'Đã xóa ghi chú.');
+        return back()->with('success', __('Đã xóa ghi chú.'));
     }
 }

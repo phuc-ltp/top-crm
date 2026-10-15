@@ -68,7 +68,7 @@
                             <span class="card-title">{{ __('Doanh thu') }}</span>
                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <div class="seg" role="tablist" id="revenueSeg" aria-label="{{ __('Độ chi tiết') }}">
-                                    @foreach (['day' => __('Ngày'), 'week' => __('Tuần'), 'month' => __('Tháng'), 'year' => __('Năm')] as $g => $gl)
+                                    @foreach (['day' => __('labels.day'), 'week' => __('labels.week'), 'month' => __('labels.month'), 'year' => __('labels.year')] as $g => $gl)
                                         <button type="button" class="{{ $g === 'month' ? 'active' : '' }}" data-granularity="{{ $g }}" role="tab" aria-selected="{{ $g === 'month' ? 'true' : 'false' }}">{{ $gl }}</button>
                                     @endforeach
                                 </div>

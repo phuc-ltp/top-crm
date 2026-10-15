@@ -25,7 +25,7 @@ class ProfileController extends Controller
             'position' => ['nullable', 'string', 'max:100'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:max_width=4000,max_height=4000'],
             'remove_avatar' => ['nullable', 'boolean'],
-        ], [], ['name' => 'Họ tên', 'phone' => 'Số điện thoại', 'position' => 'Chức vụ', 'avatar' => 'Ảnh đại diện']);
+        ], [], ['name' => __('Họ tên'), 'phone' => __('Số điện thoại'), 'position' => __('Chức vụ'), 'avatar' => __('Ảnh đại diện')]);
 
         if ($request->hasFile('avatar')) {
             $data['avatar'] = $uploads->replacePublicImage($request->file('avatar'), 'avatars', $user->avatar);
@@ -39,7 +39,7 @@ class ProfileController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'Đã cập nhật hồ sơ.');
+        return back()->with('success', __('Đã cập nhật hồ sơ.'));
     }
 
     public function password(Request $request)
@@ -47,7 +47,7 @@ class ProfileController extends Controller
         $request->validate([
             'current_password' => ['required', 'current_password'],
             'password' => ['required', 'confirmed', 'different:current_password', Password::min(8)->letters()->numbers()],
-        ], [], ['current_password' => 'Mật khẩu hiện tại', 'password' => 'Mật khẩu mới']);
+        ], [], ['current_password' => __('Mật khẩu hiện tại'), 'password' => __('Mật khẩu mới')]);
 
         $request->user()->update(['password' => $request->password]);
         // Đăng xuất các thiết bị khác sau khi đổi mật khẩu
@@ -55,7 +55,7 @@ class ProfileController extends Controller
         DB::table('sessions')->where('user_id', $request->user()->id)->where('id', '!=', $request->session()->getId())->delete();
         ActivityLogger::log('updated', $request->user(), 'Đổi mật khẩu');
 
-        return back()->with('success', 'Đổi mật khẩu thành công. Các phiên đăng nhập khác đã bị đăng xuất.');
+        return back()->with('success', __('Đổi mật khẩu thành công. Các phiên đăng nhập khác đã bị đăng xuất.'));
     }
 
     public function sessions(Request $request)
@@ -74,12 +74,12 @@ class ProfileController extends Controller
 
     public function destroyOtherSessions(Request $request)
     {
-        $request->validate(['password' => ['required', 'current_password']], [], ['password' => 'Mật khẩu']);
+        $request->validate(['password' => ['required', 'current_password']], [], ['password' => __('Mật khẩu')]);
 
         Auth::logoutOtherDevices($request->password);
         DB::table('sessions')->where('user_id', $request->user()->id)->where('id', '!=', $request->session()->getId())->delete();
 
-        return back()->with('success', 'Đã đăng xuất khỏi tất cả thiết bị khác.');
+        return back()->with('success', __('Đã đăng xuất khỏi tất cả thiết bị khác.'));
     }
 
     private function describeAgent(string $agent): string
@@ -89,7 +89,7 @@ class ProfileController extends Controller
             str_contains($agent, 'Chrome') => 'Google Chrome',
             str_contains($agent, 'Firefox') => 'Mozilla Firefox',
             str_contains($agent, 'Safari') => 'Safari',
-            default => 'Trình duyệt khác',
+            default => __('Trình duyệt khác'),
         };
         $os = match (true) {
             str_contains($agent, 'Windows') => 'Windows',
@@ -97,7 +97,7 @@ class ProfileController extends Controller
             str_contains($agent, 'iPhone') || str_contains($agent, 'iPad') => 'iOS',
             str_contains($agent, 'Mac OS') => 'macOS',
             str_contains($agent, 'Linux') => 'Linux',
-            default => 'Không rõ',
+            default => __('Không rõ'),
         };
 
         return "$browser · $os";
