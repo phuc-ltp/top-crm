@@ -57,7 +57,8 @@ class OrganizationTest extends TestCase
         $orgB = $this->secondOrganization();
         Tag::create(['name' => 'Nhãn kiểm thử']);
         app(CurrentOrganization::class)->run($orgB->id, fn () => Tag::create(['name' => 'Nhãn kiểm thử']));   // khác tổ chức: hợp lệ
-        $this->assertSame(2, Tag::where('name', 'Nhãn kiểm thử')->count());
+        $this->assertSame(1, Tag::where('name', 'Nhãn kiểm thử')->count());   // bộ lọc tổ chức: chỉ thấy bản của mình
+        $this->assertSame(2, Tag::withoutOrganizationScope()->where('name', 'Nhãn kiểm thử')->count());
 
         $this->expectException(UniqueConstraintViolationException::class);
         Tag::create(['name' => 'Nhãn kiểm thử']);   // trùng trong cùng tổ chức: bị chặn ở tầng CSDL

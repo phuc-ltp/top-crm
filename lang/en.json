@@ -761,6 +761,7 @@
     "Tuần này": "This week",
     "Tài khoản": "Account",
     "Tài khoản :provider không cung cấp email. Vui lòng đăng nhập bằng email.": "Your :provider account did not share an email. Please sign in with email.",
+    "Tài khoản của bạn chưa thuộc tổ chức nào đang hoạt động. Vui lòng liên hệ quản trị viên.": "Your account does not belong to any active organization. Please contact your administrator.",
     "Tài khoản của bạn chưa được cấp quyền cho trang hoặc thao tác này. Hãy liên hệ quản trị viên nếu bạn cần quyền truy cập.": "Your account is not allowed to access this page or action. Contact your administrator if you need access.",
     "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.": "Your account has been locked. Please contact your administrator.",
     "Tài khoản nhân viên, vai trò và trạng thái": "Employee accounts, roles and status",
