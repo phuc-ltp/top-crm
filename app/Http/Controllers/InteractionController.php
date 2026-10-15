@@ -31,7 +31,7 @@ class InteractionController extends Controller
 
     public function destroy(Request $request, Interaction $interaction)
     {
-        abort_unless($interaction->user_id === $request->user()->id || $request->user()->hasRole('Super Admin'), 403);
+        abort_unless($interaction->user_id === $request->user()->id || $request->user()->isPlatformAdmin() || $request->user()->isOrganizationOwner(), 403);
         $interaction->delete();
 
         return back()->with('success', __('Đã xóa ghi chú.'));

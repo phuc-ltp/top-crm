@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\ActivityLogger;
 use App\Support\Lookup;
+use App\Support\PermissionCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
@@ -14,12 +15,20 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    /** Vai trò mà người thao tác được phép gán (chỉ Super Admin gán được Super Admin). */
+    /** Tên các vai trò của tổ chức đang làm việc. */
+    private function organizationRoleNames(): array
+    {
+        return Role::where('organization_id', app(\App\Support\Tenancy\CurrentOrganization::class)->id())->orderBy('id')->pluck('name')->all();
+    }
+
+    /** Vai trò của tổ chức hiện tại mà người thao tác được phép gán (chỉ chủ sở hữu gán được vai trò chủ sở hữu). */
     private function assignableRoles(Request $request): array
     {
-        return Role::orderBy('id')->get()
-            ->reject(fn ($r) => $r->name === 'Super Admin' && ! $request->user()->isSuperAdmin())
-            ->pluck('name', 'name')->all();
+        $canGrantOwner = $request->user()->isPlatformAdmin() || $request->user()->isOrganizationOwner();
+
+        return Role::where('organization_id', app(\App\Support\Tenancy\CurrentOrganization::class)->id())->orderBy('id')->get()
+            ->reject(fn ($r) => $r->name === PermissionCatalog::OWNER && ! $canGrantOwner)
+            ->mapWithKeys(fn ($r) => [$r->name => __($r->name)])->all();
     }
 
     public function index(Request $request)
@@ -30,12 +39,12 @@ class UserController extends Controller
                 $term = $this->like($request->q);
                 $q->where(fn ($w) => $w->where('name', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term));
             })
-            ->when($request->filled('role'), fn ($q) => $q->role($request->role))
+            ->when($request->filled('role') && in_array($request->role, $this->organizationRoleNames(), true), fn ($q) => $q->role($request->role))
             ->when($request->filled('department'), fn ($q) => $q->where('department_id', $request->department))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
             ->orderBy('name')->paginate($this->perPage($request))->withQueryString();
 
-        return view('users.index', ['users' => $users, 'roles' => Role::orderBy('id')->pluck('name', 'name')->all(), 'departments' => Lookup::departments()]);
+        return view('users.index', ['users' => $users, 'roles' => collect($this->organizationRoleNames())->mapWithKeys(fn ($n) => [$n => __($n)])->all(), 'departments' => Lookup::departments()]);
     }
 
     public function create(Request $request)
@@ -92,8 +101,8 @@ class UserController extends Controller
         if ($user->id === $request->user()->id && $data['status'] === 'locked') {
             return back()->withInput()->with('error', __('Bạn không thể tự khóa tài khoản của mình.'));
         }
-        if ($user->id === $request->user()->id && $user->isSuperAdmin() && $data['role'] !== 'Super Admin') {
-            return back()->withInput()->with('error', __('Bạn không thể tự bỏ vai trò Super Admin của mình.'));
+        if ($user->id === $request->user()->id && $user->isOrganizationOwner() && $data['role'] !== PermissionCatalog::OWNER) {
+            return back()->withInput()->with('error', __('Bạn không thể tự bỏ vai trò chủ sở hữu tổ chức của mình.'));
         }
 
         DB::transaction(function () use ($user, $data) {

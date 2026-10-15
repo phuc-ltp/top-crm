@@ -21,7 +21,9 @@ class AuthTest extends TestCase
             'password' => 'MatKhau2026Manh', 'password_confirmation' => 'MatKhau2026Manh',
         ])->assertRedirect(route('dashboard'));
 
-        $this->assertTrue(User::where('email', 'owner@example.com')->first()->hasRole('Super Admin'));
+        $owner = User::where('email', 'owner@example.com')->first();
+        $this->assertTrue($owner->isPlatformAdmin());
+        $this->assertTrue($owner->hasRole('Organization Owner'));
         $this->post(route('logout'));
         $this->get(route('setup'))->assertNotFound();
         $this->get('/login')->assertOk();
@@ -39,7 +41,7 @@ class AuthTest extends TestCase
         $this->post(route('logout'));
 
         $this->post(route('setup.store'), $this->setupPayload('attacker@example.com'))->assertNotFound();
-        $this->assertSame(1, User::role('Super Admin')->count());
+        $this->assertSame(1, User::where('is_platform_admin', true)->count());
         $this->assertDatabaseMissing('users', ['email' => 'attacker@example.com']);
     }
 
@@ -49,7 +51,7 @@ class AuthTest extends TestCase
         $this->post(route('logout'));
         User::where('email', 'owner@example.com')->first()->forceDelete();
 
-        $this->assertSame(0, User::role('Super Admin')->count());
+        $this->assertSame(0, User::where('is_platform_admin', true)->count());
         $this->get(route('setup'))->assertNotFound();
         $this->post(route('setup.store'), $this->setupPayload('attacker@example.com'))->assertNotFound();
         $this->get('/login')->assertOk();   // không bị chuyển sang /setup
@@ -114,7 +116,7 @@ class AuthTest extends TestCase
     public function test_user_can_login_and_logout(): void
     {
         $this->admin();
-        $user = $this->userWithRole('Sales Staff', ['email' => 'nv@example.com']);
+        $user = $this->userWithRole('Sales Employee', ['email' => 'nv@example.com']);
 
         $this->post('/login', ['login' => 'nv@example.com', 'password' => 'password'])->assertRedirect(route('dashboard'));
         $this->assertAuthenticatedAs($user);
@@ -128,7 +130,7 @@ class AuthTest extends TestCase
     public function test_wrong_password_is_rejected_and_rate_limited(): void
     {
         $this->admin();
-        $this->userWithRole('Sales Staff', ['email' => 'nv@example.com']);
+        $this->userWithRole('Sales Employee', ['email' => 'nv@example.com']);
 
         for ($i = 0; $i < 5; $i++) {
             $this->post('/login', ['login' => 'nv@example.com', 'password' => 'sai-mat-khau'])->assertSessionHasErrors('login');
@@ -141,7 +143,7 @@ class AuthTest extends TestCase
     public function test_locked_user_cannot_login_and_is_kicked_out(): void
     {
         $this->admin();
-        $user = $this->userWithRole('Sales Staff', ['email' => 'khoa@example.com', 'status' => 'locked']);
+        $user = $this->userWithRole('Sales Employee', ['email' => 'khoa@example.com', 'status' => 'locked']);
 
         $this->post('/login', ['login' => 'khoa@example.com', 'password' => 'password'])->assertSessionHasErrors('login');
         $this->assertGuest();
@@ -160,7 +162,7 @@ class AuthTest extends TestCase
     {
         Notification::fake();
         $this->admin();
-        $user = $this->userWithRole('Viewer', ['email' => 'quen@example.com']);
+        $user = $this->userWithRole('Read-only Auditor', ['email' => 'quen@example.com']);
 
         $this->post(route('password.email'), ['email' => 'quen@example.com'])->assertSessionHas('success');
         $this->post(route('password.email'), ['email' => 'khong-ton-tai@example.com'])->assertSessionHas('success'); // không lộ email
@@ -179,7 +181,7 @@ class AuthTest extends TestCase
 
     public function test_change_password_and_profile(): void
     {
-        $user = $this->userWithRole('Sales Staff');
+        $user = $this->userWithRole('Sales Employee');
         $this->actingAs($user);
 
         $this->put(route('profile.password'), ['current_password' => 'sai', 'password' => 'MoiMoi2026', 'password_confirmation' => 'MoiMoi2026'])
@@ -194,7 +196,7 @@ class AuthTest extends TestCase
 
     public function test_password_never_written_to_activity_log(): void
     {
-        $user = $this->userWithRole('Sales Staff');
+        $user = $this->userWithRole('Sales Employee');
         $this->actingAs($user)->put(route('profile.password'), ['current_password' => 'password', 'password' => 'BiMat2026xyz', 'password_confirmation' => 'BiMat2026xyz']);
 
         $this->assertDatabaseMissing('activity_logs', ['properties' => null, 'description' => 'BiMat2026xyz']);

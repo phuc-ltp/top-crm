@@ -73,7 +73,7 @@ class LocaleTest extends TestCase
     public function test_language_chosen_on_login_page_is_kept_after_sign_in(): void
     {
         $this->admin();
-        $user = $this->userWithRole('Sales Staff', ['email' => 'nv@example.com']);
+        $user = $this->userWithRole('Sales Employee', ['email' => 'nv@example.com']);
         $this->assertNull($user->locale);
 
         $this->withCookie(SetLocale::COOKIE, 'en')->post('/login', ['login' => 'nv@example.com', 'password' => 'password'])

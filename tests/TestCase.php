@@ -33,9 +33,13 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 
+    /** Quản trị nền tảng + chủ sở hữu tổ chức mặc định (tương đương "Super Admin" trước đây). */
     protected function admin(): User
     {
-        return $this->userWithRole('Super Admin');
+        $user = $this->userWithRole(\App\Support\PermissionCatalog::OWNER);
+        $user->forceFill(['is_platform_admin' => true])->save();
+
+        return $user;
     }
 
     protected function customer(array $attributes = []): Customer

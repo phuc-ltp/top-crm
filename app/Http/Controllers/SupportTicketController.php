@@ -55,7 +55,7 @@ class SupportTicketController extends Controller
 
         // Thông báo ticket mới cho người được giao, hoặc cho nhân viên CSKH nếu chưa giao
         $recipients = $ticket->assignee ? collect([$ticket->assignee])
-            : User::inOrganization()->role(['Customer Support'])->active()->get();
+            : User::inOrganization()->role(['Support Agent', 'Customer Support Manager'])->active()->get();
         foreach ($recipients as $u) {
             if ($u->id !== $request->user()->id) {
                 CrmNotification::send($u, 'ticket_new', 'Ticket mới '.$ticket->code.': '.$ticket->subject, route('tickets.show', $ticket), 'bi-headset');

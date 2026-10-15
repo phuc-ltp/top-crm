@@ -13,7 +13,7 @@ class LeadPipelineTest extends TestCase
     public function test_lead_crud_with_auto_score_and_assign_notification(): void
     {
         $manager = $this->userWithRole('Sales Manager');
-        $staff = $this->userWithRole('Sales Staff');
+        $staff = $this->userWithRole('Sales Employee');
         $this->actingAs($manager);
 
         $this->post(route('leads.store'), [
@@ -74,7 +74,7 @@ class LeadPipelineTest extends TestCase
 
     public function test_kanban_move_updates_stage_history_and_probability(): void
     {
-        $owner = $this->userWithRole('Sales Staff');
+        $owner = $this->userWithRole('Sales Employee');
         $manager = $this->userWithRole('Sales Manager');
         $customer = $this->customer(['assigned_to' => $owner->id]);
         $stages = PipelineStage::ordered()->get();
@@ -93,8 +93,8 @@ class LeadPipelineTest extends TestCase
 
     public function test_kanban_move_forbidden_for_other_staff(): void
     {
-        $owner = $this->userWithRole('Sales Staff');
-        $intruder = $this->userWithRole('Sales Staff');
+        $owner = $this->userWithRole('Sales Employee');
+        $intruder = $this->userWithRole('Sales Employee');
         $stage = PipelineStage::ordered()->first();
         $opp = Opportunity::create(['title' => 'Deal', 'customer_id' => $this->customer()->id, 'pipeline_stage_id' => $stage->id, 'value' => 1, 'assigned_to' => $owner->id]);
 

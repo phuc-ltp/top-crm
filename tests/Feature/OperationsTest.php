@@ -18,7 +18,7 @@ class OperationsTest extends TestCase
     {
         Storage::fake('local');
         $manager = $this->userWithRole('Sales Manager');
-        $staff = $this->userWithRole('Sales Staff');
+        $staff = $this->userWithRole('Sales Employee');
         $this->actingAs($manager);
 
         $this->post(route('tasks.store'), [
@@ -48,16 +48,16 @@ class OperationsTest extends TestCase
     public function test_other_staff_cannot_download_attachment(): void
     {
         Storage::fake('local');
-        $owner = $this->userWithRole('Sales Staff');
+        $owner = $this->userWithRole('Sales Employee');
         $task = Task::create(['title' => 'Riêng', 'priority' => 'low', 'status' => 'pending', 'assigned_to' => $owner->id, 'created_by' => $owner->id]);
         $att = app(\App\Services\UploadService::class)->attach($task, UploadedFile::fake()->create('a.pdf', 10, 'application/pdf'));
 
-        $this->actingAs($this->userWithRole('Sales Staff'))->get(route('tasks.attachments.download', [$task, $att]))->assertForbidden();
+        $this->actingAs($this->userWithRole('Sales Employee'))->get(route('tasks.attachments.download', [$task, $att]))->assertForbidden();
     }
 
     public function test_task_reminders_and_overdue(): void
     {
-        $u = $this->userWithRole('Sales Staff');
+        $u = $this->userWithRole('Sales Employee');
         $soon = Task::create(['title' => 'Sắp hạn', 'priority' => 'low', 'status' => 'pending', 'due_date' => now()->addHours(3), 'assigned_to' => $u->id]);
         $late = Task::create(['title' => 'Trễ', 'priority' => 'low', 'status' => 'in_progress', 'due_date' => now()->subHour(), 'assigned_to' => $u->id]);
 
@@ -71,7 +71,7 @@ class OperationsTest extends TestCase
 
     public function test_campaign_and_lead_linking(): void
     {
-        $this->actingAs($this->userWithRole('Marketing Staff'));
+        $this->actingAs($this->userWithRole('Marketing Employee'));
         $this->post(route('campaigns.store'), ['name' => 'Tết 2027', 'type' => 'social', 'budget' => 10000000, 'target_leads' => 10, 'status' => 'active'])->assertRedirect();
         $campaign = Campaign::firstOrFail();
         $leads = collect(range(1, 4))->map(fn ($i) => Lead::create(['name' => "L$i", 'status' => $i === 1 ? 'converted' : 'new']));
@@ -85,7 +85,7 @@ class OperationsTest extends TestCase
 
     public function test_ticket_flow_with_internal_notes(): void
     {
-        $agent = $this->userWithRole('Customer Support');
+        $agent = $this->userWithRole('Support Agent');
         $this->actingAs($this->userWithRole('Sales Manager'));
         $customer = $this->customer();
 
@@ -107,11 +107,11 @@ class OperationsTest extends TestCase
     {
         $this->actingAs($this->admin());
         $this->post(route('users.store'), [
-            'name' => 'Nhân viên mới', 'email' => 'moi@example.com', 'status' => 'active', 'role' => 'Sales Staff',
+            'name' => 'Nhân viên mới', 'email' => 'moi@example.com', 'status' => 'active', 'role' => 'Sales Employee',
             'password' => 'Abcdef123', 'password_confirmation' => 'Abcdef123',
         ])->assertRedirect();
         $user = User::where('email', 'moi@example.com')->firstOrFail();
-        $this->assertTrue($user->hasRole('Sales Staff'));
+        $this->assertTrue($user->hasRole('Sales Employee'));
 
         $this->post(route('users.toggle-status', $user));
         $this->assertSame('locked', $user->fresh()->status);
@@ -137,7 +137,7 @@ class OperationsTest extends TestCase
 
     public function test_notifications_mark_read(): void
     {
-        $u = $this->userWithRole('Viewer');
+        $u = $this->userWithRole('Read-only Auditor');
         \App\Notifications\CrmNotification::send($u, 'assigned', 'Xin chào', route('dashboard'));
         $id = $u->notifications()->first()->id;
         $this->actingAs($u)->get(route('notifications.open', $id))->assertRedirect(route('dashboard'));

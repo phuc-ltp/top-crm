@@ -27,7 +27,7 @@ class LoginPageTest extends TestCase
     public function test_login_with_username_case_insensitive(): void
     {
         $this->admin();
-        $user = $this->userWithRole('Sales Staff', ['email' => 'nv@example.com', 'username' => 'NguyenVan.A']);
+        $user = $this->userWithRole('Sales Employee', ['email' => 'nv@example.com', 'username' => 'NguyenVan.A']);
         $this->assertSame('nguyenvan.a', $user->fresh()->username, 'Tên đăng nhập lưu chữ thường');
 
         $this->post('/login', ['login' => 'NGUYENVAN.A', 'password' => 'password'])->assertRedirect(route('dashboard'));
@@ -109,7 +109,7 @@ class LoginPageTest extends TestCase
     {
         $this->admin();
         $this->get('/trang-khong-ton-tai')->assertNotFound()->assertSee('Không tìm thấy trang')->assertDontSee('NOT FOUND');
-        $this->actingAs($this->userWithRole('Sales Staff'))->get(route('users.index'))->assertForbidden()->assertSee('Bạn không có quyền truy cập');
+        $this->actingAs($this->userWithRole('Sales Employee'))->get(route('users.index'))->assertForbidden()->assertSee('Bạn không có quyền truy cập');
     }
 
     public function test_dashboard_and_design_system_render_with_new_layout(): void
@@ -119,7 +119,7 @@ class LoginPageTest extends TestCase
             ->assertSee('Tỷ lệ cơ hội')->assertSee('Top nhân viên')->assertSee('Công việc hôm nay')->assertSee('Nguồn khách hàng')
             ->assertSee('crm-wallpaper', false)->assertSee('mac-lights', false)->assertSee('data-theme-toggle', false);
         $this->get(route('design-system'))->assertOk()->assertSee('Bảng màu chủ đạo')->assertSee('#EA7A2B');
-        $this->actingAs($this->userWithRole('Sales Staff'))->get(route('design-system'))->assertForbidden();
+        $this->actingAs($this->userWithRole('Sales Employee'))->get(route('design-system'))->assertForbidden();
     }
 
     public function test_dashboard_widgets_return_data(): void
@@ -139,12 +139,12 @@ class LoginPageTest extends TestCase
     public function test_admin_can_set_username(): void
     {
         $this->actingAs($this->admin());
-        $user = $this->userWithRole('Viewer');
-        $this->put(route('users.update', $user), ['name' => $user->name, 'email' => $user->email, 'username' => 'xem.vien', 'status' => 'active', 'role' => 'Viewer'])
+        $user = $this->userWithRole('Read-only Auditor');
+        $this->put(route('users.update', $user), ['name' => $user->name, 'email' => $user->email, 'username' => 'xem.vien', 'status' => 'active', 'role' => 'Read-only Auditor'])
             ->assertRedirect();
         $this->assertSame('xem.vien', $user->fresh()->username);
-        $other = $this->userWithRole('Viewer');
-        $this->put(route('users.update', $other), ['name' => 'B', 'email' => $other->email, 'username' => 'XEM.VIEN', 'status' => 'active', 'role' => 'Viewer'])
+        $other = $this->userWithRole('Read-only Auditor');
+        $this->put(route('users.update', $other), ['name' => 'B', 'email' => $other->email, 'username' => 'XEM.VIEN', 'status' => 'active', 'role' => 'Read-only Auditor'])
             ->assertSessionHasErrors('username');
     }
 }

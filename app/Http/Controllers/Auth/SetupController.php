@@ -57,7 +57,7 @@ class SetupController extends Controller
         try {
             // Lớp 2: giành cờ khởi tạo bằng khóa UNIQUE trong CSDL, cùng transaction với việc tạo tài khoản.
             $user = DB::transaction(function () use ($data) {
-                if (User::role('Super Admin')->exists() || ! AppInitialization::claim()) {
+                if (User::where('is_platform_admin', true)->exists() || ! AppInitialization::claim()) {
                     return null;
                 }
 
@@ -83,7 +83,10 @@ class SetupController extends Controller
             'status' => 'active', 'position' => 'Quản trị hệ thống',
             'department_id' => Department::where('code', 'BGD')->value('id'),
         ]);
-        $user->assignRole('Super Admin');
+        // Người khởi tạo = quản trị nền tảng + chủ sở hữu tổ chức mặc định
+        $user->forceFill(['is_platform_admin' => true])->save();
+        app(\App\Support\Tenancy\RoleProvisioner::class)->provision(\App\Models\Organization::DEFAULT_ID);
+        $user->assignRole(\App\Support\PermissionCatalog::OWNER);
         // Người khởi tạo hệ thống là chủ sở hữu tổ chức mặc định
         \App\Models\Organization::whereKey(\App\Models\Organization::DEFAULT_ID)->whereNull('owner_id')->update(['owner_id' => $user->id]);
 

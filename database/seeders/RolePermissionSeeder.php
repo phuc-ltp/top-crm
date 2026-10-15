@@ -19,12 +19,9 @@ class RolePermissionSeeder extends Seeder
             Permission::findOrCreate($name, 'web');
         }
 
-        foreach (PermissionCatalog::ROLES as $roleName) {
-            $role = Role::findOrCreate($roleName, 'web');
-            // Chỉ gán quyền mặc định khi vai trò chưa được tùy chỉnh
-            if ($role->permissions()->count() === 0) {
-                $role->syncPermissions(PermissionCatalog::defaultsFor($roleName));
-            }
+        // Mỗi tổ chức có bộ vai trò riêng (spatie teams)
+        foreach (\App\Models\Organization::pluck('id') as $orgId) {
+            app(\App\Support\Tenancy\RoleProvisioner::class)->provision((int) $orgId);
         }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

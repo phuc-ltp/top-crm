@@ -1,8 +1,23 @@
 {
-    "Showing": "Hiển thị",
-    "to": "đến",
-    "of": "trên",
-    "results": "kết quả",
+    "Accountant": "Kế toán",
+    "Customer Support Manager": "Quản lý chăm sóc khách hàng",
+    "Employee": "Nhân viên",
+    "Finance Manager": "Quản lý tài chính",
     "Go to page :page": "Đến trang :page",
-    "Pagination Navigation": "Điều hướng phân trang"
+    "Inventory Manager": "Quản lý kho",
+    "Marketing Employee": "Nhân viên marketing",
+    "Marketing Manager": "Quản lý marketing",
+    "of": "trên",
+    "Organization Administrator": "Quản trị tổ chức",
+    "Organization Owner": "Chủ sở hữu tổ chức",
+    "Pagination Navigation": "Điều hướng phân trang",
+    "Platform Super Administrator": "Quản trị nền tảng",
+    "Project Manager": "Quản lý dự án",
+    "Read-only Auditor": "Kiểm toán (chỉ xem)",
+    "results": "kết quả",
+    "Sales Employee": "Nhân viên bán hàng",
+    "Sales Manager": "Quản lý bán hàng",
+    "Showing": "Hiển thị",
+    "Support Agent": "Nhân viên hỗ trợ",
+    "to": "đến"
 }

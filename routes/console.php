@@ -35,7 +35,14 @@ Artisan::command('crm:create-admin {--email=} {--name=}', function () {
     $user->fill(['name' => $name, 'password' => $password, 'status' => 'active', 'is_demo' => false]);
     $user->deleted_at = null;
     $user->save();
-    $user->syncRoles(['Super Admin']);
+    $user->forceFill(['is_platform_admin' => true])->save();   // quản trị nền tảng
+    app(\App\Support\Tenancy\RoleProvisioner::class)->provision(\App\Models\Organization::DEFAULT_ID);
+    app(\App\Support\Tenancy\CurrentOrganization::class)->run(\App\Models\Organization::DEFAULT_ID, function () use ($user) {
+        if (! $user->belongsToOrganization(\App\Models\Organization::DEFAULT_ID)) {
+            $user->organizations()->syncWithoutDetaching([\App\Models\Organization::DEFAULT_ID => ['status' => 'active', 'joined_at' => now()]]);
+        }
+        $user->syncRoles([\App\Support\PermissionCatalog::OWNER]);
+    });
     \App\Support\AppInitialization::mark();   // đóng trang /setup vĩnh viễn
     $this->info("Đã tạo/cập nhật Super Admin: {$email}");
 
@@ -133,7 +140,7 @@ Artisan::command('crm:health', function () {
         $pending = collect(app('migrator')->getMigrationFiles(database_path('migrations')))->keys()
             ->diff(DB::table('migrations')->pluck('migration'));
         $line($pending->isEmpty(), 'Cấu trúc database đầy đủ'.($pending->isEmpty() ? '' : ' (thiếu '.$pending->count().' migration)'));
-        $this->line(User::role('Super Admin')->exists() ? '  [OK]   Đã có tài khoản Super Admin' : '  [!]    Chưa có Super Admin -> mở trang /setup trên trình duyệt để tạo');
+        $this->line(User::where('is_platform_admin', true)->exists() ? '  [OK]   Đã có tài khoản quản trị nền tảng' : '  [!]    Chưa có quản trị nền tảng -> mở trang /setup trên trình duyệt để tạo');
         $this->line('  [i]    Khách hàng: '.Customer::count().(Customer::where('is_demo', true)->exists() ? ' (có dữ liệu DEMO)' : ''));
     } catch (\Throwable $e) {
         $line(false, 'Kết nối MySQL thất bại: '.$e->getMessage());

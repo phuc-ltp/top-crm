@@ -7,7 +7,7 @@
     <div class="card">
         <form method="GET" class="filter-bar" data-auto-submit>
             <div class="input-group search-input"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="{{ __('Tên, email, điện thoại...') }}"></div>
-            <select name="role" class="form-select"><option value="">{{ __('Mọi vai trò') }}</option>@foreach ($roles as $r)<option value="{{ $r }}" @selected(request('role') === $r)>{{ $r }}</option>@endforeach</select>
+            <select name="role" class="form-select"><option value="">{{ __('Mọi vai trò') }}</option>@foreach ($roles as $r => $rLabel)<option value="{{ $r }}" @selected(request('role') === $r)>{{ $rLabel }}</option>@endforeach</select>
             <select name="department" class="form-select"><option value="">{{ __('Mọi phòng ban') }}</option>@foreach ($departments as $id => $name)<option value="{{ $id }}" @selected(request('department') == $id)>{{ $name }}</option>@endforeach</select>
             <select name="status" class="form-select"><option value="">{{ __('Mọi trạng thái') }}</option>@foreach (App\Models\User::STATUSES as $k => $s)<option value="{{ $k }}" @selected(request('status') === $k)>{{ __($s[0]) }}</option>@endforeach</select>
             <button class="btn btn-soft-primary"><i class="bi bi-funnel me-1"></i>{{ __('Lọc') }}</button>
@@ -19,7 +19,7 @@
                 <tr>
                     <td><div class="d-flex align-items-center gap-2"><x-avatar :user="$u" />
                         <div><a href="{{ route('users.show', $u) }}" class="row-link">{{ $u->name }}</a> @if ($u->is_demo)<span class="badge badge-soft-warning">Demo</span>@endif<div class="small text-muted">{{ $u->email }}</div></div></div></td>
-                    <td>@foreach ($u->roles as $r)<span class="badge badge-soft-orange">{{ $r->name }}</span>@endforeach</td>
+                    <td>@foreach ($u->roles as $r)<span class="badge badge-soft-orange">{{ __($r->name) }}</span>@endforeach</td>
                     <td class="small">{{ $u->department?->name ?? '—' }}<div class="text-muted">{{ $u->position }}</div></td>
                     <td>{!! badge(App\Models\User::STATUSES, $u->status) !!}</td>
                     <td class="small text-muted">{{ $u->last_login_at ? $u->last_login_at->diffForHumans() : __('Chưa đăng nhập') }}</td>

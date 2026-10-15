@@ -21,15 +21,21 @@ class UserPolicy
         return $user->can('users.create');
     }
 
-    /** Chỉ Super Admin được sửa tài khoản Super Admin (Gate::before đã cho phép Super Admin). */
+    /**
+     * Tài khoản quản trị nền tảng / chủ sở hữu tổ chức chỉ do chủ sở hữu (hoặc quản trị nền tảng — Gate::before) sửa.
+     */
     public function update(User $user, User $target): bool
     {
-        return $user->can('users.update') && ! $target->hasRole('Super Admin');
+        if ($target->isPlatformAdmin()) {
+            return false;
+        }
+
+        return $user->can('users.update') && (! $target->isOrganizationOwner() || $user->isOrganizationOwner());
     }
 
     public function delete(User $user, User $target): bool
     {
-        return $user->id !== $target->id && $user->can('users.delete') && ! $target->hasRole('Super Admin');
+        return $user->id !== $target->id && $user->can('users.delete') && ! $target->isProtectedAccount();
     }
 
     public function manage(User $user): bool

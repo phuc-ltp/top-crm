@@ -39,10 +39,11 @@ class TenantIsolationTest extends TestCase
         parent::setUp();
         $this->userA = $this->admin();   // tổ chức mặc định (A), toàn quyền
         $this->orgB = Organization::create(['name' => 'Công ty '.self::MARK, 'slug' => 'cong-ty-b']);
+        app(\App\Support\Tenancy\RoleProvisioner::class)->provision($this->orgB->id);
 
         app(CurrentOrganization::class)->run($this->orgB->id, function () {
             $this->userB = User::factory()->create(['name' => 'Nhân viên '.self::MARK, 'status' => 'active']);
-            $this->userB->assignRole('Sales Staff');
+            $this->userB->assignRole('Sales Employee');
             $stage = PipelineStage::create(['name' => 'Giai đoạn '.self::MARK, 'slug' => 'gd-b', 'position' => 1, 'probability' => 10]);
             $customer = Customer::create(['name' => 'Khách '.self::MARK, 'type' => 'business', 'status' => 'active', 'email' => 'b@bimat.test', 'assigned_to' => $this->userB->id]);
             $this->b = [
@@ -180,6 +181,8 @@ class TenantIsolationTest extends TestCase
     public function test_user_of_suspended_organization_moves_to_another_active_one(): void
     {
         $this->userB->organizations()->attach(Organization::DEFAULT_ID, ['status' => 'active', 'joined_at' => now()]);
+        $this->userB->assignRole('Sales Employee');   // vai trò ở tổ chức A (vai trò thuộc từng tổ chức)
+        $this->userB->unsetRelation('roles');
         $this->orgB->update(['status' => 'suspended']);
         $this->actingAs($this->userB->fresh())->get(route('tasks.index'))->assertOk()->assertDontSee('Việc '.self::MARK);
         $this->assertSame(Organization::DEFAULT_ID, (int) $this->userB->fresh()->current_organization_id);

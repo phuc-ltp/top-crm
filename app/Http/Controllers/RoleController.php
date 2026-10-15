@@ -15,9 +15,10 @@ class RoleController extends Controller
     public function index(Request $request)
     {
         $this->authorize('manage', User::class);
-        $roles = Role::withCount(['users', 'permissions'])->orderBy('id')->get();
+        $roles = Role::where('organization_id', app(\App\Support\Tenancy\CurrentOrganization::class)->id())
+            ->withCount(['users', 'permissions'])->orderBy('id')->get();
 
-        return view('roles.index', ['roles' => $roles, 'defaults' => PermissionCatalog::ROLES]);
+        return view('roles.index', ['roles' => $roles, 'defaults' => PermissionCatalog::ORG_ROLES]);
     }
 
     public function create()
@@ -31,7 +32,7 @@ class RoleController extends Controller
     {
         $this->authorize('manage', User::class);
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:100', Rule::unique('roles', 'name')],
+            'name' => ['required', 'string', 'max:100', Rule::unique('roles', 'name')->where('organization_id', app(\App\Support\Tenancy\CurrentOrganization::class)->id())],
             'permissions' => ['nullable', 'array'], 'permissions.*' => [Rule::in(PermissionCatalog::all())],
         ], [], ['name' => __('Tên vai trò')]);
 
@@ -55,11 +56,11 @@ class RoleController extends Controller
     public function update(Request $request, Role $role)
     {
         $this->authorize('manage', User::class);
-        abort_if($role->name === 'Super Admin', 422, __('Super Admin luôn có toàn quyền, không cần chỉnh.'));
-        $isDefault = in_array($role->name, PermissionCatalog::ROLES, true);
+        abort_if(in_array($role->name, PermissionCatalog::PROTECTED_ROLES, true), 422, __('Chủ sở hữu tổ chức luôn có toàn quyền, không cần chỉnh.'));
+        $isDefault = in_array($role->name, PermissionCatalog::ORG_ROLES, true);
 
         $data = $request->validate([
-            'name' => [$isDefault ? 'nullable' : 'required', 'string', 'max:100', Rule::unique('roles', 'name')->ignore($role->id)],
+            'name' => [$isDefault ? 'nullable' : 'required', 'string', 'max:100', Rule::unique('roles', 'name')->where('organization_id', $role->organization_id)->ignore($role->id)],
             'permissions' => ['nullable', 'array'], 'permissions.*' => [Rule::in(PermissionCatalog::all())],
         ], [], ['name' => __('Tên vai trò')]);
 
@@ -81,7 +82,7 @@ class RoleController extends Controller
     public function destroy(Role $role)
     {
         $this->authorize('manage', User::class);
-        abort_if(in_array($role->name, PermissionCatalog::ROLES, true), 422, __('Không thể xóa vai trò mặc định.'));
+        abort_if(in_array($role->name, PermissionCatalog::ORG_ROLES, true), 422, __('Không thể xóa vai trò mặc định.'));
         abort_if($role->users()->exists(), 422, __('Vai trò đang được gán cho người dùng, hãy chuyển họ sang vai trò khác trước.'));
         $role->delete();
 

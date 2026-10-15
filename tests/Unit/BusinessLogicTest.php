@@ -65,10 +65,10 @@ class BusinessLogicTest extends TestCase
         $all = PermissionCatalog::all();
         $this->assertContains('customers.view_all', $all);
         $this->assertSame(count($all), count(array_unique($all)));
-        $this->assertSame($all, PermissionCatalog::defaultsFor('Administrator'));
-        $this->assertNotContains('customers.create', PermissionCatalog::defaultsFor('Viewer'));
-        $this->assertNotContains('customers.view_all', PermissionCatalog::defaultsFor('Sales Staff'));
-        foreach (PermissionCatalog::ROLES as $role) {
+        $this->assertSame($all, PermissionCatalog::defaultsFor('Organization Administrator'));
+        $this->assertNotContains('customers.create', PermissionCatalog::defaultsFor('Read-only Auditor'));
+        $this->assertNotContains('customers.view_all', PermissionCatalog::defaultsFor('Sales Employee'));
+        foreach (PermissionCatalog::ORG_ROLES as $role) {
             foreach (PermissionCatalog::defaultsFor($role) as $p) {
                 $this->assertContains($p, $all, "$role có quyền không tồn tại: $p");
             }

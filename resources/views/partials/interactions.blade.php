@@ -31,7 +31,7 @@
                                 <div class="fw-semibold small">{{ label_of(App\Models\Interaction::TYPES, $it->type) }}@if ($it->subject) · {{ $it->subject }}@endif</div>
                                 <div class="small text-muted">{{ $it->user?->name ?? __('Hệ thống') }} · {{ vn_date($it->occurred_at ?? $it->created_at, true) }}</div>
                             </div>
-                            @if (auth()->id() === $it->user_id || auth()->user()->hasRole('Super Admin'))
+                            @if (auth()->id() === $it->user_id || auth()->user()->isPlatformAdmin() || auth()->user()->isOrganizationOwner())
                                 <form method="POST" action="{{ route('interactions.destroy', $it) }}" data-confirm="{{ __('Xóa ghi chú này?') }}" data-confirm-button="{{ __('Xóa') }}">@csrf @method('DELETE')
                                     <button class="btn btn-link btn-sm text-muted p-0" title="{{ __('Xóa') }}"><i class="bi bi-x-lg"></i></button>
                                 </form>
