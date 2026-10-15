@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Support\AppInitialization;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ResetPasswordNotification as ResetPassword;
 use Tests\TestCase;
@@ -23,6 +25,83 @@ class AuthTest extends TestCase
         $this->post(route('logout'));
         $this->get(route('setup'))->assertNotFound();
         $this->get('/login')->assertOk();
+    }
+
+    private function setupPayload(string $email = 'owner@example.com'): array
+    {
+        return ['name' => 'Chủ hệ thống', 'email' => $email, 'password' => 'MatKhau2026Manh', 'password_confirmation' => 'MatKhau2026Manh'];
+    }
+
+    public function test_setup_writes_initialized_flag_and_second_attempt_creates_nothing(): void
+    {
+        $this->post(route('setup.store'), $this->setupPayload())->assertRedirect(route('dashboard'));
+        $this->assertDatabaseHas('settings', ['key' => AppInitialization::KEY]);
+        $this->post(route('logout'));
+
+        $this->post(route('setup.store'), $this->setupPayload('attacker@example.com'))->assertNotFound();
+        $this->assertSame(1, User::role('Super Admin')->count());
+        $this->assertDatabaseMissing('users', ['email' => 'attacker@example.com']);
+    }
+
+    public function test_setup_stays_closed_after_super_admin_is_deleted(): void
+    {
+        $this->post(route('setup.store'), $this->setupPayload())->assertRedirect(route('dashboard'));
+        $this->post(route('logout'));
+        User::where('email', 'owner@example.com')->first()->forceDelete();
+
+        $this->assertSame(0, User::role('Super Admin')->count());
+        $this->get(route('setup'))->assertNotFound();
+        $this->post(route('setup.store'), $this->setupPayload('attacker@example.com'))->assertNotFound();
+        $this->get('/login')->assertOk();   // không bị chuyển sang /setup
+    }
+
+    public function test_setup_is_rejected_while_another_request_holds_the_lock(): void
+    {
+        $lock = Cache::lock('crm:setup', 30);
+        $this->assertTrue($lock->get());
+
+        $this->from(route('setup'))->post(route('setup.store'), $this->setupPayload())
+            ->assertRedirect(route('setup'))->assertSessionHasErrors('name');
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseMissing('settings', ['key' => AppInitialization::KEY]);
+
+        $lock->release();
+        $this->post(route('setup.store'), $this->setupPayload())->assertRedirect(route('dashboard'));
+    }
+
+    public function test_initialization_claim_succeeds_only_once(): void
+    {
+        $this->assertTrue(AppInitialization::claim());
+        $this->assertFalse(AppInitialization::claim());
+        $this->assertSame(1, \App\Models\Setting::where('key', AppInitialization::KEY)->count());
+        $this->get(route('setup'))->assertNotFound();
+    }
+
+    public function test_failed_account_creation_does_not_close_setup(): void
+    {
+        // Lỗi giữa chừng khi lưu tài khoản phải hoàn tác cả cờ khởi tạo, để vẫn cài đặt lại được.
+        User::creating(fn () => throw new \RuntimeException('Giả lập lỗi khi lưu tài khoản'));
+        $this->withoutExceptionHandling();
+        try {
+            $this->post(route('setup.store'), $this->setupPayload());
+            $this->fail('Lẽ ra phải ném lỗi giả lập');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Giả lập lỗi khi lưu tài khoản', $e->getMessage());
+        }
+        $this->assertDatabaseMissing('settings', ['key' => AppInitialization::KEY]);
+        $this->assertDatabaseCount('users', 0);
+        $this->assertTrue(\App\Http\Controllers\Auth\SetupController::needsSetup());
+        $this->assertTrue(Cache::lock('crm:setup', 1)->get(), 'Khóa phải được nhả sau khi lỗi');
+    }
+
+    public function test_create_admin_command_closes_setup(): void
+    {
+        $this->artisan('crm:create-admin', ['--email' => 'cli@example.com', '--name' => 'Quản trị CLI'])
+            ->expectsQuestion('Mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường, số)', 'MatKhau2026Manh')
+            ->expectsQuestion('Nhập lại mật khẩu', 'MatKhau2026Manh')
+            ->assertSuccessful();
+        $this->assertDatabaseHas('settings', ['key' => AppInitialization::KEY]);
+        $this->get(route('setup'))->assertNotFound();
     }
 
     public function test_setup_rejects_weak_password(): void

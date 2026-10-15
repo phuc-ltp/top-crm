@@ -31,7 +31,7 @@
 
 ## PHASE 1 — Foundation
 - [x] 1.0 Nâng cấp MariaDB 10.4.32 → 10.11.19 (15/10): dữ liệu khớp 100%, 80 test pass, bind-address=127.0.0.1. Chi tiết + hoàn tác: docs/MARIADB_UPGRADE.md. Thư mục cũ C:\xampp\mysql_10.4.32_old (giữ ~2 tuần).
-- [ ] 1.1 Bảo mật /setup (khóa nguyên tử) + SESSION_ENCRYPT
+- [x] 1.1 Bảo mật /setup (15/10): cờ vĩnh viễn settings.app_initialized_at (App\Support\AppInitialization; migration 2026_10_15_100000 ghi cờ cho hệ thống đã có admin) + Cache::lock + claim() dựa UNIQUE key trong transaction; crm:create-admin cũng ghi cờ. Đã thử song song thật (12 yêu cầu/4 máy chủ → 1 admin) và 2 kết nối CSDL độc lập. SESSION_ENCRYPT=true (.env + .env.example). 86 test pass.
 - [ ] 1.2 Đa ngôn ngữ vi/en  - [ ] 1.3 Organizations  - [ ] 1.4 Tenant scoping  - [ ] 1.5 RBAC 15 vai trò
 - [ ] 1.6 Chuyển tổ chức/thành viên  - [ ] 1.7 Layout  - [ ] 1.8 2FA/xác minh email  - [ ] 1.9 Sanctum API  - [ ] 1.10 Tài liệu
 

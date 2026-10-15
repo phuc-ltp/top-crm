@@ -2,7 +2,7 @@
 
 ## 1. Tài khoản quản trị đầu tiên
 
-- Khi chưa có Super Admin, mọi truy cập đều được chuyển tới trang **/setup** để bạn tự tạo tài khoản (tự đặt mật khẩu). Sau khi tạo xong, trang này tự khóa.
+- Khi hệ thống chưa được khởi tạo, mọi truy cập đều được chuyển tới trang **/setup** để bạn tự tạo tài khoản (tự đặt mật khẩu). Sau khi tạo xong, trang này **khóa vĩnh viễn**, kể cả khi tài khoản Super Admin về sau bị xóa (chống người lạ chiếm quyền). Dù có nhiều yêu cầu gửi cùng lúc thì cũng chỉ một tài khoản được tạo.
 - Cách khác: mở Command Prompt tại `C:\phuc-crm` và chạy `php artisan crm:create-admin`. Lệnh này cũng dùng để **lấy lại quyền** khi quên mật khẩu Super Admin.
 
 ## 2. Quản lý nhân viên (menu *Người dùng*)

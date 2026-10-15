@@ -36,6 +36,7 @@ Artisan::command('crm:create-admin {--email=} {--name=}', function () {
     $user->deleted_at = null;
     $user->save();
     $user->syncRoles(['Super Admin']);
+    \App\Support\AppInitialization::mark();   // đóng trang /setup vĩnh viễn
     $this->info("Đã tạo/cập nhật Super Admin: {$email}");
 
     return 0;
