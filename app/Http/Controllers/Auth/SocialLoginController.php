@@ -7,7 +7,6 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Throwable;
 
@@ -45,7 +44,7 @@ class SocialLoginController extends Controller
         return ($provider === 'facebook' ? $driver->scopes(['email']) : $driver)->redirect();
     }
 
-    public function callback(Request $request, string $provider)
+    public function callback(Request $request, string $provider, \App\Services\Auth\LoginFlow $flow)
     {
         $label = self::LABELS[$provider];
         if (! $this->configure($provider)) {
@@ -75,14 +74,12 @@ class SocialLoginController extends Controller
             return redirect()->route('login')->with('error', __('Email :email chưa được cấp tài khoản. Liên hệ quản trị viên để được cấp tài khoản.', ['email' => $email]));
         }
         if (! $user->isActive()) {
+            $flow->record($request, $user, 'blocked', $provider);
+
             return redirect()->route('login')->with('error', __('Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.'));
         }
 
-        Auth::login($user);
-        $request->session()->regenerate();
-        $user->forceFill(['last_login_at' => now(), 'last_login_ip' => $request->ip()])->saveQuietly();
-        ActivityLogger::log('login', $user, $user->name." đăng nhập bằng $label");
-
-        return redirect()->intended(route('dashboard'))->with('success', __('Chào mừng trở lại, :name!', ['name' => $user->name]));
+        // Tài khoản bật xác thực 2 lớp vẫn phải nhập mã sau khi đăng nhập Google/Facebook
+        return $flow->begin($request, $user, $provider);
     }
 }

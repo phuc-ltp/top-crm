@@ -19,8 +19,8 @@
             <x-select name="role" :label="__('Vai trò')" :options="$roles" :value="$user->getRoleNames()->first()" required :placeholder="__('— Chọn vai trò —')" col="col-md-4 mb-3" />
             <x-select name="status" :label="__('Trạng thái')" :options="App\Models\User::STATUSES" :value="$statusValue" required col="col-md-4 mb-3" />
             @unless ($user->exists)
-                <x-input name="password" type="password" :label="__('Mật khẩu ban đầu')" minlength="8" col="col-md-6 mb-3" autocomplete="new-password" :help="__('Tối thiểu 8 ký tự gồm chữ và số. Nhân viên nên đổi sau lần đăng nhập đầu.')" />
-                <x-input name="password_confirmation" type="password" :label="__('Nhập lại mật khẩu')" minlength="8" col="col-md-6 mb-3" autocomplete="new-password" />
+                <x-input name="password" type="password" :label="__('Mật khẩu ban đầu')" minlength="10" maxlength="128" col="col-md-6 mb-3" autocomplete="new-password" :help="__('Tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số. Nhân viên nên đổi sau lần đăng nhập đầu.')" />
+                <x-input name="password_confirmation" type="password" :label="__('Nhập lại mật khẩu')" minlength="10" col="col-md-6 mb-3" autocomplete="new-password" />
             @endunless
         </div></div>
         <div class="card-footer bg-transparent d-flex justify-content-end gap-2 py-3">

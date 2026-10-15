@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Quy định mật khẩu chung cho mọi nơi đặt mật khẩu (cài đặt, đổi, đặt lại, tạo tài khoản)
+        \Illuminate\Validation\Rules\Password::defaults(fn () => \App\Support\Security\PasswordPolicy::rule());
+
         // {user} trên route chỉ tìm trong thành viên của tổ chức đang làm việc (ngoài tổ chức → 404)
         \Illuminate\Support\Facades\Route::bind('user', fn ($value) => \App\Models\User::inOrganization(null, false)->findOrFail($value));
 

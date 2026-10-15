@@ -108,14 +108,14 @@ class OperationsTest extends TestCase
         $this->actingAs($this->admin());
         $this->post(route('users.store'), [
             'name' => 'Nhân viên mới', 'email' => 'moi@example.com', 'status' => 'active', 'role' => 'Sales Employee',
-            'password' => 'Abcdef123', 'password_confirmation' => 'Abcdef123',
+            'password' => 'Abcdef1234', 'password_confirmation' => 'Abcdef1234',
         ])->assertRedirect();
         $user = User::where('email', 'moi@example.com')->firstOrFail();
         $this->assertTrue($user->hasRole('Sales Employee'));
 
         $this->post(route('users.toggle-status', $user));
         $this->assertSame('suspended', $user->membershipStatus(), 'Khóa = tạm ngưng thành viên trong tổ chức');
-        $this->put(route('users.password', $user), ['password' => 'Moi12345', 'password_confirmation' => 'Moi12345'])->assertSessionHas('success');
+        $this->put(route('users.password', $user), ['password' => 'MoiMoi12345', 'password_confirmation' => 'MoiMoi12345'])->assertSessionHas('success');
         $this->post(route('users.send-reset', $user))->assertSessionHas('success');
         $this->delete(route('users.destroy', $user))->assertRedirect();
         $this->assertSoftDeleted($user);

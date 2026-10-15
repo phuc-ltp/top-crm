@@ -33,6 +33,16 @@
                     @endforeach
                     <div class="small text-muted mt-2">{{ __('Thông báo hiển thị trong chuông thông báo. Hệ thống không gửi email hàng loạt.') }}</div>
                 </div></div>
+
+                @can('platform')
+                <div class="card mt-4"><div class="card-header"><span><i class="bi bi-shield-lock me-2 text-orange"></i>{{ __('Bảo mật đăng nhập') }}</span></div><div class="card-body">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" role="switch" name="require_2fa_admins" value="1" id="require_2fa_admins" @checked(($s['require_2fa_admins'] ?? '0') === '1')>
+                        <label class="form-check-label" for="require_2fa_admins">{{ __('Bắt buộc xác thực 2 lớp cho tài khoản quản trị') }}</label>
+                    </div>
+                    <div class="small text-muted">{{ __('Áp dụng cho quản trị nền tảng, chủ sở hữu và quản trị viên tổ chức. Người chưa bật sẽ được chuyển tới trang thiết lập sau khi đăng nhập (không bị khóa tài khoản).') }}</div>
+                </div></div>
+                @endcan
             </div>
             <div class="col-lg-4">
                 <div class="card mb-4"><div class="card-header">{{ __('Thương hiệu') }}</div><div class="card-body">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\ActivityLogger;
+use App\Services\Auth\LoginFlow;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,7 +23,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(Request $request, LoginFlow $flow)
     {
         $data = $request->validate([
             'login' => ['required', 'string', 'max:255'],
@@ -41,32 +42,29 @@ class LoginController extends Controller
             ]);
         }
 
-        if (! Auth::attempt([$field => $login, 'password' => $data['password']], $request->boolean('remember'))) {
+        // Chỉ kiểm tra mật khẩu, CHƯA đăng nhập (có thể còn bước xác thực 2 lớp)
+        if (! Auth::validate([$field => $login, 'password' => $data['password']])) {
             RateLimiter::hit($key, self::DECAY_SECONDS);
             $user = User::where($field, $login)->first();
             ActivityLogger::log('login_failed', $user, 'Đăng nhập thất bại: '.$login);
             $left = max(0, self::MAX_ATTEMPTS - RateLimiter::attempts($key));
+            // Không lưu chuỗi đã gõ khi không khớp tài khoản nào (có thể là mật khẩu gõ nhầm ô)
+            $flow->record($request, $user, $left > 0 ? 'failed' : 'locked_out', 'password');
             throw ValidationException::withMessages([
                 'login' => __('Thông tin đăng nhập hoặc mật khẩu không đúng.').($left > 0 ? ' '.__('Còn :left lần thử.', ['left' => $left]) : ''),
             ]);
         }
 
-        $user = Auth::user();
+        /** @var User $user */
+        $user = Auth::getLastAttempted();
         if (! $user->isActive()) {
-            Auth::logout();
+            $flow->record($request, $user, 'blocked', 'password');
             throw ValidationException::withMessages(['login' => __('Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.')]);
         }
 
         RateLimiter::clear($key);
-        $request->session()->regenerate();
-        $user->forceFill(['last_login_at' => now(), 'last_login_ip' => $request->ip()])->saveQuietly();
-        // Ngôn ngữ đã chọn ở trang đăng nhập trở thành lựa chọn của tài khoản (nếu tài khoản chưa chọn)
-        if (! $user->locale && in_array(app()->getLocale(), \App\Http\Middleware\SetLocale::supported(), true) && $request->cookie(\App\Http\Middleware\SetLocale::COOKIE)) {
-            $user->forceFill(['locale' => app()->getLocale()])->saveQuietly();
-        }
-        ActivityLogger::log('login', $user, $user->name.' đăng nhập');
 
-        return redirect()->intended(route('dashboard'))->with('success', __('Chào mừng trở lại, :name!', ['name' => $user->name]));
+        return $flow->begin($request, $user, 'password', $request->boolean('remember'));
     }
 
     public function logout(Request $request)

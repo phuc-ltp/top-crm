@@ -44,7 +44,7 @@ class OrganizationController extends Controller
             'slug' => ['nullable', 'string', 'max:80', 'alpha_dash', Rule::unique('organizations', 'slug')],
             'owner_email' => ['required', 'email', 'max:255'],
             'owner_name' => [$existingOwner ? 'nullable' : 'required', 'string', 'max:255'],
-            'owner_password' => [$existingOwner ? 'nullable' : 'required', 'confirmed', Password::min(10)->letters()->mixedCase()->numbers()],
+            'owner_password' => [$existingOwner ? 'nullable' : 'required', 'confirmed', Password::defaults()],
         ], [], ['name' => __('Tên tổ chức'), 'owner_email' => __('Email chủ sở hữu'), 'owner_name' => __('Họ tên chủ sở hữu'), 'owner_password' => __('Mật khẩu')]);
 
         $slug = ($data['slug'] ?? null) ?: $this->uniqueSlug($data['name']);

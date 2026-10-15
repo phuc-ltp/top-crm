@@ -44,6 +44,8 @@ class Setting extends Model
         'notify_task_due' => '1',
         'notify_deal_stage' => '1',
         'notify_ticket_new' => '1',
+        // Bảo mật: bắt buộc xác thực 2 lớp cho tài khoản quản trị (chỉ quản trị nền tảng đổi được)
+        'require_2fa_admins' => '0',
     ];
 
     private const CACHE_KEY = 'crm.settings';

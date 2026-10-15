@@ -105,7 +105,7 @@ class UserController extends Controller
         }
 
         $data = $request->validate($this->rules($request) + [
-            'password' => ['required', 'confirmed', PasswordRule::min(8)->letters()->numbers()],
+            'password' => ['required', 'confirmed', PasswordRule::defaults()],
         ], [], $this->attributes());
 
         $user = DB::transaction(function () use ($data) {
@@ -171,6 +171,9 @@ class UserController extends Controller
                 $user->organizations()->updateExistingPivot($this->orgId(), ['status' => $data['status'] === 'locked' ? 'suspended' : 'active']);
             }
             $user->update($account);
+            if ($user->wasChanged('email')) {
+                $user->forceFill(['email_verified_at' => null])->saveQuietly();   // email mới phải xác minh lại
+            }
             $user->syncRoles([$data['role']]);
         });
         ActivityLogger::log('updated', $user, 'Cập nhật tài khoản '.$user->email.' (vai trò: '.$data['role'].')');
@@ -238,13 +241,31 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
         abort_unless($this->managesAccount($request, $user), 403, __('Tài khoản này thuộc nhiều tổ chức; chỉ chủ tài khoản hoặc quản trị nền tảng được thay đổi mật khẩu.'));
-        $request->validate(['password' => ['required', 'confirmed', PasswordRule::min(8)->letters()->numbers()]], [], ['password' => __('Mật khẩu mới')]);
+        $request->validate(['password' => ['required', 'confirmed', PasswordRule::defaults()]], [], ['password' => __('Mật khẩu mới')]);
 
         $user->forceFill(['password' => $request->password, 'remember_token' => null])->save();
         DB::table('sessions')->where('user_id', $user->id)->delete();
         ActivityLogger::log('updated', $user, 'Quản trị viên đặt lại mật khẩu cho '.$user->email);
 
         return back()->with('success', __('Đã đặt mật khẩu mới. Nhân viên nên đổi mật khẩu sau khi đăng nhập.'));
+    }
+
+    /**
+     * Tắt xác thực 2 lớp cho nhân viên bị mất điện thoại và mã khôi phục.
+     * Cùng điều kiện với đặt mật khẩu; tự mình thì dùng trang Bảo mật tài khoản.
+     */
+    public function resetTwoFactor(Request $request, User $user)
+    {
+        $this->authorize('update', $user);
+        abort_if($user->id === $request->user()->id, 422, __('Hãy tắt xác thực 2 lớp của chính bạn trong trang Bảo mật tài khoản.'));
+        abort_unless($this->managesAccount($request, $user), 403, __('Tài khoản này thuộc nhiều tổ chức; chỉ chủ tài khoản hoặc quản trị nền tảng được thay đổi bảo mật đăng nhập.'));
+
+        \App\Support\Security\TwoFactor::disable($user);
+        DB::table('sessions')->where('user_id', $user->id)->delete();
+        ActivityLogger::log('updated', $user, 'Quản trị viên tắt xác thực 2 lớp của '.$user->email);
+        \App\Notifications\CrmNotification::send($user, 'security', __('Xác thực 2 lớp của bạn đã được quản trị viên tắt. Hãy bật lại trong trang Bảo mật tài khoản.', [], $user->preferredLocale()), route('profile.security'), 'bi-shield-exclamation');
+
+        return back()->with('success', __('Đã tắt xác thực 2 lớp của :email. Nhân viên cần đăng nhập lại và bật lại.', ['email' => $user->email]));
     }
 
     private function rules(Request $request, ?User $user = null): array

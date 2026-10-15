@@ -46,7 +46,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', 'different:current_password', Password::min(8)->letters()->numbers()],
+            'password' => ['required', 'confirmed', 'different:current_password', Password::defaults()],
         ], [], ['current_password' => __('Mật khẩu hiện tại'), 'password' => __('Mật khẩu mới')]);
 
         $request->user()->update(['password' => $request->password]);
@@ -64,7 +64,7 @@ class ProfileController extends Controller
             ->map(fn ($s) => (object) [
                 'id' => $s->id,
                 'ip' => $s->ip_address,
-                'agent' => $this->describeAgent((string) $s->user_agent),
+                'agent' => \App\Support\Security\UserAgent::describe($s->user_agent),
                 'last_active' => \Illuminate\Support\Carbon::createFromTimestamp($s->last_activity)->timezone(config('app.timezone')),
                 'current' => $s->id === $request->session()->getId(),
             ]);
@@ -80,26 +80,5 @@ class ProfileController extends Controller
         DB::table('sessions')->where('user_id', $request->user()->id)->where('id', '!=', $request->session()->getId())->delete();
 
         return back()->with('success', __('Đã đăng xuất khỏi tất cả thiết bị khác.'));
-    }
-
-    private function describeAgent(string $agent): string
-    {
-        $browser = match (true) {
-            str_contains($agent, 'Edg') => 'Microsoft Edge',
-            str_contains($agent, 'Chrome') => 'Google Chrome',
-            str_contains($agent, 'Firefox') => 'Mozilla Firefox',
-            str_contains($agent, 'Safari') => 'Safari',
-            default => __('Trình duyệt khác'),
-        };
-        $os = match (true) {
-            str_contains($agent, 'Windows') => 'Windows',
-            str_contains($agent, 'Android') => 'Android',
-            str_contains($agent, 'iPhone') || str_contains($agent, 'iPad') => 'iOS',
-            str_contains($agent, 'Mac OS') => 'macOS',
-            str_contains($agent, 'Linux') => 'Linux',
-            default => __('Không rõ'),
-        };
-
-        return "$browser · $os";
     }
 }
