@@ -43,7 +43,7 @@ class SetupController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'username' => ['nullable', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z0-9._\-]+$/', 'unique:users,username'],
-            'password' => ['required', 'confirmed', Password::min(10)->letters()->mixedCase()->numbers()],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ], ['username.regex' => __('Tên đăng nhập chỉ gồm chữ không dấu, số, dấu chấm, gạch ngang, gạch dưới.')],
             ['name' => __('Họ tên'), 'email' => 'Email', 'username' => __('Tên đăng nhập'), 'password' => __('Mật khẩu')]);
 

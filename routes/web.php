@@ -62,6 +62,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/forgot-password', [PasswordResetController::class, 'email'])->name('password.email')->middleware('throttle:5,1');
     Route::get('/reset-password/{token}', [PasswordResetController::class, 'reset'])->name('password.reset');
     Route::post('/reset-password', [PasswordResetController::class, 'update'])->name('password.update')->middleware('throttle:5,1');
+
+    // Bước 2 đăng nhập: mã xác thực 2 lớp (người dùng CHƯA đăng nhập cho tới khi nhập đúng)
+    Route::get('/two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'show'])->name('two-factor.challenge');
+    Route::post('/two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'store'])->name('two-factor.verify')->middleware('throttle:10,1');
 });
 
 /*
@@ -95,6 +99,17 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [ProfileController::class, 'password'])->name('profile.password')->middleware('throttle:10,1');
     Route::get('/profile/sessions', [ProfileController::class, 'sessions'])->name('profile.sessions');
     Route::delete('/profile/sessions', [ProfileController::class, 'destroyOtherSessions'])->name('profile.sessions.destroy');
+
+    // Bảo mật tài khoản: xác thực 2 lớp, lịch sử đăng nhập, xác minh email
+    Route::get('/profile/security', [\App\Http\Controllers\SecurityController::class, 'show'])->name('profile.security');
+    Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/profile/two-factor', [\App\Http\Controllers\SecurityController::class, 'enable'])->name('two-factor.enable');
+        Route::post('/profile/two-factor/confirm', [\App\Http\Controllers\SecurityController::class, 'confirm'])->name('two-factor.confirm');
+        Route::delete('/profile/two-factor', [\App\Http\Controllers\SecurityController::class, 'disable'])->name('two-factor.disable');
+        Route::post('/profile/two-factor/recovery-codes', [\App\Http\Controllers\SecurityController::class, 'regenerateCodes'])->name('two-factor.recovery-codes');
+    });
+    Route::post('/email/verification-notification', [\App\Http\Controllers\SecurityController::class, 'sendVerification'])->name('verification.send')->middleware('throttle:3,10');
+    Route::get('/email/verify/{id}/{hash}', [\App\Http\Controllers\SecurityController::class, 'verify'])->name('verification.verify')->middleware(['signed', 'throttle:6,1']);
 
     // Thông báo
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -192,6 +207,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::post('/users/{user}/send-reset', [UserController::class, 'sendReset'])->name('users.send-reset');
     Route::put('/users/{user}/password', [UserController::class, 'setPassword'])->name('users.password');
+    Route::delete('/users/{user}/two-factor', [UserController::class, 'resetTwoFactor'])->name('users.two-factor.reset')->middleware('throttle:10,1');
     Route::resource('users', UserController::class);
 
     Route::resource('roles', RoleController::class)->except(['show']);

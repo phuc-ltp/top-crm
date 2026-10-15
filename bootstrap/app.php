@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\EnsureUserIsActive::class,
             \App\Http\Middleware\SetCurrentOrganization::class,
+            \App\Http\Middleware\RequireTwoFactor::class,   // sau khi xác định tổ chức (vai trò theo tổ chức)
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);

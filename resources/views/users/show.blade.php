@@ -22,6 +22,7 @@
                     <dt>{{ __('Chức vụ') }}</dt><dd>{{ $user->position ?? '—' }}</dd>
                     <dt>{{ __('Điện thoại') }}</dt><dd>{{ $user->phone ?? '—' }}</dd>
                     <dt>{{ __('Đăng nhập gần nhất') }}</dt><dd>{{ vn_date($user->last_login_at, true) }}</dd>
+                    <dt>{{ __('Xác thực 2 lớp') }}</dt><dd>{{ $user->hasTwoFactorEnabled() ? __('Đang bật') : __('Chưa bật') }}</dd>
                     <dt>{{ __('Ngày tạo') }}</dt><dd>{{ vn_date($user->created_at) }}</dd>
                 </dl>
             </div></div>
@@ -34,10 +35,17 @@
                         <button class="btn btn-light w-100"><i class="bi bi-envelope me-1"></i>{{ __('Gửi liên kết đặt lại qua email') }}</button></form>
                     <div class="small text-muted mb-2">{{ __('Hoặc đặt mật khẩu tạm thời (khi chưa cấu hình email):') }}</div>
                     <form method="POST" action="{{ route('users.password', $user) }}" class="needs-validation" novalidate>@csrf @method('PUT')
-                        <x-input name="password" type="password" :label="__('Mật khẩu mới')" required minlength="8" autocomplete="new-password" />
-                        <x-input name="password_confirmation" type="password" :label="__('Nhập lại')" required minlength="8" autocomplete="new-password" />
+                        <x-input name="password" type="password" :label="__('Mật khẩu mới')" required minlength="10" maxlength="128" autocomplete="new-password" :help="__('Mật khẩu tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số.')" />
+                        <x-input name="password_confirmation" type="password" :label="__('Nhập lại')" required minlength="10" autocomplete="new-password" />
                         <button class="btn btn-outline-primary w-100">{{ __('Đặt mật khẩu') }}</button>
                     </form>
+                    @if ($user->hasTwoFactorEnabled() && $user->id !== auth()->id())
+                        <hr>
+                        <div class="small text-muted mb-2">{{ __('Nhân viên mất điện thoại và mã khôi phục:') }}</div>
+                        <form method="POST" action="{{ route('users.two-factor.reset', $user) }}" data-confirm="{{ __('Tắt xác thực 2 lớp của :name? Chỉ làm khi đã xác minh đúng là nhân viên yêu cầu.', ['name' => $user->name]) }}">@csrf @method('DELETE')
+                            <button class="btn btn-outline-danger w-100"><i class="bi bi-shield-x me-1"></i>{{ __('Tắt xác thực 2 lớp') }}</button>
+                        </form>
+                    @endif
                 </div></div>
                 @endif
             @endcan

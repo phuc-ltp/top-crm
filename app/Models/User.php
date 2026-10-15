@@ -12,9 +12,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasLocalePreference
+class User extends Authenticatable implements HasLocalePreference, \Illuminate\Contracts\Auth\MustVerifyEmail
 {
-    use HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
+    use \Illuminate\Auth\MustVerifyEmail, HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
     public const STATUSES = [
         'active' => ['Đang hoạt động', 'success'],
@@ -25,7 +25,7 @@ class User extends Authenticatable implements HasLocalePreference
         'name', 'email', 'username', 'password', 'phone', 'position', 'avatar', 'department_id', 'status', 'is_demo',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_last_step'];
 
     protected function casts(): array
     {
@@ -34,6 +34,10 @@ class User extends Authenticatable implements HasLocalePreference
             'last_login_at' => 'datetime',
             'password' => 'hashed',
             'is_demo' => 'boolean',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
+            'two_factor_last_step' => 'integer',
         ];
     }
 
@@ -102,6 +106,22 @@ class User extends Authenticatable implements HasLocalePreference
     public function salesTargets()
     {
         return $this->hasMany(SalesTarget::class);
+    }
+
+    /** Đã bật xác thực 2 lớp (đã quét mã và xác nhận thành công). */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_confirmed_at !== null && ! empty($this->two_factor_secret);
+    }
+
+    public function loginEvents()
+    {
+        return $this->hasMany(LoginEvent::class);
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new \App\Notifications\VerifyEmailNotification);
     }
 
     public function isActive(): bool

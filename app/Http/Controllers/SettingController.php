@@ -53,6 +53,14 @@ class SettingController extends Controller
         foreach (['notify_lead_assigned', 'notify_task_due', 'notify_deal_stage', 'notify_ticket_new'] as $key) {
             Setting::put([$key => $request->boolean($key) ? '1' : '0'], 'notifications');
         }
+        // Cài đặt bảo mật áp dụng toàn hệ thống → chỉ quản trị nền tảng được đổi
+        if ($request->user()->isPlatformAdmin()) {
+            $require = $request->boolean(\App\Http\Middleware\RequireTwoFactor::SETTING) ? '1' : '0';
+            if ($require !== Setting::get(\App\Http\Middleware\RequireTwoFactor::SETTING, '0')) {
+                Setting::put([\App\Http\Middleware\RequireTwoFactor::SETTING => $require], 'security');
+                ActivityLogger::log('updated', null, $require === '1' ? 'Bật bắt buộc xác thực 2 lớp cho tài khoản quản trị' : 'Tắt bắt buộc xác thực 2 lớp cho tài khoản quản trị');
+            }
+        }
         Setting::put(array_map(fn ($v) => (string) $v, $data));
         ActivityLogger::log('updated', null, 'Cập nhật cài đặt hệ thống');
 

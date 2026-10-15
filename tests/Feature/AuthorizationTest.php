@@ -84,7 +84,7 @@ class AuthorizationTest extends TestCase
         // Quản trị tổ chức không gán được vai trò chủ sở hữu cho người khác
         $this->post(route('users.store'), [
             'name' => 'Hacker', 'email' => 'h@example.com', 'status' => 'active', 'role' => 'Organization Owner',
-            'password' => 'Abcdef123', 'password_confirmation' => 'Abcdef123',
+            'password' => 'Abcdef1234', 'password_confirmation' => 'Abcdef1234',
         ])->assertSessionHasErrors('role');
     }
 

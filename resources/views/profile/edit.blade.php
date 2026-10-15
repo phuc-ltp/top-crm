@@ -17,7 +17,10 @@
                         <dt>{{ __('Chức vụ') }}</dt><dd>{{ $user->position ?? '—' }}</dd>
                         <dt>{{ __('Đăng nhập gần nhất') }}</dt><dd>{{ vn_date($user->last_login_at, true) }}</dd>
                         <dt>{{ __('IP gần nhất') }}</dt><dd>{{ $user->last_login_ip ?? '—' }}</dd>
+                        <dt>{{ __('Xác thực 2 lớp') }}</dt><dd>{!! $user->hasTwoFactorEnabled() ? '<span class="badge badge-soft-success">'.e(__('Đang bật')).'</span>' : '<span class="badge badge-soft-secondary">'.e(__('Chưa bật')).'</span>' !!}</dd>
+                        <dt>{{ __('Email') }}</dt><dd>{!! $user->hasVerifiedEmail() ? '<span class="badge badge-soft-success">'.e(__('Đã xác minh')).'</span>' : '<span class="badge badge-soft-warning">'.e(__('Chưa xác minh')).'</span>' !!}</dd>
                     </dl>
+                    <a href="{{ route('profile.security') }}" class="btn btn-light w-100"><i class="bi bi-shield-lock me-1"></i>{{ __('Bảo mật tài khoản') }}</a>
                 </div>
             </div>
         </div>
@@ -51,8 +54,8 @@
                         @csrf @method('PUT')
                         <div class="row">
                             <x-input name="current_password" type="password" :label="__('Mật khẩu hiện tại')" required col="col-md-12 mb-3" autocomplete="current-password" />
-                            <x-input name="password" type="password" :label="__('Mật khẩu mới')" required minlength="8" col="col-md-6 mb-3" autocomplete="new-password" :help="__('Tối thiểu 8 ký tự, gồm chữ và số.')" />
-                            <x-input name="password_confirmation" type="password" :label="__('Nhập lại mật khẩu mới')" required minlength="8" col="col-md-6 mb-3" autocomplete="new-password" />
+                            <x-input name="password" type="password" :label="__('Mật khẩu mới')" required minlength="10" maxlength="128" col="col-md-6 mb-3" autocomplete="new-password" :help="__('Mật khẩu tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số.')" />
+                            <x-input name="password_confirmation" type="password" :label="__('Nhập lại mật khẩu mới')" required minlength="10" col="col-md-6 mb-3" autocomplete="new-password" />
                         </div>
                         <button class="btn btn-primary"><i class="bi bi-shield-lock me-1"></i>{{ __('Đổi mật khẩu') }}</button>
                     </form>

@@ -21,7 +21,7 @@ Artisan::command('crm:create-admin {--email=} {--name=}', function () {
     $validator = Validator::make(compact('email', 'name', 'password') + ['password_confirmation' => $confirm], [
         'email' => ['required', 'email'],
         'name' => ['required', 'max:255'],
-        'password' => ['required', 'confirmed', Password::min(10)->letters()->mixedCase()->numbers()],
+        'password' => ['required', 'confirmed', Password::defaults()],
     ]);
     if ($validator->fails()) {
         foreach ($validator->errors()->all() as $error) {
@@ -153,3 +153,5 @@ Artisan::command('crm:health', function () {
 })->purpose('Kiểm tra tình trạng hệ thống OrangeCRM');
 
 Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlapping();
+// Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
+Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

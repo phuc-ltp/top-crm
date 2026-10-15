@@ -10,6 +10,8 @@ class JsTranslations
 {
     public const KEYS = [
         'Đóng',
+        'Đã sao chép mã khôi phục.',
+        'Không sao chép được, hãy chép thủ công.',
         'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
         'Bạn không có quyền thực hiện thao tác này.',
         'Không tìm thấy dữ liệu.',
