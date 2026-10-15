@@ -1,7 +1,7 @@
 # OrangeCRM / TOP CRM — Tiến độ (file dùng để tiếp tục khi bị dừng)
 
 ## Quyết định kỹ thuật
-- Laravel **12.x** (thay 10.x vì Laravel 10 hết hỗ trợ bảo mật 04/02/2025). PHP 8.2.12 XAMPP, MariaDB 10.4.32 (root, mật khẩu trống).
+- Laravel **12.x** (thay 10.x vì Laravel 10 hết hỗ trợ bảo mật 04/02/2025). PHP 8.2.12 XAMPP, MariaDB 10.11.19 (từ 15/10; root, mật khẩu trống, chỉ nghe 127.0.0.1).
 - Thư mục: C:\phuc-crm (ngoài htdocs). Apache: C:\xampp\apache\conf\extra\httpd-orangecrm.conf (Alias /orangecrm -> public, Require local).
 - Vite `base: './'` (bắt buộc để font/icon chạy dưới /orangecrm).
 - DB: `php artisan crm:install` (migrations + seed cấu hình). SQL: database/sql/orangecrm_db.sql (build_sql.php), đã test import 14/10 (423 cột, 0 khác biệt).
@@ -27,7 +27,13 @@
 - `SAO_LUU.bat` → scripts/backup.ps1: mysqldump (MYSQL_PWD, không lộ dòng lệnh) → C:\TOPCRM_Backup\database (zip, giữ 30); uploads (robocopy); .env → secrets\ (ACL chỉ user/SYSTEM/Admins, giữ 10); git commit tự động (chặn tệp bí mật) + push sang kho bare C:\TOPCRM_Backup\git\phuc-crm.git; push origin nếu có.
 - Đã thử khôi phục bản sao lưu vào CSDL tạm: số bản ghi khớp 100%, đã xóa CSDL tạm. Clone kho sao lưu OK, không có .env.
 - Hướng dẫn: docs/GIT_BACKUP.md. GitHub: XONG 15/10 — remote origin = https://github.com/phuc-ltp/top-crm (PRIVATE), đã quét toàn bộ lịch sử không có bí mật; SAO_LUU.bat tự push origin.
-- BƯỚC TIẾP sau khi user duyệt giao diện: Phase 1 bước 1.0 (nâng cấp MariaDB 10.11, chạy SAO_LUU.bat trước).
+- 15/10: USER ĐÃ DUYỆT giao diện macOS → làm Phase 1, yêu cầu làm kỹ từng phần.
+
+## PHASE 1 — Foundation
+- [x] 1.0 Nâng cấp MariaDB 10.4.32 → 10.11.19 (15/10): dữ liệu khớp 100%, 80 test pass, bind-address=127.0.0.1. Chi tiết + hoàn tác: docs/MARIADB_UPGRADE.md. Thư mục cũ C:\xampp\mysql_10.4.32_old (giữ ~2 tuần).
+- [ ] 1.1 Bảo mật /setup (khóa nguyên tử) + SESSION_ENCRYPT
+- [ ] 1.2 Đa ngôn ngữ vi/en  - [ ] 1.3 Organizations  - [ ] 1.4 Tenant scoping  - [ ] 1.5 RBAC 15 vai trò
+- [ ] 1.6 Chuyển tổ chức/thành viên  - [ ] 1.7 Layout  - [ ] 1.8 2FA/xác minh email  - [ ] 1.9 Sanctum API  - [ ] 1.10 Tài liệu
 
 ## Sự cố MySQL (đã xử lý 14/10)
 - APPCRASH 0x80000003 (13/10 16:29, 14/10 11:35) của mysqld 10.4.32 — nguyên nhân chưa rõ; đã có watchdog (scripts/mysql-watchdog.ps1, bật từ START_CRM.bat).

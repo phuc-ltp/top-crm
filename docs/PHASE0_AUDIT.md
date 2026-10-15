@@ -81,7 +81,7 @@ Ký hiệu: ✅ có và hoạt động · 🟡 có nhưng cần nâng cấp theo
 | Mức | Vấn đề | Đề xuất |
 |---|---|---|
 | 🔴 Cao | `/setup`: kiểm tra "chưa có Super Admin" **nằm ngoài khóa** → 2 request đồng thời có thể tạo 2 Super Admin | Dùng khóa nguyên tử (`Cache::lock` / bản ghi `app_initialized` có unique) + kiểm tra lại trong transaction |
-| 🔴 Cao | MariaDB 10.4.32 hết hỗ trợ, đã sập 2 lần | Nâng cấp MariaDB 10.11 LTS (cần bạn đồng ý; có sao lưu trước) |
+| 🔴 Cao | MariaDB 10.4.32 hết hỗ trợ, đã sập 2 lần | ✅ **Đã nâng cấp lên 10.11.19 ngày 15/10/2026** — xem docs/MARIADB_UPGRADE.md |
 | 🟠 Trung bình | Chưa có Git → không có lịch sử thay đổi, khó hoàn tác | Cài Git for Windows, khởi tạo repo, commit mốc hiện tại |
 | 🟠 Trung bình | Không có 2FA, chưa xác minh email | Phase 1 |
 | 🟠 Trung bình | API dùng session, chưa có token | Thêm `laravel/sanctum` (chính chủ Laravel) |

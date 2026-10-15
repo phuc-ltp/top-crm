@@ -47,7 +47,8 @@ if (-not $xampp) {
         $zip = "$sql.zip"
         Compress-Archive -Path $sql -DestinationPath $zip -Force
         Remove-Item $sql -Force
-        Say ("CSDL: {0} ({1:N1} MB)" -f (Split-Path $zip -Leaf), ((Get-Item $zip).Length / 1MB)) 'Green'
+        $len = (Get-Item $zip).Length; $size = if ($len -ge 1MB) { "{0:N1} MB" -f ($len / 1MB) } else { "{0:N0} KB" -f ($len / 1KB) }
+        Say "CSDL: $(Split-Path $zip -Leaf) ($size)" 'Green'
         Get-ChildItem (Join-Path $BackupRoot 'database') -Filter "${db}_*.sql.zip" | Sort-Object Name -Descending | Select-Object -Skip $Keep | Remove-Item -Force
     }
 }

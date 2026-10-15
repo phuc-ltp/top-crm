@@ -11,7 +11,7 @@
 | PDF | barryvdh/laravel-dompdf 3.1 (font DejaVu Sans cho tiếng Việt) |
 | Excel/CSV | maatwebsite/excel 3.1 |
 | Frontend | Blade, Bootstrap 5.3, Bootstrap Icons, Chart.js 4, SortableJS, Vite 6 |
-| Database | MariaDB 10.4 / MySQL 5.7+, InnoDB, utf8mb4_unicode_ci |
+| Database | MariaDB 10.11 LTS (XAMPP, nâng cấp 15/10/2026; tương thích MySQL 8), InnoDB, utf8mb4_unicode_ci |
 
 ### Về phiên bản Laravel
 
