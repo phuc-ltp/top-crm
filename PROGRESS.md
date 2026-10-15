@@ -26,7 +26,7 @@
 ## Sao lưu & Git — XONG 15/10/2026
 - `SAO_LUU.bat` → scripts/backup.ps1: mysqldump (MYSQL_PWD, không lộ dòng lệnh) → C:\TOPCRM_Backup\database (zip, giữ 30); uploads (robocopy); .env → secrets\ (ACL chỉ user/SYSTEM/Admins, giữ 10); git commit tự động (chặn tệp bí mật) + push sang kho bare C:\TOPCRM_Backup\git\phuc-crm.git; push origin nếu có.
 - Đã thử khôi phục bản sao lưu vào CSDL tạm: số bản ghi khớp 100%, đã xóa CSDL tạm. Clone kho sao lưu OK, không có .env.
-- Hướng dẫn: docs/GIT_BACKUP.md. GitHub: CHƯA làm — cần user tạo kho PRIVATE và gửi link (push ra ngoài phải được user xác nhận).
+- Hướng dẫn: docs/GIT_BACKUP.md. GitHub: XONG 15/10 — remote origin = https://github.com/phuc-ltp/top-crm (PRIVATE), đã quét toàn bộ lịch sử không có bí mật; SAO_LUU.bat tự push origin.
 - BƯỚC TIẾP sau khi user duyệt giao diện: Phase 1 bước 1.0 (nâng cấp MariaDB 10.11, chạy SAO_LUU.bat trước).
 
 ## Sự cố MySQL (đã xử lý 14/10)
