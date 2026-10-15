@@ -125,7 +125,10 @@ Route::middleware('auth')->group(function () {
     // Lịch sử tương tác / ghi chú
     Route::post('/interactions/{type}/{id}', [InteractionController::class, 'store'])->name('interactions.store')
         ->whereIn('type', ['customer', 'lead', 'contact', 'opportunity'])->whereNumber('id');
+    Route::put('/interactions/{interaction}', [InteractionController::class, 'update'])->name('interactions.update');
+    Route::patch('/interactions/{interaction}/complete', [InteractionController::class, 'complete'])->name('interactions.complete');
     Route::delete('/interactions/{interaction}', [InteractionController::class, 'destroy'])->name('interactions.destroy');
+    Route::get('/activities', [\App\Http\Controllers\ActivityController::class, 'index'])->name('activities.index');
 
     // Khách hàng
     Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');

@@ -92,9 +92,10 @@ class OpportunityController extends Controller
     public function show(Opportunity $opportunity)
     {
         $this->authorize('view', $opportunity);
-        $opportunity->load(['customer', 'contact', 'lead', 'stage', 'assignee', 'creator', 'interactions.user:id,name',
-            'stageHistories.fromStage', 'stageHistories.toStage', 'stageHistories.user:id,name', 'quotations',
-            'tasks' => fn ($q) => $q->with('assignee:id,name')->latest()]);
+        $opportunity->load(['customer', 'contact', 'lead', 'stage', 'assignee', 'creator',
+            'stageHistories.fromStage', 'stageHistories.toStage', 'stageHistories.user:id,name',
+            'quotations' => fn ($q) => $this->onlyVisible($q, 'quotations', request()->user()),
+            'tasks' => fn ($q) => $this->onlyVisible($q, 'tasks', request()->user())->with('assignee:id,name')->latest()]);
 
         return view('opportunities.show', ['opportunity' => $opportunity, 'stages' => PipelineStage::ordered()->get()]);
     }

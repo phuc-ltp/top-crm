@@ -67,7 +67,11 @@ class LeadController extends Controller
     public function show(Lead $lead)
     {
         $this->authorize('view', $lead);
-        $lead->load(['assignee', 'creator', 'source', 'campaigns', 'convertedCustomer', 'convertedOpportunity', 'interactions.user:id,name']);
+        $user = request()->user();
+        $lead->load(['assignee', 'creator', 'source',
+            'campaigns' => fn ($q) => $this->onlyVisible($q, 'campaigns', $user),
+            'convertedCustomer' => fn ($q) => $this->onlyVisible($q, 'customers', $user),
+            'convertedOpportunity' => fn ($q) => $this->onlyVisible($q, 'opportunities', $user)]);
 
         return view('leads.show', compact('lead'));
     }

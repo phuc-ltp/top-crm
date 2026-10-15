@@ -84,7 +84,7 @@ Artisan::command('crm:purge-demo {--force}', function () {
 */
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
-    $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']}");
+    $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']} · Nhắc hoạt động: {$result['activities']}");
 })->purpose('Gửi nhắc việc và đánh dấu công việc quá hạn');
 
 /*

@@ -43,6 +43,7 @@ class Menu
                 ['Công việc', 'bi-check2-square', null, null, null, [
                     ['Danh sách công việc', null, 'tasks.index', 'tasks.view', ['tasks.index', 'tasks.show', 'tasks.create', 'tasks.edit']],
                     ['Lịch công việc', null, 'tasks.calendar', 'tasks.view', 'tasks.calendar'],
+                    ['Hoạt động & lịch hẹn', null, 'activities.index', 'dashboard.view', 'activities.*'],
                 ]],
                 ['Marketing', 'bi-megaphone-fill', 'campaigns.index', 'campaigns.view', 'campaigns.*'],
                 ['Hỗ trợ khách hàng', 'bi-headset', 'tickets.index', 'tickets.view', 'tickets.*'],

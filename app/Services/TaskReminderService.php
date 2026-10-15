@@ -16,11 +16,12 @@ class TaskReminderService
     public function run(): array
     {
         // Chạy riêng trong từng tổ chức đang hoạt động (dữ liệu công việc được giới hạn theo tổ chức)
-        $totals = ['due_soon' => 0, 'overdue' => 0];
+        $totals = ['due_soon' => 0, 'overdue' => 0, 'activities' => 0];
         foreach (Organization::where('status', 'active')->pluck('id') as $orgId) {
             $result = app(CurrentOrganization::class)->run((int) $orgId, fn () => $this->runForCurrentOrganization());
             $totals['due_soon'] += $result['due_soon'];
             $totals['overdue'] += $result['overdue'];
+            $totals['activities'] += $result['activities'];
         }
 
         return $totals;
@@ -51,6 +52,23 @@ class TaskReminderService
                 }
             });
 
-        return ['due_soon' => $dueSoon, 'overdue' => $overdue];
+        // Hoạt động đã lên lịch (gọi, hẹn, theo dõi...) trong 1 giờ tới: nhắc người phụ trách 1 lần
+        $activities = 0;
+        \App\Models\Interaction::with(['assignee', 'interactable'])->planned()->whereNull('reminded_at')
+            ->whereBetween('scheduled_at', [now()->subMinutes(15), now()->addHour()])
+            ->chunkById(200, function ($items) use (&$activities) {
+                foreach ($items as $a) {
+                    $who = $a->assignee ?? $a->user;
+                    if ($who) {
+                        CrmNotification::send($who, 'task_due', __('Sắp đến giờ: :title (:subject) lúc :time', [
+                            'title' => $a->subject ?: label_of(\App\Models\Interaction::TYPES, $a->type), 'subject' => $a->subjectLabel(), 'time' => vn_date($a->scheduled_at, true),
+                        ], $who->preferredLocale()), $a->subjectUrl(), 'bi-alarm');
+                    }
+                    $a->forceFill(['reminded_at' => now()])->saveQuietly();
+                    $activities++;
+                }
+            });
+
+        return ['due_soon' => $dueSoon, 'overdue' => $overdue, 'activities' => $activities];
     }
 }

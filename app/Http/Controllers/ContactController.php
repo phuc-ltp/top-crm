@@ -65,7 +65,7 @@ class ContactController extends Controller
     public function show(Contact $contact)
     {
         $this->authorize('view', $contact);
-        $contact->load(['customer', 'creator', 'interactions.user:id,name']);
+        $contact->load(['customer', 'creator']);
 
         return view('contacts.show', compact('contact'));
     }
