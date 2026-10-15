@@ -1,9 +1,9 @@
 @extends('layouts.app')
-@section('title', $role->exists ? __('Quyền: :name', ['name' => $role->name]) : __('Tạo vai trò'))
+@section('title', $role->exists ? __('Quyền: :name', ['name' => __($role->name)]) : __('Tạo vai trò'))
 @section('content')
-    @php($isDefault = in_array($role->name, App\Support\PermissionCatalog::ROLES, true))
+    @php($isDefault = in_array($role->name, App\Support\PermissionCatalog::ORG_ROLES, true))
     @php($assigned = old('permissions', $assigned))
-    <x-page-header :title="$role->exists ? __('Phân quyền: :name', ['name' => $role->name]) : __('Tạo vai trò mới')" :breadcrumbs="['Vai trò & quyền' => route('roles.index'), ($role->exists ? $role->name : 'Tạo mới') => null]" />
+    <x-page-header :title="$role->exists ? __('Phân quyền: :name', ['name' => __($role->name)]) : __('Tạo vai trò mới')" :breadcrumbs="['Vai trò & quyền' => route('roles.index'), ($role->exists ? $role->name : 'Tạo mới') => null]" />
     <form method="POST" action="{{ $role->exists ? route('roles.update', $role) : route('roles.store') }}" class="needs-validation" novalidate>
         @csrf @if ($role->exists) @method('PUT') @endif
         @unless ($isDefault)

@@ -21,7 +21,7 @@ class AppInitialization
     public static function done(): bool
     {
         return Setting::query()->where('key', self::KEY)->exists()
-            || User::role('Super Admin')->exists();   // cài đặt cũ có admin nhưng chưa có cờ
+            || User::where('is_platform_admin', true)->exists();   // cài đặt cũ có quản trị nhưng chưa có cờ
     }
 
     /**

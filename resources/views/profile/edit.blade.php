@@ -10,7 +10,7 @@
                     <x-avatar :user="$user" size="lg" class="mb-3" />
                     <h5 class="fw-bold mb-0">{{ $user->name }}</h5>
                     <div class="text-muted small mb-2">{{ $user->email }}</div>
-                    @foreach ($user->roles as $role)<span class="badge badge-soft-orange">{{ $role->name }}</span>@endforeach
+                    @foreach ($user->roles as $role)<span class="badge badge-soft-orange">{{ __($role->name) }}</span>@endforeach
                     <hr>
                     <dl class="detail-list text-start small">
                         <dt>{{ __('Phòng ban') }}</dt><dd>{{ $user->department?->name ?? '—' }}</dd>

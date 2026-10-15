@@ -75,7 +75,7 @@
         <div class="dropup">
             <button class="sidebar-card" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <x-avatar :user="$authUser" />
-                <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $authUser->name }}</span><span class="s d-block text-truncate">{{ $authUser->getRoleNames()->first() ?? __('Chưa có vai trò') }}</span></span>
+                <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $authUser->name }}</span><span class="s d-block text-truncate">{{ $authUser->isPlatformAdmin() ? __('Platform Super Administrator') : ($authUser->getRoleNames()->first() ? __($authUser->getRoleNames()->first()) : __('Chưa có vai trò')) }}</span></span>
                 <i class="bi bi-three-dots-vertical"></i>
             </button>
             <ul class="dropdown-menu">

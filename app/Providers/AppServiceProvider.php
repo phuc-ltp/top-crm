@@ -44,8 +44,11 @@ class AppServiceProvider extends ServiceProvider
             'department' => \App\Models\Department::class,
         ]);
 
-        // Super Admin có toàn quyền
-        Gate::before(fn ($user) => $user->hasRole('Super Admin') ? true : null);
+        // Quản trị nền tảng có toàn quyền trên mọi tổ chức
+        Gate::before(fn ($user) => $user->isPlatformAdmin() ? true : null);
+
+        // {role} trên route chỉ tìm trong vai trò của tổ chức đang làm việc
+        \Illuminate\Support\Facades\Route::bind('role', fn ($value) => \Spatie\Permission\Models\Role::where('organization_id', app(\App\Support\Tenancy\CurrentOrganization::class)->id())->findOrFail($value));
 
         Paginator::useBootstrapFive();
         Carbon::setLocale('vi');

@@ -32,9 +32,25 @@ class PermissionCatalog
         'export' => 'Xuất', 'assign' => 'Phân công', 'approve' => 'Duyệt', 'manage' => 'Quản trị',
     ];
 
-    public const ROLES = [
-        'Super Admin', 'Administrator', 'Sales Manager', 'Sales Staff', 'Marketing Staff', 'Customer Support', 'Viewer',
+    /** Vai trò cấp nền tảng: không phải vai trò spatie mà là cờ users.is_platform_admin (toàn quyền mọi tổ chức). */
+    public const PLATFORM_ROLE = 'Platform Super Administrator';
+
+    /** Vai trò chủ sở hữu tổ chức (luôn có toàn quyền trong tổ chức; không chỉnh được). */
+    public const OWNER = 'Organization Owner';
+
+    /** 14 vai trò tổ chức — mỗi tổ chức có bản riêng (spatie teams, team = organization_id). */
+    public const ORG_ROLES = [
+        'Organization Owner', 'Organization Administrator',
+        'Sales Manager', 'Sales Employee',
+        'Marketing Manager', 'Marketing Employee',
+        'Customer Support Manager', 'Support Agent',
+        'Finance Manager', 'Accountant',
+        'Inventory Manager', 'Project Manager',
+        'Employee', 'Read-only Auditor',
     ];
+
+    /** Vai trò được bảo vệ: không chỉnh quyền / không xóa. */
+    public const PROTECTED_ROLES = ['Organization Owner'];
 
     public static function all(): array
     {
@@ -48,7 +64,7 @@ class PermissionCatalog
         return $permissions;
     }
 
-    /** Ma trận quyền mặc định. Super Admin có toàn quyền qua Gate::before. */
+    /** Ma trận quyền mặc định. Quản trị nền tảng có toàn quyền qua Gate::before (users.is_platform_admin). */
     public static function defaultsFor(string $role): array
     {
         $all = self::all();
@@ -66,14 +82,14 @@ class PermissionCatalog
         };
 
         return match ($role) {
-            'Super Admin', 'Administrator' => $all,
+            'Organization Owner', 'Organization Administrator' => $all,
             'Sales Manager' => $pick([
                 'dashboard' => '*', 'customers' => '*', 'contacts' => '*', 'leads' => '*', 'opportunities' => '*',
                 'tasks' => '*', 'quotations' => '*', 'orders' => '*', 'invoices' => '*',
                 'products' => ['view', 'export'], 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'],
                 'reports' => '*', 'users' => ['view'],
             ]),
-            'Sales Staff' => $pick([
+            'Sales Employee' => $pick([
                 'dashboard' => '*',
                 'customers' => ['view', 'create', 'update'],
                 'contacts' => ['view', 'create', 'update'],
@@ -86,7 +102,7 @@ class PermissionCatalog
                 'products' => ['view'],
                 'tickets' => ['view', 'create'],
             ]),
-            'Marketing Staff' => $pick([
+            'Marketing Employee' => $pick([
                 'dashboard' => '*', 'campaigns' => '*',
                 'leads' => ['view', 'view_all', 'create', 'update', 'export', 'assign'],
                 'customers' => ['view', 'view_all', 'export'],
@@ -95,7 +111,7 @@ class PermissionCatalog
                 'tasks' => ['view', 'create', 'update'],
                 'reports' => ['view'],
             ]),
-            'Customer Support' => $pick([
+            'Support Agent' => $pick([
                 'dashboard' => '*', 'tickets' => '*',
                 'customers' => ['view', 'view_all', 'update'],
                 'contacts' => ['view', 'view_all', 'create', 'update'],
@@ -103,12 +119,45 @@ class PermissionCatalog
                 'tasks' => ['view', 'create', 'update'],
                 'reports' => ['view'],
             ]),
-            'Viewer' => $pick([
+            'Read-only Auditor' => $pick([
                 'dashboard' => ['view'],
                 'customers' => ['view', 'view_all'], 'contacts' => ['view', 'view_all'], 'leads' => ['view', 'view_all'],
                 'opportunities' => ['view', 'view_all'], 'tasks' => ['view', 'view_all'], 'products' => ['view'],
                 'quotations' => ['view', 'view_all'], 'orders' => ['view', 'view_all'], 'invoices' => ['view', 'view_all'],
                 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'], 'reports' => ['view'],
+                'activity_logs' => ['view'],
+            ]),
+            'Marketing Manager' => $pick([
+                'dashboard' => '*', 'campaigns' => '*', 'leads' => '*', 'tasks' => '*', 'reports' => '*',
+                'customers' => ['view', 'view_all', 'export'], 'contacts' => ['view', 'view_all', 'export'],
+                'products' => ['view'], 'users' => ['view'],
+            ]),
+            'Customer Support Manager' => $pick([
+                'dashboard' => '*', 'tickets' => '*', 'contacts' => '*', 'tasks' => '*', 'reports' => '*',
+                'customers' => ['view', 'view_all', 'update', 'export'], 'products' => ['view'], 'users' => ['view'],
+            ]),
+            'Finance Manager' => $pick([
+                'dashboard' => '*', 'invoices' => '*', 'reports' => '*',
+                'orders' => ['view', 'view_all', 'export', 'approve'], 'quotations' => ['view', 'view_all', 'export'],
+                'customers' => ['view', 'view_all', 'export'], 'products' => ['view'],
+                'tasks' => ['view', 'create', 'update'], 'users' => ['view'],
+            ]),
+            'Accountant' => $pick([
+                'dashboard' => ['view'], 'invoices' => ['view', 'view_all', 'create', 'update', 'export'],
+                'orders' => ['view', 'view_all'], 'customers' => ['view', 'view_all'], 'products' => ['view'],
+                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'],
+            ]),
+            'Inventory Manager' => $pick([
+                'dashboard' => ['view'], 'products' => '*', 'orders' => ['view', 'view_all'],
+                'reports' => ['view'], 'tasks' => ['view', 'create', 'update'],
+            ]),
+            'Project Manager' => $pick([
+                'dashboard' => '*', 'tasks' => '*', 'customers' => ['view', 'view_all'],
+                'opportunities' => ['view', 'view_all'], 'reports' => ['view'], 'users' => ['view'],
+            ]),
+            'Employee' => $pick([
+                'dashboard' => ['view'], 'tasks' => ['view', 'create', 'update'],
+                'customers' => ['view'], 'contacts' => ['view'], 'products' => ['view'],
             ]),
             default => [],
         };

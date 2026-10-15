@@ -66,7 +66,7 @@ class PageSmokeTest extends TestCase
             $this->get(route($prefix.'.edit', $models[$prefix]))->assertOk();
         }
         $this->get(route('leads.convert', $models['leads']))->assertOk();
-        $this->get(route('roles.edit', \Spatie\Permission\Models\Role::findByName('Sales Staff')))->assertOk();
+        $this->get(route('roles.edit', \Spatie\Permission\Models\Role::findByName('Sales Employee')))->assertOk();
     }
 
     public function test_reports_render_and_export(): void
@@ -110,7 +110,7 @@ class PageSmokeTest extends TestCase
 
     public function test_every_role_can_open_dashboard_and_menu_pages(): void
     {
-        foreach (['Administrator', 'Sales Manager', 'Sales Staff', 'Marketing Staff', 'Customer Support', 'Viewer'] as $role) {
+        foreach (['Organization Administrator', 'Sales Manager', 'Sales Employee', 'Marketing Employee', 'Support Agent', 'Read-only Auditor'] as $role) {
             $user = $this->userWithRole($role);
             $this->actingAs($user)->get(route('dashboard'))->assertOk();
             foreach (\App\Support\Menu::flatRoutes($user) as $route) {

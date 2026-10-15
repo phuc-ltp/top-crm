@@ -15,7 +15,7 @@
             <div class="card mb-4"><div class="card-body text-center">
                 <x-avatar :user="$user" size="lg" class="mb-2" />
                 <div class="fw-bold">{{ $user->name }}</div><div class="small text-muted mb-2">{{ $user->email }}</div>
-                @foreach ($user->roles as $r)<span class="badge badge-soft-orange">{{ $r->name }}</span>@endforeach {!! badge(App\Models\User::STATUSES, $user->status) !!}
+                @foreach ($user->roles as $r)<span class="badge badge-soft-orange">{{ __($r->name) }}</span>@endforeach @if ($user->isPlatformAdmin())<span class="badge badge-soft-danger">{{ __('Platform Super Administrator') }}</span>@endif {!! badge(App\Models\User::STATUSES, $user->status) !!}
                 <hr>
                 <dl class="detail-list text-start small">
                     <dt>{{ __('Phòng ban') }}</dt><dd>{{ $user->department?->name ?? '—' }}</dd>

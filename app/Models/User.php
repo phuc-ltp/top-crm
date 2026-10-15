@@ -97,9 +97,22 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->status === 'active';
     }
 
-    public function isSuperAdmin(): bool
+    /** Quản trị nền tảng: toàn quyền trên mọi tổ chức (không phải vai trò spatie). */
+    public function isPlatformAdmin(): bool
     {
-        return $this->hasRole('Super Admin');
+        return (bool) $this->is_platform_admin;
+    }
+
+    /** Chủ sở hữu tổ chức đang làm việc. */
+    public function isOrganizationOwner(): bool
+    {
+        return $this->hasRole(\App\Support\PermissionCatalog::OWNER);
+    }
+
+    /** Tài khoản được bảo vệ: quản trị nền tảng hoặc chủ sở hữu tổ chức. */
+    public function isProtectedAccount(): bool
+    {
+        return $this->isPlatformAdmin() || $this->isOrganizationOwner();
     }
 
     public function getAvatarUrlAttribute(): ?string

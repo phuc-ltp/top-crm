@@ -304,7 +304,9 @@ class DemoDataSeeder extends Seeder
                 'department_id' => $dept[$code] ?? null, 'position' => $position,
                 'phone' => '09'.mt_rand(10000000, 99999999), 'status' => 'active', 'is_demo' => true,
             ]);
-            $user->syncRoles([str_replace(' 2', '', $key)]);
+            $roleMap = ['Administrator' => 'Organization Administrator', 'Sales Manager' => 'Sales Manager', 'Sales Staff' => 'Sales Employee',
+                'Marketing Staff' => 'Marketing Employee', 'Customer Support' => 'Support Agent', 'Viewer' => 'Read-only Auditor'];
+            $user->syncRoles([$roleMap[str_replace(' 2', '', $key)]]);
             $users[$key] = $user;
         }
 

@@ -59,7 +59,7 @@ class DatabaseTest extends TestCase
         DB::table('opportunities')->where('id', $opp->id)->delete();
         $this->assertSame(0, DB::table('opportunity_stage_histories')->where('opportunity_id', $opp->id)->count(), 'Cascade');
 
-        $user = $this->userWithRole('Sales Staff');
+        $user = $this->userWithRole('Sales Employee');
         $c2 = $this->customer(['assigned_to' => $user->id]);
         DB::table('model_has_roles')->where('model_id', $user->id)->delete();
         DB::table('users')->where('id', $user->id)->delete();
@@ -85,7 +85,7 @@ class DatabaseTest extends TestCase
 
     public function test_seeders_create_reference_and_demo_data(): void
     {
-        $this->assertSame(7, DB::table('roles')->count());
+        $this->assertSame(14, DB::table('roles')->count());   // 14 vai trò của tổ chức mặc định
         $this->assertSame(6, PipelineStage::count());
         $this->assertSame(0, Customer::count(), 'Không có dữ liệu demo khi CRM_DEMO_DATA=false');
 

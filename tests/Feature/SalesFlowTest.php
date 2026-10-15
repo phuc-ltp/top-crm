@@ -119,7 +119,7 @@ class SalesFlowTest extends TestCase
 
     public function test_sales_staff_cannot_approve_own_order(): void
     {
-        $staff = $this->userWithRole('Sales Staff');
+        $staff = $this->userWithRole('Sales Employee');
         $order = app(\App\Services\SalesDocumentService::class)->save(new SalesOrder, [
             'customer_id' => $this->customer(['assigned_to' => $staff->id])->id, 'order_date' => today(), 'status' => 'pending',
             'tax_rate' => 0, 'created_by' => $staff->id, 'assigned_to' => $staff->id,
@@ -132,7 +132,7 @@ class SalesFlowTest extends TestCase
     public function test_sales_target_progress(): void
     {
         $this->actingAs($this->admin());
-        $staff = $this->userWithRole('Sales Staff');
+        $staff = $this->userWithRole('Sales Employee');
         $this->post(route('targets.store'), ['user_id' => $staff->id, 'year' => now()->year, 'month' => now()->month, 'target_amount' => 1000000])->assertRedirect();
         $this->get(route('targets.index'))->assertOk()->assertSee($staff->name);
     }
