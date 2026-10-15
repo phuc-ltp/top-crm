@@ -29,7 +29,14 @@
 - BƯỚC TIẾP: Phase 1 bước 1.0 (backup → user cài Git → git init + commit mốc → nâng cấp MariaDB 10.11 → chạy 77 test).
 - Sau phê duyệt: Phase 1 theo bảng mục 7 trong PHASE0_AUDIT.md (bước 1.0 → 1.10), từng bước có test.
 
-## ĐANG LÀM (tạm dừng 14/10 tối): Design System + Dashboard theo ảnh concept (images/2.png của user)
+## 15/10/2026
+- Lỗi "404 đen" user gặp thực chất là 419 (CSRF hết hạn: trang /setup mở > 2 giờ). ĐÃ SỬA: bootstrap/app.php bắt HttpException 419 → quay lại form giữ dữ liệu + cảnh báo; trang lỗi mang thương hiệu resources/views/errors/*.
+- ĐÃ TẠO Super Admin: Trịnh Phú Phúc · phuphuc40@gmail.com · username phuphuc (mật khẩu ngẫu nhiên đã báo user trong chat, user cần đổi).
+- Design System + Dashboard mới: build OK, 79 test PASS, đã chụp light/dark/1600/1366/mobile qua CDP (scratchpad/cdp.ps1 đăng nhập thật).
+- Git: đã khởi tạo repo nhánh main, commit mốc 26c7c2f (user đã cài Git). .gitignore loại .env, storage/backups.
+- CÒN của bước 1.0: nâng cấp MariaDB 10.11 (đã duyệt) — CHƯA làm. Chờ user duyệt thiết kế rồi tiếp Phase 1 (1.1 bảo mật /setup → 1.10).
+
+## (cũ) Design System + Dashboard theo ảnh concept (images/2.png của user) — đã xong 15/10
 - ĐÃ VIẾT (chưa build/test xong lần cuối): resources/css/app.css mới (tokens light/dark, palette #211610/#35231B/#D9823B/#F7F3EE, lưới 8px, radius 10–14), layouts/app.blade.php mới (sidebar nhóm thu gọn, topbar: Ctrl+K, theme toggle, Tạo mới, user), app/Support/Menu.php (nhóm + flatRoutes()), app.js (theme toggle + chart theme từ CSS var + Ctrl+K), DashboardService (previousRange, change, opportunityOutcomes, topOpportunities, topSellers, myTasks), DashboardController, dashboard.blade.php mới, components/trend.blade.php, design-system.blade.php + route 'design-system', Setting brand_color mặc định #D9823B.
 - PageSmokeTest đã sửa dùng Menu::flatRoutes + thêm route settings.branding, design-system (kiểm tra lại file có đúng không).
 - BƯỚC TIẾP: npm run build → php artisan test → sửa lỗi → chụp màn hình bằng Edge headless (cần đăng nhập: dùng DB preview + port 8002 + CDP/Runtime.evaluate để login) ở light/dark, 1920/1366/mobile → báo user duyệt thiết kế.
