@@ -121,7 +121,7 @@ erDiagram
 | `tasks`, `task_checklist_items`, `task_comments` | Công việc, checklist, bình luận. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |
 | `campaigns`, `campaign_leads` | Chiến dịch marketing. |
-| `interactions` | Lịch sử tương tác (gọi, email, gặp...) — đa hình. |
+| `interactions` | **Hoạt động** (ghi chú, gọi, email, gặp, việc theo dõi) — đa hình (khách hàng, người liên hệ, lead, cơ hội). `status` planned/done, `scheduled_at`, `assigned_to`, `outcome`, `completed_at`, `reminded_at` (từ bước 2.2). |
 | `attachments` | Tệp đính kèm (lưu ngoài `public/`, tải qua controller có kiểm tra quyền) — đa hình. |
 | `activity_logs` | Nhật ký hoạt động theo tổ chức (không ghi trường nhạy cảm). |
 | `notifications` | Thông báo trong chuông (kênh database). |

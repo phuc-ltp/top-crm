@@ -62,11 +62,11 @@ class OperationsTest extends TestCase
         $late = Task::create(['title' => 'Trễ', 'priority' => 'low', 'status' => 'in_progress', 'due_date' => now()->subHour(), 'assigned_to' => $u->id]);
 
         $result = app(TaskReminderService::class)->run();
-        $this->assertSame(['due_soon' => 1, 'overdue' => 1], $result);
+        $this->assertSame(['due_soon' => 1, 'overdue' => 1, 'activities' => 0], $result);
         $this->assertSame('overdue', $late->fresh()->status);
         $this->assertNotNull($soon->fresh()->reminded_at);
         $this->assertSame(2, $u->notifications()->count());
-        $this->assertSame(['due_soon' => 0, 'overdue' => 0], app(TaskReminderService::class)->run()); // không nhắc lặp
+        $this->assertSame(['due_soon' => 0, 'overdue' => 0, 'activities' => 0], app(TaskReminderService::class)->run()); // không nhắc lặp
     }
 
     public function test_campaign_and_lead_linking(): void

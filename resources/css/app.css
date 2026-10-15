@@ -439,6 +439,18 @@ th a.sort-link:hover { color: var(--crm-primary-text); }
 .timeline::before { content: ''; position: absolute; left: 17px; top: 4px; bottom: 4px; width: 2px; background: var(--crm-border); }
 .timeline li { position: relative; padding: 0 0 16px 48px; }
 .timeline .tl-icon { position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--crm-primary-soft); color: var(--crm-primary-text); border: 3px solid var(--crm-surface); }
+/* Dòng thời gian: màu theo loại sự kiện */
+.timeline .tl-icon.tone-blue { background: var(--crm-info-soft); color: var(--crm-info-text); }
+.timeline .tl-icon.tone-green { background: var(--crm-success-soft); color: var(--crm-success-text); }
+.timeline .tl-icon.tone-red { background: var(--crm-danger-soft); color: var(--crm-danger-text); }
+.timeline .tl-icon.tone-purple { background: var(--crm-purple-soft); color: var(--crm-purple-text); }
+.timeline .tl-icon.tone-gray { background: var(--crm-neutral-soft); color: var(--crm-neutral-text); }
+/* Hoạt động đã lên lịch */
+.activity-planned { padding: 10px 12px; border: 1px solid var(--crm-border); border-radius: 12px; margin-bottom: 8px; background: var(--crm-surface); }
+.activity-planned.is-overdue { border-color: color-mix(in srgb, var(--crm-danger) 45%, transparent); background: color-mix(in srgb, var(--crm-danger) 6%, var(--crm-surface)); }
+.activity-planned .tl-icon { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--crm-info-soft); color: var(--crm-info-text); }
+.activity-panel .nav-pills .nav-link { padding: 4px 12px; font-size: .8rem; font-weight: 600; border-radius: 9px; color: var(--crm-text-muted); }
+.activity-panel .nav-pills .nav-link.active { background: var(--crm-primary-grad); color: #fff; }
 .nav-tabs-crm { border-bottom: 1px solid var(--crm-border); gap: 4px; }
 .nav-tabs-crm .nav-link { border: 0; color: var(--crm-text-muted); font-weight: 500; padding: 12px 16px; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; }
 .nav-tabs-crm .nav-link:hover { color: var(--crm-text); }
@@ -543,6 +555,11 @@ pre { color: var(--crm-text); }
 .seg button { border: 0; background: transparent; color: var(--crm-text-muted); font-size: .76rem; font-weight: 600; padding: 4px 11px; border-radius: 8px; transition: background .15s, color .15s; }
 .seg button:hover { color: var(--crm-text); }
 .seg button.active { background: var(--crm-surface-solid); color: var(--crm-text); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+/* Seg dùng radio (trong form lọc) */
+.seg > label.btn { border: 0; background: transparent; color: var(--crm-text-muted); font-size: .76rem; font-weight: 600; padding: 4px 11px; border-radius: 8px; }
+.seg > label.btn:hover { color: var(--crm-text); }
+.seg > .btn-check:checked + label.btn { background: var(--crm-surface-solid); color: var(--crm-text); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.seg > .btn-check:focus-visible + label.btn { outline: 2px solid var(--crm-primary); outline-offset: 1px; }
 .seg .count { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 3px; border-radius: 9px; background: var(--crm-neutral-soft); font-size: .68rem; }
 .seg button.active .count { background: var(--crm-primary-soft); color: var(--crm-primary-text); }
 .seg-line { display: flex; flex-wrap: nowrap; width: 100%; overflow-x: auto; scrollbar-width: none; }

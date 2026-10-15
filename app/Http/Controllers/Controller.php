@@ -10,6 +10,15 @@ abstract class Controller
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    /**
+     * Giới hạn bản ghi liên quan hiển thị trên trang chi tiết theo quyền của người xem:
+     * không có quyền xem module → không trả bản ghi nào; có quyền → chỉ trong phạm vi visibleTo.
+     */
+    protected function onlyVisible($query, string $module, \App\Models\User $user)
+    {
+        return $user->can($module.'.view') ? $query->visibleTo($user) : $query->whereRaw('1 = 0');
+    }
+
     /** Số dòng mỗi trang (cho phép 10–100). */
     protected function perPage(Request $request): int
     {

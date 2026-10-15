@@ -38,7 +38,7 @@ class LeadService
         }
 
         if ($lead->exists) {
-            $score += min(15, $lead->interactions()->count() * 5);
+            $score += min(15, $lead->interactions()->where('status', 'done')->count() * 5);
         }
 
         return min(100, $score);

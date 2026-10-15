@@ -9,9 +9,9 @@
     </x-page-header>
 
     <div class="row g-3 mb-4">
-        <div class="col-md-4"><x-stat-card icon="bi-cash-coin" tone="green" :label="__('Đã thanh toán')" :value="money($stats['revenue'])" /></div>
-        <div class="col-md-4"><x-stat-card icon="bi-kanban" tone="orange" :label="__('Cơ hội đang mở')" :value="money($stats['open_deals'])" /></div>
-        <div class="col-md-4"><x-stat-card icon="bi-headset" tone="blue" :label="__('Ticket đang xử lý')" :value="$stats['tickets_open']" /></div>
+        @if ($stats['revenue'] !== null)<div class="col-md-4"><x-stat-card icon="bi-cash-coin" tone="green" :label="__('Đã thanh toán')" :value="money($stats['revenue'])" /></div>@endif
+        @if ($stats['open_deals'] !== null)<div class="col-md-4"><x-stat-card icon="bi-kanban" tone="orange" :label="__('Cơ hội đang mở')" :value="money($stats['open_deals'])" /></div>@endif
+        @if ($stats['tickets_open'] !== null)<div class="col-md-4"><x-stat-card icon="bi-headset" tone="blue" :label="__('Ticket đang xử lý')" :value="$stats['tickets_open']" /></div>@endif
     </div>
 
     <div class="row g-4">
@@ -61,11 +61,11 @@
 
         <div class="col-lg-8">
             <ul class="nav nav-tabs-crm mb-3" role="tablist">
-                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-activity" type="button">{{ __('Tương tác') }}</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-deals" type="button">{{ __('Cơ hội (:count)', ['count' => $customer->opportunities->count()]) }}</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-invoices" type="button">{{ __('Hóa đơn (:count)', ['count' => $customer->invoices->count()]) }}</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tickets" type="button">{{ __('Hỗ trợ (:count)', ['count' => $customer->tickets->count()]) }}</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tasks" type="button">{{ __('Công việc (:count)', ['count' => $customer->tasks->count()]) }}</button></li>
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-activity" type="button">{{ __('Hoạt động') }}</button></li>
+                @can('opportunities.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-deals" type="button">{{ __('Cơ hội (:count)', ['count' => $customer->opportunities->count()]) }}</button></li>@endcan
+                @can('invoices.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-invoices" type="button">{{ __('Hóa đơn (:count)', ['count' => $customer->invoices->count()]) }}</button></li>@endcan
+                @can('tickets.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tickets" type="button">{{ __('Hỗ trợ (:count)', ['count' => $customer->tickets->count()]) }}</button></li>@endcan
+                @can('tasks.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tasks" type="button">{{ __('Công việc (:count)', ['count' => $customer->tasks->count()]) }}</button></li>@endcan
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="tab-activity">

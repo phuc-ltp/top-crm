@@ -84,19 +84,21 @@ class CustomerController extends Controller
     {
         $this->authorize('view', $customer);
 
+        // Bản ghi liên quan chỉ hiện trong phạm vi quyền của người xem (không có quyền module → không thấy)
+        $user = request()->user();
         $customer->load([
-            'assignee', 'creator', 'source', 'tags', 'contacts',
-            'interactions.user:id,name,avatar',
-            'opportunities' => fn ($q) => $q->with('stage')->latest()->limit(10),
-            'invoices' => fn ($q) => $q->latest('issue_date')->limit(10),
-            'tickets' => fn ($q) => $q->latest()->limit(10),
-            'tasks' => fn ($q) => $q->with('assignee:id,name')->latest()->limit(10),
+            'assignee', 'creator', 'source', 'tags',
+            'contacts' => fn ($q) => $this->onlyVisible($q, 'contacts', $user),
+            'opportunities' => fn ($q) => $this->onlyVisible($q, 'opportunities', $user)->with('stage')->latest()->limit(10),
+            'invoices' => fn ($q) => $this->onlyVisible($q, 'invoices', $user)->latest('issue_date')->limit(10),
+            'tickets' => fn ($q) => $this->onlyVisible($q, 'tickets', $user)->latest()->limit(10),
+            'tasks' => fn ($q) => $this->onlyVisible($q, 'tasks', $user)->with('assignee:id,name')->latest()->limit(10),
         ]);
 
         $stats = [
-            'revenue' => (float) $customer->invoices()->where('status', 'issued')->sum('amount_paid'),
-            'open_deals' => $customer->opportunities()->open()->sum('value'),
-            'tickets_open' => $customer->tickets()->whereIn('status', ['open', 'in_progress', 'waiting'])->count(),
+            'revenue' => $user->can('invoices.view') ? (float) $this->onlyVisible($customer->invoices(), 'invoices', $user)->where('status', 'issued')->sum('amount_paid') : null,
+            'open_deals' => $user->can('opportunities.view') ? $this->onlyVisible($customer->opportunities(), 'opportunities', $user)->open()->sum('value') : null,
+            'tickets_open' => $user->can('tickets.view') ? $this->onlyVisible($customer->tickets(), 'tickets', $user)->whereIn('status', ['open', 'in_progress', 'waiting'])->count() : null,
         ];
 
         return view('customers.show', compact('customer', 'stats'));
