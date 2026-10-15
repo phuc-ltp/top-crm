@@ -1,4 +1,6 @@
-# Báo cáo kiểm thử OrangeCRM
+# Báo cáo kiểm thử OrangeCRM (bàn giao 14/10/2026)
+
+> Báo cáo lịch sử. Phạm vi kiểm thử và kết quả hiện tại (190 test, hết Phase 1): xem [TESTING.md](TESTING.md).
 
 **Ngày kiểm thử:** 14/10/2026
 **Môi trường:** Windows 11 Pro · XAMPP · PHP 8.2.12 · MariaDB 10.4.32 · Laravel 12.69.3 · Node 24

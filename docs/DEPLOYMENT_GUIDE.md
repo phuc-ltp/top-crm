@@ -1,5 +1,7 @@
 # Hướng dẫn triển khai
 
+> Trước khi đưa lên Internet, làm đủ danh sách bắt buộc trong [SECURITY.md](SECURITY.md#5-bắt-buộc-trước-khi-đưa-lên-internet) (tắt APP_DEBUG, HTTPS, mật khẩu database, SMTP, bắt buộc 2FA cho quản trị...).
+
 ## 1. Hiện trạng (máy tính cá nhân)
 
 - Ứng dụng chạy **chỉ trên máy này**: Laravel tại `127.0.0.1:8000`, Apache tại `localhost/orangecrm` với `Require local`.

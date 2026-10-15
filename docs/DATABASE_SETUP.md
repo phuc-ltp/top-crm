@@ -3,7 +3,7 @@
 - **Tên database:** `orangecrm_db`
 - **Hệ quản trị:** MySQL / MariaDB (trong XAMPP)
 - **Kiểu lưu trữ:** InnoDB, bảng mã `utf8mb4` (hiển thị đúng tiếng Việt)
-- **Quy mô:** 46 bảng, 69 khóa ngoại
+- **Quy mô:** 50 bảng, 491 cột, 97 khóa ngoại (chi tiết và sơ đồ quan hệ: [DATABASE.md](DATABASE.md))
 
 ## 1. Hai cách khởi tạo database (chỉ dùng MỘT trong hai)
 
@@ -34,7 +34,7 @@ C:\xampp\mysql\bin\mysql.exe -u root --default-character-set=utf8mb4 < C:\phuc-c
 
 Tệp SQL đã kèm bảng `migrations`, nên sau khi import, Laravel biết cấu trúc đã đủ và sẽ không tạo bảng trùng.
 
-**Đã kiểm thử:** import vào database trống riêng, rồi so với database tạo bằng migration: giống hệt nhau (422 cột, 199 chỉ mục, 69 khóa ngoại, 0 khác biệt).
+**Đã kiểm thử (17/10/2026):** import vào database trống riêng thành công, import lần hai không lỗi, không còn migration nào thiếu; tệp không chứa tài khoản quản trị, dữ liệu thật, khóa API hay lịch sử đăng nhập. Tạo lại tệp sau khi đổi cấu trúc: `powershell -ExecutionPolicy Bypass -File scripts\generate-sql.ps1` (chạy trên database tạm, không đụng database thật).
 
 ### Sau khi import: tạo tài khoản quản trị
 
@@ -82,7 +82,9 @@ Nhớ sao lưu thêm thư mục `C:\phuc-crm\storage\app` (ảnh đại diện, 
 
 | Nhóm | Bảng |
 |---|---|
+| Tổ chức | organizations, organization_user |
 | Người dùng & quyền | users, departments, roles, permissions, model_has_roles, role_has_permissions, sessions |
+| Bảo mật | login_events, personal_access_tokens, password_reset_tokens |
 | Khách hàng | customers, customer_tag, tags, contacts, interactions |
 | Lead & Marketing | leads, lead_sources, campaigns, campaign_leads |
 | Bán hàng | pipeline_stages, opportunities, opportunity_stage_histories, products, product_categories, quotations, quotation_items, sales_orders, sales_order_items, invoices, invoice_items, payments, sales_targets |
