@@ -13,7 +13,7 @@ class ContactController extends Controller
     private function rules(): array
     {
         return [
-            'customer_id' => ['nullable', 'exists:customers,id'],
+            'customer_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('customers')],
             'full_name' => ['required', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:100'],
             'email' => ['nullable', 'email', 'max:255'],

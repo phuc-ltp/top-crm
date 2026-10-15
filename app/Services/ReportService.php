@@ -162,7 +162,7 @@ class ReportService
     private function employees(): array
     {
         $canAll = $this->viewer->can('invoices.view_all') && $this->viewer->can('leads.view_all');
-        $users = User::active()->when(! $canAll, fn ($q) => $q->whereKey($this->viewer->id))
+        $users = User::inOrganization()->active()->when(! $canAll, fn ($q) => $q->whereKey($this->viewer->id))
             ->when($this->userId, fn ($q) => $q->whereKey($this->userId))->orderBy('name')->get();
         [$f, $t] = [$this->from, $this->to];
 

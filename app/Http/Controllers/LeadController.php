@@ -118,7 +118,7 @@ class LeadController extends Controller
 
         $data = $request->validate([
             'mode' => ['required', 'in:new,existing'],
-            'customer_id' => ['required_if:mode,existing', 'nullable', 'exists:customers,id'],
+            'customer_id' => ['required_if:mode,existing', 'nullable', \App\Support\Tenancy\TenantRule::exists('customers')],
             'customer_name' => ['required_if:mode,new', 'nullable', 'string', 'max:255'],
             'customer_type' => ['nullable', 'in:individual,business'],
             'create_opportunity' => ['nullable', 'boolean'],

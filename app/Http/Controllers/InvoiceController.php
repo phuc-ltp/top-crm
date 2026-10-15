@@ -25,7 +25,7 @@ class InvoiceController extends SalesDocumentController
     {
         return [
             'due_date' => ['nullable', 'date', 'after_or_equal:issue_date'],
-            'sales_order_id' => ['nullable', 'exists:sales_orders,id'],
+            'sales_order_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('sales_orders')],
         ];
     }
 

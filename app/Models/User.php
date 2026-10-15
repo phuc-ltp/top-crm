@@ -55,6 +55,14 @@ class User extends Authenticatable implements HasLocalePreference
         return $this->belongsTo(Organization::class, 'current_organization_id');
     }
 
+    /** Chỉ người dùng là thành viên đang hoạt động của tổ chức (mặc định: tổ chức đang làm việc). */
+    public function scopeInOrganization($query, ?int $organizationId = null)
+    {
+        $organizationId ??= app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+
+        return $query->whereHas('organizations', fn ($q) => $q->whereKey($organizationId)->where('organization_user.status', 'active'));
+    }
+
     public function belongsToOrganization(int $organizationId): bool
     {
         return $this->organizations()->whereKey($organizationId)->wherePivot('status', 'active')->exists();

@@ -231,7 +231,7 @@ class TaskController extends Controller
             'priority' => ['required', Rule::in(array_keys(Task::PRIORITIES))],
             'status' => ['required', Rule::in(array_keys(Task::STATUSES))],
             'due_date' => ['nullable', 'date'],
-            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'related_type' => ['nullable', Rule::in(array_keys(Task::RELATED_TYPES))],
             'related_id' => ['nullable', 'required_with:related_type', 'integer'],
             'checklist' => ['nullable', 'array', 'max:50'],

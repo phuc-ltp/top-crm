@@ -129,7 +129,7 @@ class CampaignController extends Controller
             'target_leads' => ['required', 'integer', 'min:0', 'max:1000000'],
             'status' => ['required', Rule::in(array_keys(Campaign::STATUSES))],
             'description' => ['nullable', 'string', 'max:5000'],
-            'owner_id' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at')],
+            'owner_id' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
         ], [], ['name' => __('Tên chiến dịch'), 'owner_id' => __('Người phụ trách')]);
     }
 }

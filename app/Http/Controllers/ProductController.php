@@ -106,9 +106,9 @@ class ProductController extends Controller
     private function validated(Request $request, ?Product $product = null): array
     {
         $data = $request->validate([
-            'sku' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9\-_.]+$/', Rule::unique('products', 'sku')->ignore($product?->id)],
+            'sku' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9\-_.]+$/', \App\Support\Tenancy\TenantRule::unique('products', 'sku')->ignore($product?->id)],
             'name' => ['required', 'string', 'max:255'],
-            'product_category_id' => ['nullable', 'exists:product_categories,id'],
+            'product_category_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('product_categories')],
             'description' => ['nullable', 'string', 'max:5000'],
             'price' => ['required', 'numeric', 'min:0', 'max:999999999999'],
             'unit' => ['required', 'string', 'max:30'],
