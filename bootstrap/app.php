@@ -22,7 +22,15 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
+        // API: phiên web (cùng tên miền) hoặc khóa API Bearer
+        $middleware->statefulApi();
+        // Xác định tài khoản / tổ chức TRƯỚC khi tìm bản ghi trên route ({customer}...) để không bao giờ
+        // tìm nhầm sang tổ chức khác (khóa API của tổ chức A không đọc được dữ liệu tổ chức B)
+        $middleware->prependToPriorityList(\Illuminate\Routing\Middleware\SubstituteBindings::class, \App\Http\Middleware\EnsureUserIsActive::class);
+        $middleware->prependToPriorityList(\Illuminate\Routing\Middleware\SubstituteBindings::class, \App\Http\Middleware\SetCurrentOrganization::class);
+        $middleware->prependToPriorityList(\Illuminate\Routing\Middleware\SubstituteBindings::class, \App\Http\Middleware\ApiContext::class);
         $middleware->alias([
+            'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
             'setup.redirect' => \App\Http\Middleware\RedirectToSetup::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,

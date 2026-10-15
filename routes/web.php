@@ -79,6 +79,11 @@ Route::middleware('auth')->group(function () {
     // Chuyển tổ chức (không gian làm việc)
     Route::post('/workspace/switch', [\App\Http\Controllers\WorkspaceController::class, 'switch'])->name('workspace.switch')->middleware('throttle:30,1');
 
+    // Khóa API cá nhân (theo tổ chức đang làm việc)
+    Route::get('/profile/api-tokens', [\App\Http\Controllers\ApiTokenController::class, 'index'])->name('api-tokens.index');
+    Route::post('/profile/api-tokens', [\App\Http\Controllers\ApiTokenController::class, 'store'])->name('api-tokens.store')->middleware('throttle:10,1');
+    Route::delete('/profile/api-tokens/{token}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('api-tokens.destroy')->whereNumber('token');
+
     // Giao diện sáng / tối của người dùng
     Route::post('/preferences/theme', [\App\Http\Controllers\ThemeController::class, 'update'])->name('preferences.theme')->middleware('throttle:30,1');
 

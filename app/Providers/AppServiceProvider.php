@@ -62,7 +62,14 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             return Limit::perMinute(5)->by(mb_strtolower((string) $request->input('email')).'|'.$request->ip());
         });
-        RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->id ?: $request->ip()));
+        // Giới hạn theo khóa API (mỗi khóa một hạn mức riêng), phiên web theo người dùng, khách theo IP
+        RateLimiter::for('api', function (Request $request) {
+            $token = $request->user()?->currentAccessToken();
+            $key = $token instanceof \App\Models\ApiToken ? 'token:'.$token->getKey() : ($request->user() ? 'user:'.$request->user()->id : 'ip:'.$request->ip());
+
+            return Limit::perMinute(120)->by($key);
+        });
+        \Laravel\Sanctum\Sanctum::usePersonalAccessTokenModel(\App\Models\ApiToken::class);
 
         View::composer('layouts.app', function ($view) {
             $user = auth()->user();

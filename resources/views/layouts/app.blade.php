@@ -190,6 +190,7 @@
                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>{{ __('Hồ sơ cá nhân') }}</a></li>
                     <li><a class="dropdown-item" href="{{ route('profile.security') }}"><i class="bi bi-shield-lock me-2"></i>{{ __('Bảo mật tài khoản') }}</a></li>
                     <li><a class="dropdown-item" href="{{ route('profile.sessions') }}"><i class="bi bi-laptop me-2"></i>{{ __('Phiên đăng nhập') }}</a></li>
+                    @can('api.use')<li><a class="dropdown-item" href="{{ route('api-tokens.index') }}"><i class="bi bi-key me-2"></i>{{ __('Khóa API') }}</a></li>@endcan
                     <li><hr class="dropdown-divider"></li>
                     <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>{{ __('Đăng xuất') }}</button></form></li>
                 </ul>

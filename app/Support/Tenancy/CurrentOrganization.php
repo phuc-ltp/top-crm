@@ -25,6 +25,11 @@ class CurrentOrganization
             return $this->id;
         }
         $user = auth()->user();
+        // Yêu cầu bằng khóa API: luôn là tổ chức của khóa (không phải tổ chức đang chọn trên web)
+        $token = $user && method_exists($user, 'currentAccessToken') ? $user->currentAccessToken() : null;
+        if ($token instanceof \App\Models\ApiToken) {
+            return $token->organization_id ? (int) $token->organization_id : null;
+        }
         if ($user?->current_organization_id) {
             return (int) $user->current_organization_id;
         }
