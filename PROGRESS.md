@@ -35,7 +35,7 @@
 - [x] 1.2 Đa ngôn ngữ vi/en (15/10): toàn bộ giao diện (~1.100 câu trong lang/en.json), bộ chọn ngôn ngữ thật, users.locale, email theo ngôn ngữ người nhận, trang pháp lý tiếng Anh. Hướng dẫn: docs/I18N.md. Chưa dịch: nội dung nhật ký/thông báo đã lưu (dữ liệu). 97 test pass.
 - GHI CHÚ cho 1.8: chính sách mật khẩu chưa thống nhất (setup 10 ký tự + hoa/thường/số; đổi/đặt lại chỉ 8 ký tự) → dùng Password::defaults().
 - [x] 1.3 Organizations (15/10): bảng organizations/organization_user, users.current_organization_id, organization_id trên 21 bảng (backfill = 1), unique theo tổ chức, trait BelongsToOrganization + CurrentOrganization (tự gán, không fillable). Thử 3 vòng migrate/rollback trên bản sao, cấu trúc sau rollback giống hệt. Đã chạy trên CSDL thật (tổ chức 1 "TOP CRM", owner = phuphuc). Tài liệu: docs/MULTI_TENANCY.md.
-- [ ] 1.4 Tenant scoping  - [ ] 1.5 RBAC 15 vai trò
+- [ ] 1.4 Tenant scoping — ĐANG LÀM, TẠM DỪNG 15/10/2026. Phần dở nằm ở nhánh git `wip/phase-1.4-tenant-scoping` (commit a74eab7, CHƯA KIỂM THỬ): OrganizationScope (global scope), middleware SetCurrentOrganization, TenantRule::exists/unique/member, User::inOrganization + route binding {user}, TaskReminderService theo tổ chức. KHI TIẾP TỤC: `git checkout wip/phase-1.4-tenant-scoping` → chạy `php artisan test` → sửa lỗi → viết test cô lập dữ liệu A/B (xem, sửa, xóa, tìm kiếm, xuất file, dashboard, báo cáo, API, chọn người phụ trách) → tài liệu → merge vào main. Nhánh main hiện = bản ổn định 1.3 (105 test pass).  - [ ] 1.5 RBAC 15 vai trò
 - [ ] 1.6 Chuyển tổ chức/thành viên  - [ ] 1.7 Layout  - [ ] 1.8 2FA/xác minh email  - [ ] 1.9 Sanctum API  - [ ] 1.10 Tài liệu
 
 ## Sự cố MySQL (đã xử lý 14/10)
