@@ -18,6 +18,17 @@
   - Đã chụp màn hình (Edge headless, scratchpad/shot.ps1) ở 1920x1080, 1672x941, 1600x900, 1440x860, 1366x768, 1280x650, 390/360 mobile — OK.
 - docs/MOBILE_UI.md: nơi ghép code giao diện điện thoại (user sẽ gửi code sau).
 
+## ĐANG LÀM (TẠM DỪNG 15/10/2026) — Giao diện macOS kính mờ (ảnh 4 của user; hủy thiết kế sidebar sáng trước đó)
+- ĐÃ XONG (chưa commit):
+  - resources/css/app.css: token macOS sáng/tối, wallpaper mờ, sidebar kính, `.crm-window`, topbar, footer; CSS dashboard (hello-card, kpi-card, seg, funnel, promo-card, sched...).
+  - layouts/app.blade.php: cấu trúc mới (wallpaper, mac-lights vàng = thu gọn menu, xanh = toàn màn hình; thẻ workspace/user; topbar có Tạo mới, chuông, lịch, sáng/tối, ngôn ngữ, avatar; footer có link).
+  - app.js: nút toàn màn hình; crmPalette.surface dùng `--crm-surface-solid`.
+  - DashboardService: invoicesIssued, sparklines, revenueSeries(day/week/month/year), revenueYears, funnelCumulative, customerSources, taskBoard, recentOrders, daySchedule.
+  - DashboardController: truyền dữ liệu mới + `widget()` (route dashboard.widget/{revenue|schedule}); view dashboard.blade.php mới + dashboard/_schedule.blade.php.
+  - `npm run build` OK.
+- LỖI CẦN SỬA TIẾP: test 76 pass / 3 fail — "Undefined variable $crmSettings" trong dashboard.blade.php (view composer chỉ gắn cho layout; dùng `\App\Models\Setting::allCached()` hoặc `$crmSettings ?? Setting::allCached()` trong view).
+- SAU ĐÓ: chạy lại test → chụp CDP sáng/tối 1600/1366/390 (`cdp.ps1 -Login phuphuc ...`) → sửa lỗi hiển thị → cập nhật trang design-system → commit Git → báo user duyệt thiết kế.
+
 ## Sự cố MySQL (đã xử lý 14/10)
 - APPCRASH 0x80000003 (13/10 16:29, 14/10 11:35) của mysqld 10.4.32 — nguyên nhân chưa rõ; đã có watchdog (scripts/mysql-watchdog.ps1, bật từ START_CRM.bat).
 - Sau đó MySQL tự tắt vì multi-master.info bị ghi log nhầm (do khởi động mysqld ẩn không có --log-error). Đã chuyển tệp rác sang C:\xampp\mysql\data_junk_backup_20261014, dữ liệu nguyên vẹn. Mọi chỗ khởi động mysqld nay có --log-error.

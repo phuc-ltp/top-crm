@@ -12,7 +12,7 @@
             <div class="card h-100"><div class="card-body">
                 <div class="ds-section-title">Bảng màu chủ đạo</div>
                 <div class="row g-3 mb-4">
-                    @foreach ([['#211610', 'Nâu đen', 'Sidebar'], ['#35231B', 'Nâu đậm', 'Sidebar hover'], ['#D9823B', 'Cam đồng', 'Hành động chính'], ['#F7F3EE', 'Kem sáng', 'Nền làm việc'], ['#FFFFFF', 'Trắng', 'Thẻ / bảng']] as [$hex, $name, $use])
+                    @foreach ([['rgba(34,24,18,.74)', 'Kính nâu tối', 'Sidebar'], ['#EA7A2B', 'Cam đồng', 'Hành động chính'], ['rgba(248,245,242,.80)', 'Kính kem', 'Cửa sổ làm việc'], ['#FFFFFF', 'Trắng', 'Thẻ / bảng'], ['#262422', 'Than ấm', 'Thẻ (chế độ tối)']] as [$hex, $name, $use])
                         <div class="col"><div class="ds-swatch" style="background: {{ $hex }}"></div>
                             <div class="small fw-semibold mt-2">{{ $hex }}</div><div class="ds-label">{{ $name }} · {{ $use }}</div></div>
                     @endforeach

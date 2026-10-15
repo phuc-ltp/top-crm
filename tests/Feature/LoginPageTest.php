@@ -116,9 +116,24 @@ class LoginPageTest extends TestCase
     {
         $this->actingAs($this->admin());
         $this->get(route('dashboard', ['period' => 'this_year']))->assertOk()
-            ->assertSee('Tổng quan')->assertSee('Tỷ lệ cơ hội')->assertSee('Doanh số nhân viên')->assertSee('data-theme-toggle', false);
-        $this->get(route('design-system'))->assertOk()->assertSee('Bảng màu chủ đạo')->assertSee('#D9823B');
+            ->assertSee('Tỷ lệ cơ hội')->assertSee('Top nhân viên')->assertSee('Công việc hôm nay')->assertSee('Nguồn khách hàng')
+            ->assertSee('crm-wallpaper', false)->assertSee('mac-lights', false)->assertSee('data-theme-toggle', false);
+        $this->get(route('design-system'))->assertOk()->assertSee('Bảng màu chủ đạo')->assertSee('#EA7A2B');
         $this->actingAs($this->userWithRole('Sales Staff'))->get(route('design-system'))->assertForbidden();
+    }
+
+    public function test_dashboard_widgets_return_data(): void
+    {
+        $this->actingAs($this->admin());
+        foreach (['day' => 30, 'week' => 12, 'month' => 12, 'year' => 5] as $g => $n) {
+            $res = $this->getJson(route('dashboard.widget', ['widget' => 'revenue', 'granularity' => $g]))->assertOk()->json('data');
+            $this->assertCount($n, $res['labels']);
+            $this->assertCount($n, $res['paid']);
+        }
+        $this->getJson(route('dashboard.widget', ['widget' => 'revenue', 'granularity' => 'hour']))->assertUnprocessable();
+        $this->getJson(route('dashboard.widget', ['widget' => 'schedule', 'day' => now()->addDay()->toDateString()]))
+            ->assertOk()->assertJsonPath('is_today', false)->assertJsonStructure(['html', 'label']);
+        $this->get('/dashboard/widget/other')->assertNotFound();
     }
 
     public function test_admin_can_set_username(): void

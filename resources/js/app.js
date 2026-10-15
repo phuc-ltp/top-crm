@@ -76,6 +76,11 @@ function initSidebar() {
         }
     }));
     $('.crm-backdrop')?.addEventListener('click', () => body.classList.remove('sidebar-open'));
+    // Nút xanh lá kiểu macOS: bật / tắt toàn màn hình
+    $$('[data-fullscreen]').forEach((btn) => btn.addEventListener('click', () => {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => { });
+        else document.exitFullscreen?.();
+    }));
 }
 
 /* ============ Forms: validation + chống gửi trùng ============ */
@@ -250,7 +255,7 @@ window.crmPalette = () => ({
     primary: cssVar('--crm-primary'), primarySoft: cssVar('--crm-primary-soft'),
     success: cssVar('--crm-success'), danger: cssVar('--crm-danger'), warning: cssVar('--crm-warning'),
     info: cssVar('--crm-info'), purple: cssVar('--crm-purple'), text: cssVar('--chart-text'), grid: cssVar('--chart-grid'),
-    surface: cssVar('--crm-surface'), dark: cssVar('--crm-text'),
+    surface: cssVar('--crm-surface-solid') || cssVar('--crm-surface'), dark: cssVar('--crm-text'),
 });
 function applyChartTheme() {
     const p = crmPalette();

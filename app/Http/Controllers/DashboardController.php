@@ -30,12 +30,44 @@ class DashboardController extends Controller
             'kpis' => $service->kpis($from, $to),
             'from' => $from,
             'to' => $to,
+            'invoices' => $service->invoicesIssued($from, $to),
+            'sparks' => $service->sparklines($from, $to),
+            'years' => $service->revenueYears(),
             'outcomes' => $service->opportunityOutcomes(),
-            'topOpportunities' => $user->can('opportunities.view') ? $service->topOpportunities() : collect(),
+            'funnel' => $user->can('opportunities.view') ? $service->funnelCumulative() : [],
+            'sources' => $user->can('customers.view') ? $service->customerSources($from, $to) : ['total' => 0, 'items' => []],
             'topSellers' => $user->can('invoices.view') ? $service->topSellers($from, $to) : collect(),
-            'myTasks' => $service->myTasks(),
-            'activities' => $service->recentActivities(6),
+            'taskBoard' => $service->taskBoard(),
+            'recentOrders' => $user->can('orders.view') ? $service->recentOrders() : collect(),
+            'schedule' => $service->daySchedule(now()),
             'notifications' => $user->notifications()->limit(4)->get(),
+        ]);
+    }
+
+    /** Widget tải lại bằng AJAX: biểu đồ doanh thu theo độ chi tiết, lịch theo ngày. */
+    public function widget(Request $request, string $widget)
+    {
+        abort_unless($request->user()->can('dashboard.view'), 403);
+        $service = new DashboardService($request->user());
+
+        if ($widget === 'revenue') {
+            $data = $request->validate([
+                'granularity' => ['nullable', 'in:day,week,month,year'],
+                'year' => ['nullable', 'integer', 'min:2000', 'max:2100'],
+            ]);
+
+            return response()->json(['success' => true, 'data' => $service->revenueSeries($data['granularity'] ?? 'month', $data['year'] ?? null)]);
+        }
+
+        abort_unless($widget === 'schedule', 404);
+        $data = $request->validate(['day' => ['required', 'date']]);
+        $day = \Illuminate\Support\Carbon::parse($data['day']);
+
+        return response()->json([
+            'success' => true,
+            'label' => vn_date($day),
+            'is_today' => $day->isToday(),
+            'html' => view('dashboard._schedule', ['schedule' => $service->daySchedule($day)])->render(),
         ]);
     }
 

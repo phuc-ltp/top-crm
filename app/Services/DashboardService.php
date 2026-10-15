@@ -275,4 +275,161 @@ class DashboardService
         return Task::visibleTo($this->user)->open()->whereNotNull('due_date')
             ->where('assigned_to', $this->user->id)->orderBy('due_date')->limit($limit)->get();
     }
+
+    /** Số hóa đơn phát hành trong kỳ và % thay đổi so với kỳ trước. */
+    public function invoicesIssued(Carbon $from, Carbon $to): array
+    {
+        [$prevFrom, $prevTo] = self::previousRange($from, $to);
+        $q = fn ($a, $b) => Invoice::visibleTo($this->user)->where('status', 'issued')
+            ->whereBetween('issue_date', [$a->toDateString(), $b->toDateString()]);
+        $count = $q($from, $to)->count();
+
+        return ['count' => $count, 'total' => (float) $q($from, $to)->sum('total'), 'change' => self::change($count, $q($prevFrom, $prevTo)->count())];
+    }
+
+    /**
+     * Chuỗi nhỏ (sparkline) cho 4 thẻ KPI: chia kỳ đang xem thành tối đa 12 khoảng bằng nhau.
+     * Trả về ['revenue' => [...], 'customers' => [...], 'opportunities' => [...], 'invoices' => [...]].
+     */
+    public function sparklines(Carbon $from, Carbon $to, int $points = 12): array
+    {
+        $days = (int) $from->copy()->startOfDay()->diffInDays($to->copy()->startOfDay()) + 1;
+        $points = max(1, min($points, $days));
+        $size = (int) ceil($days / $points);
+        $bucket = function ($rows) use ($from, $size, $points) {
+            $out = array_fill(0, $points, 0.0);
+            foreach ($rows as $day => $value) {
+                $i = intdiv((int) $from->copy()->startOfDay()->diffInDays(Carbon::parse($day)), $size);
+                if ($i >= 0 && $i < $points) {
+                    $out[$i] += (float) $value;
+                }
+            }
+
+            return $out;
+        };
+        $a = $from->toDateString();
+        $b = $to->toDateString();
+
+        return [
+            'revenue' => $bucket(Payment::whereIn('invoice_id', $this->invoiceIds())->whereBetween('payment_date', [$a, $b])
+                ->selectRaw('DATE(payment_date) as d, SUM(amount) as v')->groupBy('d')->pluck('v', 'd')),
+            'customers' => $bucket(Customer::visibleTo($this->user)->whereBetween('created_at', [$from, $to])
+                ->selectRaw('DATE(created_at) as d, COUNT(*) as v')->groupBy('d')->pluck('v', 'd')),
+            'opportunities' => $bucket(Opportunity::visibleTo($this->user)->whereBetween('created_at', [$from, $to])
+                ->selectRaw('DATE(created_at) as d, COUNT(*) as v')->groupBy('d')->pluck('v', 'd')),
+            'invoices' => $bucket(Invoice::visibleTo($this->user)->where('status', 'issued')->whereBetween('issue_date', [$a, $b])
+                ->selectRaw('DATE(issue_date) as d, COUNT(*) as v')->groupBy('d')->pluck('v', 'd')),
+        ];
+    }
+
+    /**
+     * Doanh thu theo độ chi tiết: day = 30 ngày gần nhất, week = 12 tuần gần nhất,
+     * month = 12 tháng của năm $year, year = 5 năm gần nhất. Thực thu (payments) & hóa đơn phát hành.
+     */
+    public function revenueSeries(string $granularity, ?int $year = null): array
+    {
+        $year ??= (int) now()->year;
+        [$start, $end, $sqlFormat, $steps, $step, $keyFormat, $label] = match ($granularity) {
+            'day' => [now()->subDays(29)->startOfDay(), now()->endOfDay(), '%Y-%m-%d', 30, 'addDays', 'Y-m-d', fn ($d) => $d->format('d/m')],
+            'week' => [now()->startOfWeek()->subWeeks(11), now()->endOfWeek(), '%x-%v', 12, 'addWeeks', 'o-W', fn ($d) => 'T'.$d->format('W')],
+            'year' => [now()->startOfYear()->subYears(4), now()->endOfYear(), '%Y', 5, 'addYears', 'Y', fn ($d) => $d->format('Y')],
+            default => [Carbon::create($year)->startOfYear(), Carbon::create($year)->endOfYear(), '%Y-%m', 12, 'addMonths', 'Y-m', fn ($d) => 'T'.$d->month],
+        };
+
+        $paid = Payment::whereIn('invoice_id', $this->invoiceIds())->whereBetween('payment_date', [$start->toDateString(), $end->toDateString()])
+            ->selectRaw("DATE_FORMAT(payment_date, '{$sqlFormat}') as k, SUM(amount) as total")->groupBy('k')->pluck('total', 'k');
+        $invoiced = Invoice::visibleTo($this->user)->where('status', 'issued')->whereBetween('issue_date', [$start->toDateString(), $end->toDateString()])
+            ->selectRaw("DATE_FORMAT(issue_date, '{$sqlFormat}') as k, SUM(total) as total")->groupBy('k')->pluck('total', 'k');
+
+        $labels = $p = $i = [];
+        for ($n = 0; $n < $steps; $n++) {
+            $d = $start->copy()->{$step}($n);
+            $k = $d->format($keyFormat);
+            $labels[] = $label($d);
+            $p[] = (float) ($paid[$k] ?? 0);
+            $i[] = (float) ($invoiced[$k] ?? 0);
+        }
+
+        return ['labels' => $labels, 'paid' => $p, 'invoiced' => $i, 'total_paid' => array_sum($p), 'total_invoiced' => array_sum($i)];
+    }
+
+    /** Các năm có dữ liệu thanh toán/hóa đơn (để chọn năm trên biểu đồ). */
+    public function revenueYears(): array
+    {
+        $min = Payment::whereIn('invoice_id', $this->invoiceIds())->min('payment_date');
+        $first = $min ? (int) Carbon::parse($min)->year : (int) now()->year;
+
+        return range((int) now()->year, min($first, (int) now()->year));
+    }
+
+    /**
+     * Phễu lũy kế: số cơ hội (không tính thất bại) đã đi tới ít nhất từng giai đoạn.
+     * Cơ hội ở giai đoạn sau được tính là đã qua các giai đoạn trước.
+     */
+    public function funnelCumulative(): array
+    {
+        $stages = PipelineStage::ordered()->where('is_lost', false)->get();
+        $counts = Opportunity::visibleTo($this->user)->selectRaw('pipeline_stage_id, COUNT(*) as cnt')
+            ->groupBy('pipeline_stage_id')->pluck('cnt', 'pipeline_stage_id');
+
+        $rows = [];
+        $running = 0;
+        foreach ($stages->reverse() as $s) {
+            $running += (int) ($counts[$s->id] ?? 0);
+            $rows[] = ['name' => $s->name, 'color' => $s->color, 'count' => $running];
+        }
+        $rows = array_reverse($rows);
+        $top = $rows[0]['count'] ?? 0;
+
+        return array_map(fn ($r) => $r + ['pct' => $top > 0 ? round($r['count'] / $top * 100) : 0], $rows);
+    }
+
+    /** Khách hàng mới trong kỳ theo nguồn. */
+    public function customerSources(Carbon $from, Carbon $to): array
+    {
+        $rows = Customer::visibleTo($this->user)->whereBetween('customers.created_at', [$from, $to])
+            ->leftJoin('lead_sources as ls', 'ls.id', '=', 'customers.lead_source_id')
+            ->selectRaw("COALESCE(ls.name, 'Chưa xác định') as name, COUNT(*) as cnt")
+            ->groupBy('name')->orderByDesc('cnt')->orderBy('name')->get();
+        $total = (int) $rows->sum('cnt');
+
+        return [
+            'total' => $total,
+            'items' => $rows->map(fn ($r) => ['name' => $r->name, 'count' => (int) $r->cnt, 'pct' => $total ? round($r->cnt / $total * 100) : 0])->all(),
+        ];
+    }
+
+    /** Công việc của tôi theo nhóm: hôm nay, quá hạn, sắp đến hạn (3 ngày), hoàn thành hôm nay. */
+    public function taskBoard(int $limit = 6): array
+    {
+        $mine = fn () => Task::where('assigned_to', $this->user->id);
+        $today = [now()->startOfDay(), now()->endOfDay()];
+        $groups = [
+            'all' => $mine()->where(fn ($q) => $q->whereBetween('due_date', $today)->orWhere(fn ($q) => $q->open()->where('due_date', '<', now())))
+                ->where('status', '!=', 'cancelled'),
+            'overdue' => $mine()->open()->where('due_date', '<', now()),
+            'upcoming' => $mine()->open()->whereBetween('due_date', [now(), now()->addDays(3)->endOfDay()]),
+            'completed' => $mine()->where('status', 'completed')->whereBetween('completed_at', $today),
+        ];
+
+        return collect($groups)->map(fn ($q) => [
+            'count' => (clone $q)->count(),
+            'items' => $q->orderBy('due_date')->limit($limit)->get(['id', 'title', 'due_date', 'priority', 'status', 'completed_at']),
+        ])->all();
+    }
+
+    /** Đơn hàng mới nhất trong phạm vi quyền. */
+    public function recentOrders(int $limit = 5)
+    {
+        return \App\Models\SalesOrder::visibleTo($this->user)->with('customer:id,name')
+            ->latest('order_date')->latest('id')->limit($limit)->get(['id', 'number', 'customer_id', 'order_date', 'status', 'total']);
+    }
+
+    /** Lịch trong ngày: công việc của tôi có hạn trong ngày $day (sắp theo giờ). */
+    public function daySchedule(Carbon $day)
+    {
+        return Task::where('assigned_to', $this->user->id)->where('status', '!=', 'cancelled')
+            ->whereBetween('due_date', [$day->copy()->startOfDay(), $day->copy()->endOfDay()])
+            ->orderBy('due_date')->limit(8)->get(['id', 'title', 'due_date', 'priority', 'status']);
+    }
 }

@@ -58,6 +58,6 @@ class AppServiceProvider extends ServiceProvider
             $view->with('hasDemoData', \Illuminate\Support\Facades\Cache::remember('crm.has_demo', 600,
                 fn () => \App\Models\Customer::withTrashed()->where('is_demo', true)->exists()));
         });
-        View::composer(['layouts.auth', 'auth.*', 'pages.*'], fn ($view) => $view->with('crmSettings', Setting::allCached()));
+        View::composer(['layouts.auth', 'auth.*', 'pages.*', 'dashboard'], fn ($view) => $view->with('crmSettings', Setting::allCached()));
     }
 }

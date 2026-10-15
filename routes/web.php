@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', fn () => redirect()->route('dashboard'));
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
+    Route::get('/dashboard/widget/{widget}', [DashboardController::class, 'widget'])->whereIn('widget', ['revenue', 'schedule'])->name('dashboard.widget');
     Route::get('/search', SearchController::class)->name('search');
 
     // Hồ sơ
