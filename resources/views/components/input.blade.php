@@ -14,7 +14,7 @@
         <input type="{{ $type }}" name="{{ $name }}" id="{{ $id }}" value="{{ $val }}" @required($required)
             {{ $attributes->except('id')->merge(['class' => 'form-control'.($hasError ? ' is-invalid' : '')]) }}>
         @if ($append)<span class="input-group-text">{!! $append !!}</span>@endif
-        <div class="invalid-feedback">{{ $hasError ? $errors->first($dotName) : 'Vui lòng nhập '.mb_strtolower($label ?? 'giá trị hợp lệ').'.' }}</div>
+        <div class="invalid-feedback">{{ $hasError ? $errors->first($dotName) : __('Vui lòng nhập :field.', ['field' => mb_strtolower($label ?? __('giá trị hợp lệ'))]) }}</div>
     @if ($prepend || $append)</div>@endif
     @if ($help)<div class="form-text">{{ $help }}</div>@endif
 </div>

@@ -296,7 +296,9 @@ body.crm-app { background: var(--crm-bg); min-height: 100vh; }
 .btn-create { height: 40px; border-radius: 12px; padding: 0 18px; font-weight: 600; background: var(--crm-primary-grad); border: 0; color: #fff; box-shadow: 0 8px 20px rgba(var(--crm-primary-rgb), .35); display: inline-flex; align-items: center; gap: 6px; }
 .btn-create:hover, .btn-create:focus, .btn-create.show { color: #fff; filter: brightness(1.05); }
 .topbar-lang { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--crm-card-border); background: var(--crm-surface); color: var(--crm-text); font-weight: 500; font-size: .85rem; box-shadow: var(--crm-shadow); }
-.flag-vn { width: 20px; height: 20px; border-radius: 50%; background: #DA251D; display: inline-grid; place-items: center; color: #FFCD00; font-size: .62rem; line-height: 1; flex-shrink: 0; }
+.flag-vi, .flag-en { width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-size: .62rem; line-height: 1; flex-shrink: 0; }
+.flag-vi { background: #DA251D; color: #FFCD00; }
+.flag-en { background: #1F3A93; color: #fff; font-size: .55rem; font-weight: 700; letter-spacing: -.02em; }
 .topbar-user { display: flex; align-items: center; gap: 8px; padding: 2px; border-radius: 50%; border: 0; background: transparent; }
 .topbar-user .avatar { width: 40px; height: 40px; box-shadow: 0 0 0 2px var(--crm-surface-solid), 0 0 0 3px var(--crm-primary); }
 
@@ -525,8 +527,8 @@ pre { color: var(--crm-text); }
 .kpi-value { font-size: clamp(1.25rem, .7vw + 1rem, 1.7rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: auto; }
 .kpi-spark { position: relative; width: 84px; height: 36px; flex-shrink: 0; }
-.kpi-trend { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; }
-.kpi-trend .small-xs { white-space: nowrap; }
+.kpi-trend { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; min-width: 0; flex: 1 1 auto; }
+.kpi-trend .small-xs { line-height: 1.25; }
 
 .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--crm-surface-3); }
 .seg button { border: 0; background: transparent; color: var(--crm-text-muted); font-size: .76rem; font-weight: 600; padding: 4px 11px; border-radius: 8px; transition: background .15s, color .15s; }

@@ -26,7 +26,7 @@ if (! function_exists('money_short')) {
         if (Setting::get('currency', 'VND') !== 'VND' || abs($amount) < 1_000_000) {
             return money($amount);
         }
-        [$div, $unit] = abs($amount) >= 1_000_000_000 ? [1_000_000_000, 'tỷ'] : [1_000_000, 'tr'];
+        [$div, $unit] = abs($amount) >= 1_000_000_000 ? [1_000_000_000, __('tỷ')] : [1_000_000, __('tr')];
         $value = rtrim(rtrim(number_format($amount / $div, 1, ',', '.'), '0'), ',');
 
         return $value.' '.$unit.' ₫';
@@ -48,13 +48,13 @@ if (! function_exists('vn_date')) {
 
 if (! function_exists('badge')) {
     /**
-     * Badge trạng thái từ hằng số dạng ['key' => ['Nhãn', 'màu']].
+     * Badge trạng thái từ hằng số dạng ['key' => ['Nhãn', 'màu']]. Nhãn được dịch theo ngôn ngữ giao diện.
      */
     function badge(array $map, ?string $value): string
     {
         [$label, $color] = $map[$value] ?? [$value ?? '—', 'secondary'];
 
-        return '<span class="badge badge-soft-'.e($color).'">'.e($label).'</span>';
+        return '<span class="badge badge-soft-'.e($color).'">'.e(__($label)).'</span>';
     }
 }
 
@@ -63,6 +63,6 @@ if (! function_exists('label_of')) {
     {
         $item = $map[$value] ?? $value ?? '—';
 
-        return is_array($item) ? $item[0] : $item;
+        return __(is_array($item) ? $item[0] : $item);
     }
 }

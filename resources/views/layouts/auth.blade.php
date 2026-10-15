@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     {{-- Thứ tự quan trọng: auth-mobile.css phải nạp SAU auth.css --}}
     @vite(['resources/css/app.css', 'resources/css/auth.css', 'resources/css/auth-mobile.css', 'resources/js/app.js'])
+    @if ($jsI18n = \App\Support\JsTranslations::forCurrentLocale())<script>window.CRM_I18N = @json($jsI18n);</script>@endif
 </head>
 <body class="top-auth">
 @php
@@ -32,29 +33,23 @@
     </div>
 
     <div class="ta-topbar">
-        <div class="dropdown ta-lang">
-            <button class="btn" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-globe2"></i> Tiếng Việt <i class="bi bi-chevron-down small"></i></button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><span class="dropdown-item active"><i class="bi bi-check2 me-2"></i>Tiếng Việt</span></li>
-                <li><span class="dropdown-item disabled" title="Giao diện tiếng Anh đang được phát triển">English (sắp ra mắt)</span></li>
-            </ul>
-        </div>
+        @include('partials.locale-switcher', ['variant' => 'auth'])
     </div>
 
     @hasSection('page')
         <main class="ta-page fade-in"><div class="ta-page-inner">@yield('page')</div></main>
     @else
         <main class="ta-main">
-            <section class="ta-hero ta-desktop-only" aria-label="Giới thiệu">
+            <section class="ta-hero ta-desktop-only" aria-label="{{ __('Giới thiệu sản phẩm') }}">
                 <x-brand :size="80" :slogan="true" />
                 <div class="ta-divider"></div>
                 <h1>{{ $crmSettings['login_headline'] }}<span class="accent">{{ $crmSettings['login_headline_accent'] }}</span></h1>
                 <p class="lead-text">{{ $crmSettings['login_description'] }}</p>
                 <ul class="ta-features">
-                    <li><span class="ic"><i class="bi bi-people-fill"></i></span><span><span class="t">Quản lý khách hàng</span><span class="d">Lưu trữ và chăm sóc khách hàng hiệu quả</span></span></li>
-                    <li><span class="ic"><i class="bi bi-bar-chart-fill"></i></span><span><span class="t">Tăng doanh số</span><span class="d">Tối ưu quy trình bán hàng</span></span></li>
-                    <li><span class="ic"><i class="bi bi-clipboard-check"></i></span><span><span class="t">Quản lý công việc</span><span class="d">Theo dõi và kiểm soát tiến độ</span></span></li>
-                    <li><span class="ic"><i class="bi bi-pie-chart-fill"></i></span><span><span class="t">Báo cáo trực quan</span><span class="d">Dữ liệu chính xác, dễ dàng phân tích</span></span></li>
+                    <li><span class="ic"><i class="bi bi-people-fill"></i></span><span><span class="t">{{ __('Quản lý khách hàng') }}</span><span class="d">{{ __('Lưu trữ và chăm sóc khách hàng hiệu quả') }}</span></span></li>
+                    <li><span class="ic"><i class="bi bi-bar-chart-fill"></i></span><span><span class="t">{{ __('Tăng doanh số') }}</span><span class="d">{{ __('Tối ưu quy trình bán hàng') }}</span></span></li>
+                    <li><span class="ic"><i class="bi bi-clipboard-check"></i></span><span><span class="t">{{ __('Quản lý công việc') }}</span><span class="d">{{ __('Theo dõi và kiểm soát tiến độ') }}</span></span></li>
+                    <li><span class="ic"><i class="bi bi-pie-chart-fill"></i></span><span><span class="t">{{ __('Báo cáo trực quan') }}</span><span class="d">{{ __('Dữ liệu chính xác, dễ dàng phân tích') }}</span></span></li>
                 </ul>
                 @php($stats = \App\Models\Setting::loginStats())
                 @if ($stats)
@@ -75,11 +70,11 @@
     @endif
 
     <footer class="ta-footer">
-        <span>© {{ date('Y') }} {{ $crmSettings['copyright_text'] }}.@if ($crmSettings['copyright_owner']) Bản quyền thuộc {{ $crmSettings['copyright_owner'] }}.@endif Tất cả quyền được bảo lưu.</span>
-        <nav aria-label="Liên kết chân trang">
-            <a href="{{ route('pages.terms') }}">Điều khoản sử dụng</a>
-            <a href="{{ route('pages.privacy') }}">Chính sách bảo mật</a>
-            <a href="{{ route('pages.support') }}">Hỗ trợ</a>
+        <span>© {{ date('Y') }} {{ $crmSettings['copyright_text'] }}.@if ($crmSettings['copyright_owner']) {{ __('Bản quyền thuộc :owner.', ['owner' => $crmSettings['copyright_owner']]) }}@endif {{ __('Tất cả quyền được bảo lưu.') }}</span>
+        <nav aria-label="{{ __('Liên kết chân trang') }}">
+            <a href="{{ route('pages.terms') }}">{{ __('Điều khoản sử dụng') }}</a>
+            <a href="{{ route('pages.privacy') }}">{{ __('Chính sách bảo mật') }}</a>
+            <a href="{{ route('pages.support') }}">{{ __('Hỗ trợ') }}</a>
         </nav>
     </footer>
 </div>

@@ -14,6 +14,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\InteractionController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\PaymentController;
@@ -35,6 +36,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dieu-khoan-su-dung', [PageController::class, 'show'])->defaults('slug', 'terms')->name('pages.terms');
 Route::get('/chinh-sach-bao-mat', [PageController::class, 'show'])->defaults('slug', 'privacy')->name('pages.privacy');
 Route::get('/ho-tro', [PageController::class, 'show'])->defaults('slug', 'support')->name('pages.support');
+
+// Đổi ngôn ngữ giao diện (khách và người dùng đã đăng nhập)
+Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update')->middleware('throttle:30,1');
 
 /*
 |--------------------------------------------------------------------------

@@ -18,6 +18,6 @@
             <option value="{{ $key }}" @selected(is_array($selected) ? in_array((string) $key, $selected, true) : (string) $key === $selected)>{{ $text }}</option>
         @endforeach
     </select>
-    <div class="invalid-feedback">{{ $hasError ? $errors->first($dotName) : 'Vui lòng chọn '.mb_strtolower($label ?? 'một giá trị').'.' }}</div>
+    <div class="invalid-feedback">{{ $hasError ? $errors->first($dotName) : __('Vui lòng chọn :field.', ['field' => mb_strtolower($label ?? __('một giá trị'))]) }}</div>
     @if ($help)<div class="form-text">{{ $help }}</div>@endif
 </div>

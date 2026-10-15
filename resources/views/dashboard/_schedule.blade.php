@@ -8,5 +8,5 @@
         </span>
     </a>
 @empty
-    <x-empty-state icon="bi-calendar2-heart" title="Không có công việc nào trong ngày" />
+    <x-empty-state icon="bi-calendar2-heart" :title="__('Không có công việc nào trong ngày')" />
 @endforelse

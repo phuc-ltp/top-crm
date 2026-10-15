@@ -9,6 +9,6 @@
     @endif
     <textarea name="{{ $name }}" id="{{ $id }}" rows="{{ $rows }}" @required($required)
         {{ $attributes->except('id')->merge(['class' => 'form-control'.($hasError ? ' is-invalid' : '')]) }}>{{ old($name, $value) }}</textarea>
-    <div class="invalid-feedback">{{ $hasError ? $errors->first($name) : 'Vui lòng nhập '.mb_strtolower($label ?? 'nội dung').'.' }}</div>
+    <div class="invalid-feedback">{{ $hasError ? $errors->first($name) : __('Vui lòng nhập :field.', ['field' => mb_strtolower($label ?? __('nội dung'))]) }}</div>
     @if ($help)<div class="form-text">{{ $help }}</div>@endif
 </div>

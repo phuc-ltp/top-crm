@@ -331,9 +331,9 @@ class DashboardService
         $year ??= (int) now()->year;
         [$start, $end, $sqlFormat, $steps, $step, $keyFormat, $label] = match ($granularity) {
             'day' => [now()->subDays(29)->startOfDay(), now()->endOfDay(), '%Y-%m-%d', 30, 'addDays', 'Y-m-d', fn ($d) => $d->format('d/m')],
-            'week' => [now()->startOfWeek()->subWeeks(11), now()->endOfWeek(), '%x-%v', 12, 'addWeeks', 'o-W', fn ($d) => 'T'.$d->format('W')],
+            'week' => [now()->startOfWeek()->subWeeks(11), now()->endOfWeek(), '%x-%v', 12, 'addWeeks', 'o-W', fn ($d) => __('Tuần :n', ['n' => (int) $d->format('W')])],
             'year' => [now()->startOfYear()->subYears(4), now()->endOfYear(), '%Y', 5, 'addYears', 'Y', fn ($d) => $d->format('Y')],
-            default => [Carbon::create($year)->startOfYear(), Carbon::create($year)->endOfYear(), '%Y-%m', 12, 'addMonths', 'Y-m', fn ($d) => 'T'.$d->month],
+            default => [Carbon::create($year)->startOfYear(), Carbon::create($year)->endOfYear(), '%Y-%m', 12, 'addMonths', 'Y-m', fn ($d) => app()->getLocale() === 'vi' ? 'T'.$d->month : $d->format('M')],
         };
 
         $paid = Payment::whereIn('invoice_id', $this->invoiceIds())->whereBetween('payment_date', [$start->toDateString(), $end->toDateString()])
@@ -389,13 +389,13 @@ class DashboardService
     {
         $rows = Customer::visibleTo($this->user)->whereBetween('customers.created_at', [$from, $to])
             ->leftJoin('lead_sources as ls', 'ls.id', '=', 'customers.lead_source_id')
-            ->selectRaw("COALESCE(ls.name, 'Chưa xác định') as name, COUNT(*) as cnt")
+            ->selectRaw('ls.name as name, COUNT(*) as cnt')
             ->groupBy('name')->orderByDesc('cnt')->orderBy('name')->get();
         $total = (int) $rows->sum('cnt');
 
         return [
             'total' => $total,
-            'items' => $rows->map(fn ($r) => ['name' => $r->name, 'count' => (int) $r->cnt, 'pct' => $total ? round($r->cnt / $total * 100) : 0])->all(),
+            'items' => $rows->map(fn ($r) => ['name' => $r->name ?? __('Chưa xác định'), 'label' => $r->name ? __($r->name) : __('Chưa xác định'), 'count' => (int) $r->cnt, 'pct' => $total ? round($r->cnt / $total * 100) : 0])->all(),
         ];
     }
 

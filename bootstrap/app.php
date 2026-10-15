@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             \App\Http\Middleware\EnsureUserIsActive::class,
+            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
         $middleware->alias([
@@ -31,7 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Phản hồi JSON tiếng Việt cho các yêu cầu AJAX
         $exceptions->render(function (AccessDeniedHttpException|AuthorizationException $e, Request $request) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Bạn không có quyền thực hiện thao tác này.'], 403);
+                return response()->json(['message' => __('Bạn không có quyền thực hiện thao tác này.')], 403);
             }
         });
 
@@ -41,8 +42,9 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($e->getStatusCode() !== 419) {
                 return null;
             }
+            \App\Http\Middleware\SetLocale::apply($request);   // CSRF chạy trước middleware ngôn ngữ
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Phiên làm việc đã hết hạn. Vui lòng tải lại trang.'], 419);
+                return response()->json(['message' => __('Phiên làm việc đã hết hạn. Vui lòng tải lại trang.')], 419);
             }
             if ($request->isMethod('GET')) {
                 return null;
@@ -50,6 +52,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return redirect()->back()
                 ->withInput($request->except(['password', 'password_confirmation', 'current_password', '_token']))
-                ->with('warning', 'Phiên làm việc đã hết hạn do để trang mở quá lâu. Dữ liệu đã được giữ lại — vui lòng nhập lại mật khẩu (nếu có) và bấm gửi lần nữa.');
+                ->with('warning', __('Phiên làm việc đã hết hạn do để trang mở quá lâu. Dữ liệu đã được giữ lại — vui lòng nhập lại mật khẩu (nếu có) và bấm gửi lần nữa.'));
         });
     })->create();

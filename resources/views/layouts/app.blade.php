@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi" data-bs-theme="light">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Tổng quan') · {{ $crmSettings['company_name'] }}</title>
+    <title>@yield('title', __('Tổng quan')) · {{ $crmSettings['company_name'] }}</title>
     {{-- Áp dụng giao diện sáng/tối trước khi vẽ trang (tránh nháy màu) --}}
     <script>
         (function () {
@@ -25,17 +25,18 @@
         <style>:root { --crm-primary: {{ $brandColor }}; --crm-primary-hover: {{ $brandColor }}; }</style>
     @endif
     @stack('styles')
+    @if ($jsI18n = \App\Support\JsTranslations::forCurrentLocale())<script>window.CRM_I18N = @json($jsI18n);</script>@endif
 </head>
 <body class="crm-app">
 @php($authUser = auth()->user())
 @php($wallpaper = $crmSettings['login_background'] ? Storage::disk('public')->url($crmSettings['login_background']) : asset('images/login-bg.jpg'))
 <div class="crm-wallpaper" style="--wallpaper: url('{{ $wallpaper }}')" aria-hidden="true"></div>
 
-<aside class="crm-sidebar" aria-label="Điều hướng chính">
+<aside class="crm-sidebar" aria-label="{{ __('Điều hướng chính') }}">
     <div class="mac-lights">
         <span class="l-red" aria-hidden="true"></span>
-        <button class="l-yellow" type="button" data-toggle-sidebar title="Thu gọn / mở rộng menu" aria-label="Thu gọn menu"></button>
-        <button class="l-green" type="button" data-fullscreen title="Toàn màn hình" aria-label="Toàn màn hình"></button>
+        <button class="l-yellow" type="button" data-toggle-sidebar title="{{ __('Thu gọn / mở rộng menu') }}" aria-label="{{ __('Thu gọn menu') }}"></button>
+        <button class="l-green" type="button" data-fullscreen title="{{ __('Toàn màn hình') }}" aria-label="{{ __('Toàn màn hình') }}"></button>
     </div>
     <a href="{{ route('dashboard') }}" class="brand">
         <x-brand-logo :size="40" />
@@ -66,23 +67,23 @@
         @endforeach
     </nav>
     <div class="sidebar-bottom">
-        <a href="{{ $authUser->can('settings.manage') ? route('settings.edit') : route('profile.edit') }}" class="sidebar-card workspace" title="Không gian làm việc">
+        <a href="{{ $authUser->can('settings.manage') ? route('settings.edit') : route('profile.edit') }}" class="sidebar-card workspace" title="{{ __('Không gian làm việc') }}">
             <span class="ic"><x-brand-logo :size="22" /></span>
-            <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $crmSettings['company_name'] }}</span><span class="s">Không gian làm việc</span></span>
+            <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $crmSettings['company_name'] }}</span><span class="s">{{ __('Không gian làm việc') }}</span></span>
             <i class="bi bi-chevron-right small"></i>
         </a>
         <div class="dropup">
             <button class="sidebar-card" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <x-avatar :user="$authUser" />
-                <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $authUser->name }}</span><span class="s d-block text-truncate">{{ $authUser->getRoleNames()->first() ?? 'Chưa có vai trò' }}</span></span>
+                <span class="min-w-0 flex-grow-1"><span class="t d-block text-truncate">{{ $authUser->name }}</span><span class="s d-block text-truncate">{{ $authUser->getRoleNames()->first() ?? __('Chưa có vai trò') }}</span></span>
                 <i class="bi bi-three-dots-vertical"></i>
             </button>
             <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
-                <li><a class="dropdown-item" href="{{ route('profile.edit') }}#password"><i class="bi bi-key me-2"></i>Đổi mật khẩu</a></li>
-                <li><a class="dropdown-item" href="{{ route('pages.support') }}"><i class="bi bi-question-circle me-2"></i>Hướng dẫn & hỗ trợ</a></li>
+                <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>{{ __('Hồ sơ cá nhân') }}</a></li>
+                <li><a class="dropdown-item" href="{{ route('profile.edit') }}#password"><i class="bi bi-key me-2"></i>{{ __('Đổi mật khẩu') }}</a></li>
+                <li><a class="dropdown-item" href="{{ route('pages.support') }}"><i class="bi bi-question-circle me-2"></i>{{ __('Hướng dẫn & hỗ trợ') }}</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button></form></li>
+                <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>{{ __('Đăng xuất') }}</button></form></li>
             </ul>
         </div>
     </div>
@@ -92,31 +93,31 @@
 <div class="crm-main">
 <div class="crm-window">
     @if ($hasDemoData ?? false)
-        <div class="demo-ribbon no-print"><i class="bi bi-cone-striped me-1"></i> Hệ thống đang chứa DỮ LIỆU DEMO phục vụ thử nghiệm — không phải số liệu kinh doanh thật.</div>
+        <div class="demo-ribbon no-print"><i class="bi bi-cone-striped me-1"></i> {{ __('Hệ thống đang chứa DỮ LIỆU DEMO phục vụ thử nghiệm — không phải số liệu kinh doanh thật.') }}</div>
     @endif
     <header class="crm-topbar">
-        <button class="topbar-icon d-lg-none" type="button" data-toggle-sidebar aria-label="Mở menu"><i class="bi bi-list"></i></button>
+        <button class="topbar-icon d-lg-none" type="button" data-toggle-sidebar aria-label="{{ __('Mở menu') }}"><i class="bi bi-list"></i></button>
 
         <div class="crm-search d-none d-md-block">
             <i class="bi bi-search"></i>
-            <input type="search" id="globalSearch" class="form-control" placeholder="Tìm kiếm khách hàng, đơn hàng, công việc..." autocomplete="off" data-url="{{ route('search') }}" aria-label="Tìm kiếm">
+            <input type="search" id="globalSearch" class="form-control" placeholder="{{ __('Tìm kiếm khách hàng, đơn hàng, công việc...') }}" autocomplete="off" data-url="{{ route('search') }}" aria-label="{{ __('Tìm kiếm') }}">
             <kbd>Ctrl K</kbd>
             <div id="globalSearchResults" class="crm-search-results"></div>
         </div>
 
         <div class="ms-auto d-flex align-items-center gap-2">
             @php($quick = collect([
-                ['customers.create', 'Khách hàng', 'bi-people', 'create', \App\Models\Customer::class],
-                ['leads.create', 'Lead', 'bi-funnel', 'create', \App\Models\Lead::class],
-                ['opportunities.create', 'Cơ hội', 'bi-kanban', 'create', \App\Models\Opportunity::class],
-                ['tasks.create', 'Công việc', 'bi-check2-square', 'create', \App\Models\Task::class],
-                ['quotations.create', 'Báo giá', 'bi-file-earmark-text', 'create', \App\Models\Quotation::class],
-                ['orders.create', 'Đơn hàng', 'bi-bag-check', 'create', \App\Models\SalesOrder::class],
-                ['tickets.create', 'Ticket hỗ trợ', 'bi-headset', 'create', \App\Models\SupportTicket::class],
+                ['customers.create', __('labels.customer'), 'bi-people', 'create', \App\Models\Customer::class],
+                ['leads.create', __('labels.lead'), 'bi-funnel', 'create', \App\Models\Lead::class],
+                ['opportunities.create', __('labels.opportunity'), 'bi-kanban', 'create', \App\Models\Opportunity::class],
+                ['tasks.create', __('labels.task'), 'bi-check2-square', 'create', \App\Models\Task::class],
+                ['quotations.create', __('labels.quotation'), 'bi-file-earmark-text', 'create', \App\Models\Quotation::class],
+                ['orders.create', __('labels.order'), 'bi-bag-check', 'create', \App\Models\SalesOrder::class],
+                ['tickets.create', __('labels.ticket'), 'bi-headset', 'create', \App\Models\SupportTicket::class],
             ])->filter(fn ($q) => $authUser->can($q[3], $q[4])))
             @if ($quick->isNotEmpty())
                 <div class="dropdown">
-                    <button class="btn btn-create" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-lg"></i><span class="txt">Tạo mới</span></button>
+                    <button class="btn btn-create" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-plus-lg"></i><span class="txt">{{ __('Tạo mới') }}</span></button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         @foreach ($quick as $q)
                             <li><a class="dropdown-item" href="{{ route($q[0]) }}"><i class="bi {{ $q[2] }} me-2 text-orange"></i>{{ $q[1] }}</a></li>
@@ -126,7 +127,7 @@
             @endif
 
             <div class="dropdown" id="notifDropdown" data-url="{{ route('notifications.feed') }}">
-                <button class="topbar-icon" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-label="Thông báo">
+                <button class="topbar-icon" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-label="{{ __('Thông báo') }}">
                     <i class="bi bi-bell"></i>
                     @if ($unreadNotifications > 0)
                         <span class="dot" id="notifBadge">{{ $unreadNotifications > 99 ? '99+' : $unreadNotifications }}</span>
@@ -134,35 +135,29 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end p-0" style="width: 360px; max-width: 92vw;">
                     <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
-                        <strong>Thông báo</strong>
-                        <a href="#" class="small" id="notifMarkAll" data-url="{{ route('notifications.read-all') }}">Đánh dấu tất cả đã đọc</a>
+                        <strong>{{ __('Thông báo') }}</strong>
+                        <a href="#" class="small" id="notifMarkAll" data-url="{{ route('notifications.read-all') }}">{{ __('Đánh dấu tất cả đã đọc') }}</a>
                     </div>
                     <div id="notifList" class="p-2" style="max-height: 380px; overflow-y: auto;"></div>
-                    <a href="{{ route('notifications.index') }}" class="d-block text-center py-2 border-top small fw-semibold">Xem tất cả</a>
+                    <a href="{{ route('notifications.index') }}" class="d-block text-center py-2 border-top small fw-semibold">{{ __('Xem tất cả') }}</a>
                 </div>
             </div>
             @can('tasks.view')
-                <a href="{{ route('tasks.calendar') }}" class="topbar-icon d-none d-sm-grid" title="Lịch công việc" aria-label="Lịch công việc"><i class="bi bi-calendar2-check"></i></a>
+                <a href="{{ route('tasks.calendar') }}" class="topbar-icon d-none d-sm-grid" title="{{ __('Lịch công việc') }}" aria-label="{{ __('Lịch công việc') }}"><i class="bi bi-calendar2-check"></i></a>
             @endcan
-            <button class="topbar-icon theme-toggle" type="button" data-theme-toggle title="Chuyển giao diện sáng / tối" aria-label="Chuyển giao diện sáng / tối">
+            <button class="topbar-icon theme-toggle" type="button" data-theme-toggle title="{{ __('Chuyển giao diện sáng / tối') }}" aria-label="{{ __('Chuyển giao diện sáng / tối') }}">
                 <i class="bi bi-moon-stars"></i><i class="bi bi-sun"></i>
             </button>
-            <div class="dropdown d-none d-md-block">
-                <button class="topbar-lang" data-bs-toggle="dropdown" aria-expanded="false"><span class="flag-vn">★</span><span class="lang-text">Tiếng Việt</span><i class="bi bi-chevron-down small"></i></button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li><span class="dropdown-item active"><i class="bi bi-check2 me-2"></i>Tiếng Việt</span></li>
-                    <li><span class="dropdown-item disabled" title="Giao diện tiếng Anh đang được phát triển">English (sắp ra mắt)</span></li>
-                </ul>
-            </div>
+            @include('partials.locale-switcher', ['variant' => 'topbar'])
             <div class="dropdown">
-                <button class="topbar-user" data-bs-toggle="dropdown" aria-label="Tài khoản"><x-avatar :user="$authUser" /></button>
+                <button class="topbar-user" data-bs-toggle="dropdown" aria-label="{{ __('Tài khoản') }}"><x-avatar :user="$authUser" /></button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li class="px-3 py-2"><div class="fw-semibold small">{{ $authUser->name }}</div><div class="small-xs text-muted">{{ $authUser->email }}</div></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
-                    <li><a class="dropdown-item" href="{{ route('profile.sessions') }}"><i class="bi bi-laptop me-2"></i>Phiên đăng nhập</a></li>
+                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}"><i class="bi bi-person me-2"></i>{{ __('Hồ sơ cá nhân') }}</a></li>
+                    <li><a class="dropdown-item" href="{{ route('profile.sessions') }}"><i class="bi bi-laptop me-2"></i>{{ __('Phiên đăng nhập') }}</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button></form></li>
+                    <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>{{ __('Đăng xuất') }}</button></form></li>
                 </ul>
             </div>
         </div>
@@ -173,8 +168,8 @@
     </main>
 
     <footer class="crm-footer">
-        <span>© {{ date('Y') }} {{ $crmSettings['copyright_text'] }}.@if ($crmSettings['copyright_owner']) Bản quyền thuộc {{ $crmSettings['copyright_owner'] }}.@endif Tất cả quyền được bảo lưu.</span>
-        <nav><a href="{{ route('pages.terms') }}">Điều khoản sử dụng</a><a href="{{ route('pages.privacy') }}">Chính sách bảo mật</a><a href="{{ route('pages.support') }}">Hỗ trợ</a></nav>
+        <span>© {{ date('Y') }} {{ $crmSettings['copyright_text'] }}.@if ($crmSettings['copyright_owner']) {{ __('Bản quyền thuộc :owner.', ['owner' => $crmSettings['copyright_owner']]) }}@endif {{ __('Tất cả quyền được bảo lưu.') }}</span>
+        <nav><a href="{{ route('pages.terms') }}">{{ __('Điều khoản sử dụng') }}</a><a href="{{ route('pages.privacy') }}">{{ __('Chính sách bảo mật') }}</a><a href="{{ route('pages.support') }}">{{ __('Hỗ trợ') }}</a></nav>
     </footer>
 </div>
 </div>
@@ -188,8 +183,8 @@
                 <p class="confirm-message mb-0 fw-semibold"></p>
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0 pb-4">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-danger confirm-ok">Xác nhận</button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('Hủy') }}</button>
+                <button type="button" class="btn btn-danger confirm-ok">{{ __('Xác nhận') }}</button>
             </div>
         </div>
     </div>

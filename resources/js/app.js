@@ -10,6 +10,9 @@ const csrf = () => document.querySelector('meta[name="csrf-token"]')?.content;
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* Dịch câu giao diện: bản dịch do server chèn vào window.CRM_I18N (khóa = câu tiếng Việt) */
+const t = (s) => (window.CRM_I18N && window.CRM_I18N[s]) || s;
+window.t = t;
 
 /* ============ Toast ============ */
 window.toast = function (type, message) {
@@ -24,7 +27,7 @@ window.toast = function (type, message) {
     el.className = `crm-toast ${type}`;
     el.setAttribute('role', 'alert');
     el.innerHTML = `<i class="bi ${icons[type] || icons.info}"></i><div class="flex-grow-1">${escapeHtml(message)}</div>
-        <button type="button" class="btn-close btn-sm" aria-label="Đóng"></button>`;
+        <button type="button" class="btn-close btn-sm" aria-label="${t('Đóng')}"></button>`;
     box.appendChild(el);
     const close = () => { el.classList.add('hide'); setTimeout(() => el.remove(), 250); };
     el.querySelector('.btn-close').addEventListener('click', close);
@@ -48,14 +51,14 @@ window.api = async function (url, { method = 'GET', body = null } = {}) {
     try { data = await res.json(); } catch (e) { /* phản hồi không phải JSON */ }
     if (!res.ok) {
         const messages = {
-            401: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
-            403: 'Bạn không có quyền thực hiện thao tác này.',
-            404: 'Không tìm thấy dữ liệu.',
-            419: 'Phiên làm việc đã hết hạn. Vui lòng tải lại trang.',
-            429: 'Bạn thao tác quá nhanh, vui lòng thử lại sau.',
+            401: t('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'),
+            403: t('Bạn không có quyền thực hiện thao tác này.'),
+            404: t('Không tìm thấy dữ liệu.'),
+            419: t('Phiên làm việc đã hết hạn. Vui lòng tải lại trang.'),
+            429: t('Bạn thao tác quá nhanh, vui lòng thử lại sau.'),
         };
         const firstError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
-        const err = new Error(firstError || data?.message || messages[res.status] || 'Đã có lỗi xảy ra, vui lòng thử lại.');
+        const err = new Error(firstError || data?.message || messages[res.status] || t('Đã có lỗi xảy ra, vui lòng thử lại.'));
         err.status = res.status;
         err.data = data;
         throw err;
@@ -90,7 +93,7 @@ function setLoading(btn, loading) {
         btn.dataset.originalHtml = btn.innerHTML;
         btn.dataset.loading = 'true';
         btn.disabled = true;
-        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span>${btn.dataset.loadingText || 'Đang xử lý...'}`;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span>${btn.dataset.loadingText || t('Đang xử lý...')}`;
     } else {
         btn.dataset.loading = 'false';
         btn.disabled = false;
@@ -109,7 +112,7 @@ function initForms() {
                 e.stopPropagation();
                 form.classList.add('was-validated');
                 form.querySelector(':invalid')?.focus();
-                toast('warning', 'Vui lòng kiểm tra lại các trường được đánh dấu.');
+                toast('warning', t('Vui lòng kiểm tra lại các trường được đánh dấu.'));
                 return;
             }
             if (form.dataset.confirm && !form.dataset.confirmed) {
@@ -131,13 +134,13 @@ function initForms() {
 }
 
 /* ============ Hộp thoại xác nhận ============ */
-function confirmDialog(message, buttonText = 'Xác nhận') {
+function confirmDialog(message, buttonText) {
     return new Promise((resolve) => {
         const el = $('#confirmModal');
         if (!el) { resolve(window.confirm(message)); return; }
         $('.confirm-message', el).textContent = message;
         const okBtn = $('.confirm-ok', el);
-        okBtn.textContent = buttonText || 'Xác nhận';
+        okBtn.textContent = buttonText || t('Xác nhận');
         const modal = bootstrap.Modal.getOrCreateInstance(el);
         let result = false;
         const onOk = () => { result = true; modal.hide(); };
@@ -167,11 +170,11 @@ function initGlobalSearch() {
             try {
                 const res = await fetch(`${input.dataset.url}?q=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json' }, signal: controller.signal });
                 const data = await res.json();
-                if (!data.groups?.length) { box.innerHTML = '<div class="p-3 text-muted small">Không tìm thấy kết quả phù hợp.</div>'; return; }
+                if (!data.groups?.length) { box.innerHTML = `<div class="p-3 text-muted small">${t('Không tìm thấy kết quả phù hợp.')}</div>`; return; }
                 box.innerHTML = data.groups.map((g) => `<div class="group-title">${escapeHtml(g.label)}</div>` +
                     g.items.map((i) => `<a href="${escapeHtml(i.url)}"><i class="bi ${escapeHtml(g.icon)} text-orange"></i><div class="min-w-0"><div class="fw-semibold text-truncate">${escapeHtml(i.title)}</div><div class="small text-muted text-truncate">${escapeHtml(i.subtitle || '')}</div></div></a>`).join('')).join('');
             } catch (e) {
-                if (e.name !== 'AbortError') box.innerHTML = '<div class="p-3 text-danger small">Không thể tìm kiếm lúc này.</div>';
+                if (e.name !== 'AbortError') box.innerHTML = `<div class="p-3 text-danger small">${t('Không thể tìm kiếm lúc này.')}</div>`;
             }
         }, 300);
     });
@@ -189,7 +192,7 @@ function initNotifications() {
         list.innerHTML = '<div class="p-3"><div class="skeleton mb-2"></div><div class="skeleton mb-2"></div><div class="skeleton w-50"></div></div>';
         try {
             const data = await api(dropdown.dataset.url);
-            if (!data.items.length) { list.innerHTML = '<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-bell"></i></div><div class="small">Chưa có thông báo nào</div></div>'; return; }
+            if (!data.items.length) { list.innerHTML = '<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-bell"></i></div><div class="small">' + t('Chưa có thông báo nào') + '</div></div>'; return; }
             list.innerHTML = data.items.map((n) => `<a class="notif-item ${n.read ? '' : 'unread'}" href="${escapeHtml(n.open_url)}">
                 <span class="avatar avatar-sm tone-orange"><i class="bi ${escapeHtml(n.icon)}"></i></span>
                 <span class="min-w-0"><span class="d-block small fw-semibold text-truncate-2">${escapeHtml(n.message)}</span><span class="small-xs text-muted">${escapeHtml(n.time)}</span></span></a>`).join('');
@@ -290,8 +293,8 @@ document.addEventListener('keydown', (e) => {
 
 const moneyTick = (v) => {
     const n = Number(v);
-    if (Math.abs(n) >= 1e9) return (n / 1e9).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' tỷ';
-    if (Math.abs(n) >= 1e6) return (n / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' tr';
+    if (Math.abs(n) >= 1e9) return (n / 1e9).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' ' + t('tỷ');
+    if (Math.abs(n) >= 1e6) return (n / 1e6).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' ' + t('tr');
     return n.toLocaleString('vi-VN');
 };
 window.moneyTick = moneyTick;
@@ -357,7 +360,7 @@ function initLineItems() {
             recalc();
         });
         $('[data-remove-row]', tr)?.addEventListener('click', () => {
-            if ($$('tr', tbody).length <= 1) { toast('warning', 'Chứng từ cần ít nhất một dòng.'); return; }
+            if ($$('tr', tbody).length <= 1) { toast('warning', t('Chứng từ cần ít nhất một dòng.')); return; }
             tr.remove();
             recalc();
         });

@@ -9,4 +9,10 @@ return [
     'attachment_max_kb' => 10240,
 
     'per_page' => 15,
+
+    // Ngôn ngữ giao diện: mã => tên hiển thị (tên luôn viết bằng chính ngôn ngữ đó)
+    'locales' => [
+        'vi' => 'Tiếng Việt',
+        'en' => 'English',
+    ],
 ];

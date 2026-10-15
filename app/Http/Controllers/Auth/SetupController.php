@@ -44,14 +44,14 @@ class SetupController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'username' => ['nullable', 'string', 'min:3', 'max:50', 'regex:/^[A-Za-z0-9._\-]+$/', 'unique:users,username'],
             'password' => ['required', 'confirmed', Password::min(10)->letters()->mixedCase()->numbers()],
-        ], ['username.regex' => 'Tên đăng nhập chỉ gồm chữ không dấu, số, dấu chấm, gạch ngang, gạch dưới.'],
-            ['name' => 'Họ tên', 'email' => 'Email', 'username' => 'Tên đăng nhập', 'password' => 'Mật khẩu']);
+        ], ['username.regex' => __('Tên đăng nhập chỉ gồm chữ không dấu, số, dấu chấm, gạch ngang, gạch dưới.')],
+            ['name' => __('Họ tên'), 'email' => 'Email', 'username' => __('Tên đăng nhập'), 'password' => __('Mật khẩu')]);
 
         // Lớp 1: khóa nguyên tử — chỉ một yêu cầu được xử lý tại một thời điểm.
         $lock = Cache::lock('crm:setup', 30);
         if (! $lock->get()) {
             return back()->withInput($request->except('password', 'password_confirmation'))
-                ->withErrors(['name' => 'Đang có một yêu cầu khởi tạo khác được xử lý. Vui lòng tải lại trang sau vài giây.']);
+                ->withErrors(['name' => __('Đang có một yêu cầu khởi tạo khác được xử lý. Vui lòng tải lại trang sau vài giây.')]);
         }
 
         try {
@@ -72,7 +72,7 @@ class SetupController extends Controller
         $request->session()->regenerate();
         ActivityLogger::log('created', $user, 'Khởi tạo tài khoản Super Admin');
 
-        return redirect()->route('dashboard')->with('success', 'Đã tạo tài khoản quản trị. Chào mừng bạn đến với TOP CRM!');
+        return redirect()->route('dashboard')->with('success', __('Đã tạo tài khoản quản trị. Chào mừng bạn đến với TOP CRM!'));
     }
 
     private function createOwner(array $data): User

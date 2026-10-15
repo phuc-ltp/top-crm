@@ -27,7 +27,7 @@ class PasswordResetController extends Controller
         }
 
         // Luôn trả cùng một thông báo để không lộ email nào tồn tại
-        return back()->with('success', 'Nếu email tồn tại trong hệ thống, liên kết đặt lại mật khẩu đã được gửi.');
+        return back()->with('success', __('Nếu email tồn tại trong hệ thống, liên kết đặt lại mật khẩu đã được gửi.'));
     }
 
     public function reset(Request $request, string $token)
@@ -41,7 +41,7 @@ class PasswordResetController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', PasswordRule::min(8)->letters()->numbers()],
-        ], [], ['password' => 'Mật khẩu mới']);
+        ], [], ['password' => __('Mật khẩu mới')]);
 
         $status = Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function (User $user, string $password) {
             $user->forceFill(['password' => $password, 'remember_token' => Str::random(60)])->save();
@@ -49,7 +49,7 @@ class PasswordResetController extends Controller
         });
 
         return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('success', 'Đặt lại mật khẩu thành công. Vui lòng đăng nhập.')
-            : back()->withInput($request->only('email'))->withErrors(['email' => 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.']);
+            ? redirect()->route('login')->with('success', __('Đặt lại mật khẩu thành công. Vui lòng đăng nhập.'))
+            : back()->withInput($request->only('email'))->withErrors(['email' => __('Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.')]);
     }
 }

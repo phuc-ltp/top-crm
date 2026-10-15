@@ -8,6 +8,8 @@ use App\Models\User;
  * Menu sidebar — nhóm có thể thu gọn. Mỗi mục chỉ hiển thị khi người dùng có quyền;
  * nhóm không còn mục con nào thì ẩn. Chỉ liệt kê module đã có chức năng thật.
  *
+ * Nhãn viết bằng tiếng Việt và được dịch khi hiển thị (lang/en.json); id nhóm tính từ nhãn gốc nên không đổi theo ngôn ngữ.
+ *
  * Định dạng mục: [nhãn, icon, route, quyền, mẫu route active] hoặc
  *               [nhãn, icon, null, null, null, [mục con...]]
  */
@@ -72,22 +74,22 @@ class Menu
                     $children = [];
                     foreach ($def[5] as $child) {
                         if ($user->can($child[3])) {
-                            $children[] = ['label' => $child[0], 'route' => $child[2], 'active' => request()->routeIs($child[4])];
+                            $children[] = ['label' => __($child[0]), 'route' => $child[2], 'active' => request()->routeIs($child[4])];
                         }
                     }
                     if ($children) {
                         $visible[] = [
-                            'label' => $def[0], 'icon' => $def[1], 'children' => $children,
+                            'label' => __($def[0]), 'icon' => $def[1], 'children' => $children,
                             'active' => collect($children)->contains('active', true),
                             'id' => 'nav-'.substr(md5($def[0]), 0, 8),
                         ];
                     }
                 } elseif ($user->can($def[3])) {
-                    $visible[] = ['label' => $def[0], 'icon' => $def[1], 'route' => $def[2], 'active' => request()->routeIs($def[4]), 'children' => []];
+                    $visible[] = ['label' => __($def[0]), 'icon' => $def[1], 'route' => $def[2], 'active' => request()->routeIs($def[4]), 'children' => []];
                 }
             }
             if ($visible) {
-                $result[] = ['title' => $section ?: null, 'items' => $visible];
+                $result[] = ['title' => $section ? __($section) : null, 'items' => $visible];
             }
         }
 

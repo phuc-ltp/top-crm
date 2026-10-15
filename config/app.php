@@ -78,9 +78,10 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'vi'),
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    // Dự phòng = vi: khóa dịch là câu tiếng Việt, thiếu bản dịch thì hiện nguyên tiếng Việt
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'vi'),
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 

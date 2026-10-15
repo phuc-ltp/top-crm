@@ -4,7 +4,7 @@
     $home = auth()->check() ? route('dashboard') : route('login');
 @endphp
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,9 +46,9 @@
         @hasSection('action')
             @yield('action')
         @else
-            <a class="btn primary" href="{{ $home }}">{{ auth()->check() ? 'Về trang tổng quan' : 'Về trang đăng nhập' }}</a>
+            <a class="btn primary" href="{{ $home }}">{{ auth()->check() ? __('Về trang tổng quan') : __('Về trang đăng nhập') }}</a>
         @endif
-        <a class="btn ghost" href="javascript:history.back()">Quay lại</a>
+        <a class="btn ghost" href="javascript:history.back()">{{ __('Quay lại') }}</a>
     </div>
     <div class="foot">© {{ date('Y') }} {{ $s['copyright_text'] ?? 'TOP — Technology of Prowess' }}</div>
 </main>
