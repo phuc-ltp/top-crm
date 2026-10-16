@@ -158,28 +158,68 @@ function initGlobalSearch() {
     if (!input || !box) return;
     let timer;
     let controller;
+    let active = -1;
+    const open = (html) => { box.innerHTML = html; box.classList.add('show'); input.setAttribute('aria-expanded', 'true'); active = -1; };
+    const close = () => { box.classList.remove('show'); input.setAttribute('aria-expanded', 'false'); active = -1; };
+    const links = () => $$('a[data-option]', box);
+    const highlight = (i) => {
+        const all = links();
+        if (!all.length) return;
+        active = (i + all.length) % all.length;
+        all.forEach((a, k) => { a.classList.toggle('active', k === active); a.setAttribute('aria-selected', k === active ? 'true' : 'false'); });
+        all[active].scrollIntoView({ block: 'nearest' });
+    };
+    const resultsUrl = (q) => `${input.dataset.resultsUrl}?q=${encodeURIComponent(q)}`;
+    const option = (url, icon, title, subtitle) => `<a href="${escapeHtml(url)}" data-option role="option"><i class="bi ${escapeHtml(icon)} text-orange"></i><div class="min-w-0"><div class="fw-semibold text-truncate">${escapeHtml(title)}</div>${subtitle ? `<div class="small text-muted text-truncate">${escapeHtml(subtitle)}</div>` : ''}</div></a>`;
+
+    // Ô trống: hiện tìm gần đây
+    const showRecent = async () => {
+        try {
+            const data = await api(input.dataset.url);
+            if (!data.recent?.length || input.value.trim() !== '') return;
+            open(`<div class="group-title d-flex justify-content-between"><span>${t('Tìm gần đây')}</span><button type="button" class="btn btn-link btn-sm p-0" data-clear-recent>${t('Xóa')}</button></div>` +
+                data.recent.map((q) => option(resultsUrl(q), 'bi-clock-history', q, '')).join(''));
+            $('[data-clear-recent]', box)?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try { await api(input.dataset.clearUrl, { method: 'DELETE' }); close(); } catch (err) { toast('error', err.message); }
+            });
+        } catch (e) { /* bỏ qua */ }
+    };
+
+    input.addEventListener('focus', () => { if (input.value.trim() === '') showRecent(); });
     input.addEventListener('input', () => {
         clearTimeout(timer);
         const q = input.value.trim();
-        if (q.length < 2) { box.classList.remove('show'); return; }
+        if (q === '') { showRecent(); return; }
+        if (q.length < 2) { close(); return; }
         timer = setTimeout(async () => {
             controller?.abort();
             controller = new AbortController();
-            box.innerHTML = '<div class="p-3"><div class="skeleton mb-2"></div><div class="skeleton w-75"></div></div>';
-            box.classList.add('show');
+            open('<div class="p-3"><div class="skeleton mb-2"></div><div class="skeleton w-75"></div></div>');
             try {
-                const res = await fetch(`${input.dataset.url}?q=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json' }, signal: controller.signal });
+                const res = await fetch(`${input.dataset.url}?q=${encodeURIComponent(q)}`, { headers: { Accept: 'application/json' }, signal: controller.signal, credentials: 'same-origin' });
                 const data = await res.json();
-                if (!data.groups?.length) { box.innerHTML = `<div class="p-3 text-muted small">${t('Không tìm thấy kết quả phù hợp.')}</div>`; return; }
-                box.innerHTML = data.groups.map((g) => `<div class="group-title">${escapeHtml(g.label)}</div>` +
-                    g.items.map((i) => `<a href="${escapeHtml(i.url)}"><i class="bi ${escapeHtml(g.icon)} text-orange"></i><div class="min-w-0"><div class="fw-semibold text-truncate">${escapeHtml(i.title)}</div><div class="small text-muted text-truncate">${escapeHtml(i.subtitle || '')}</div></div></a>`).join('')).join('');
+                const all = `<a href="${escapeHtml(resultsUrl(q))}" data-option role="option" class="border-top"><i class="bi bi-search text-orange"></i><div class="fw-semibold">${escapeHtml(t('Xem tất cả kết quả cho “:q”').replace(':q', q))}</div></a>`;
+                if (!data.groups?.length) { open(`<div class="p-3 text-muted small">${t('Không tìm thấy kết quả phù hợp.')}</div>`); return; }
+                open(data.groups.map((g) => `<div class="group-title">${escapeHtml(g.label)}</div>` + g.items.map((i) => option(i.url, g.icon, i.title, i.subtitle)).join('')).join('') + all);
             } catch (e) {
-                if (e.name !== 'AbortError') box.innerHTML = `<div class="p-3 text-danger small">${t('Không thể tìm kiếm lúc này.')}</div>`;
+                if (e.name !== 'AbortError') open(`<div class="p-3 text-danger small">${t('Không thể tìm kiếm lúc này.')}</div>`);
             }
-        }, 300);
+        }, 250);
     });
-    document.addEventListener('click', (e) => { if (!e.target.closest('.crm-search')) box.classList.remove('show'); });
-    input.addEventListener('keydown', (e) => { if (e.key === 'Escape') { box.classList.remove('show'); input.blur(); } });
+    document.addEventListener('click', (e) => { if (!e.target.closest('.crm-search')) close(); });
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { close(); input.blur(); return; }
+        if (e.key === 'ArrowDown') { e.preventDefault(); highlight(active + 1); return; }
+        if (e.key === 'ArrowUp') { e.preventDefault(); highlight(active - 1); return; }
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const chosen = links()[active];
+            const q = input.value.trim();
+            if (chosen) window.location.href = chosen.href;
+            else if (q.length >= 2) window.location.href = resultsUrl(q);
+        }
+    });
 }
 
 /* ============ Thông báo ============ */

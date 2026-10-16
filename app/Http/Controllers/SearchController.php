@@ -2,60 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contact;
-use App\Models\Customer;
-use App\Models\Invoice;
-use App\Models\Lead;
-use App\Models\Opportunity;
-use App\Models\SupportTicket;
+use App\Models\SearchHistory;
+use App\Services\GlobalSearch;
+use App\Support\Tenancy\CurrentOrganization;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
-/** Tìm kiếm toàn cục (AJAX) — chỉ trả về dữ liệu người dùng được phép xem. */
+/** Tìm kiếm toàn cục — chỉ trả về dữ liệu người dùng được phép xem trong tổ chức đang làm việc. */
 class SearchController extends Controller
 {
+    public function __construct(private GlobalSearch $search) {}
+
+    private function orgId(): int
+    {
+        return (int) app(CurrentOrganization::class)->id();
+    }
+
+    /** AJAX: gợi ý khi gõ; ô trống → danh sách tìm gần đây. */
     public function __invoke(Request $request)
     {
-        $request->validate(['q' => ['required', 'string', 'min:2', 'max:100']]);
+        $q = GlobalSearch::normalize($request->input('q'));
+        if ($q === '') {
+            return response()->json(['groups' => [], 'recent' => $this->search->recent($request->user(), $this->orgId())]);
+        }
+        $request->merge(['q' => $q])->validate(['q' => ['string', 'min:'.GlobalSearch::MIN_LENGTH, 'max:'.GlobalSearch::MAX_LENGTH]]);
+
+        return response()->json(['groups' => $this->search->suggest($q, $request->user())]);
+    }
+
+    /** Trang kết quả đầy đủ: số kết quả theo loại, danh sách có phân trang của loại đang chọn. */
+    public function results(Request $request)
+    {
         $user = $request->user();
-        $term = $this->like($request->q);
-        $groups = [];
+        $allowed = $this->search->allowedTypes($user);
+        $q = GlobalSearch::normalize($request->input('q'));
+        $request->validate(['type' => ['nullable', Rule::in($allowed)]]);
 
-        $add = function (string $label, string $icon, $items) use (&$groups) {
-            if ($items->isNotEmpty()) {
-                $groups[] = ['label' => $label, 'icon' => $icon, 'items' => $items->values()];
-            }
-        };
-
-        if ($user->can('customers.view')) {
-            $add(__('Khách hàng'), 'bi-people', Customer::visibleTo($user)
-                ->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('code', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term))
-                ->limit(5)->get()->map(fn ($c) => ['title' => $c->name, 'subtitle' => $c->code.' · '.($c->phone ?? $c->email), 'url' => route('customers.show', $c)]));
-        }
-        if ($user->can('leads.view')) {
-            $add('Leads', 'bi-funnel', Lead::visibleTo($user)
-                ->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('code', 'like', $term)->orWhere('company', 'like', $term)->orWhere('email', 'like', $term))
-                ->limit(5)->get()->map(fn ($l) => ['title' => $l->name, 'subtitle' => $l->code.' · '.label_of(Lead::statuses(), $l->status), 'url' => route('leads.show', $l)]));
-        }
-        if ($user->can('opportunities.view')) {
-            $add(__('Cơ hội'), 'bi-kanban', Opportunity::visibleTo($user)
-                ->where(fn ($q) => $q->where('title', 'like', $term)->orWhere('code', 'like', $term))
-                ->limit(5)->get()->map(fn ($o) => ['title' => $o->title, 'subtitle' => $o->code.' · '.money($o->value), 'url' => route('opportunities.show', $o)]));
-        }
-        if ($user->can('contacts.view')) {
-            $add(__('Người liên hệ'), 'bi-person-lines-fill', Contact::visibleTo($user)
-                ->where(fn ($q) => $q->where('full_name', 'like', $term)->orWhere('email', 'like', $term)->orWhere('phone', 'like', $term))
-                ->limit(5)->get()->map(fn ($c) => ['title' => $c->full_name, 'subtitle' => $c->company ?? $c->email, 'url' => route('contacts.show', $c)]));
-        }
-        if ($user->can('invoices.view')) {
-            $add(__('Hóa đơn'), 'bi-receipt', Invoice::visibleTo($user)->where('number', 'like', $term)
-                ->limit(5)->get()->map(fn ($i) => ['title' => $i->number, 'subtitle' => money($i->total), 'url' => route('invoices.show', $i)]));
-        }
-        if ($user->can('tickets.view')) {
-            $add(__('Ticket hỗ trợ'), 'bi-headset', SupportTicket::visibleTo($user)
-                ->where(fn ($q) => $q->where('subject', 'like', $term)->orWhere('code', 'like', $term))
-                ->limit(5)->get()->map(fn ($t) => ['title' => $t->subject, 'subtitle' => $t->code.' · '.label_of(SupportTicket::STATUSES, $t->status), 'url' => route('tickets.show', $t)]));
+        if (mb_strlen($q) < GlobalSearch::MIN_LENGTH) {
+            return view('search.results', ['q' => $q, 'counts' => [], 'type' => null, 'items' => null, 'types' => GlobalSearch::types(),
+                'recent' => $this->search->recent($user, $this->orgId())]);
         }
 
-        return response()->json(['groups' => $groups]);
+        $this->search->remember($q, $user, $this->orgId());
+        $counts = $this->search->counts($q, $user);
+        $type = $request->input('type') ?: (collect($counts)->filter()->keys()->first() ?? ($allowed[0] ?? null));
+        $items = $type ? $this->search->query($type, $q, $user)->paginate($this->perPage($request))->withQueryString()
+            ->through(fn ($m) => $this->search->present($type, $m)) : null;
+
+        return view('search.results', ['q' => $q, 'counts' => $counts, 'type' => $type, 'items' => $items, 'types' => GlobalSearch::types(),
+            'recent' => $this->search->recent($user, $this->orgId())]);
+    }
+
+    /** Xóa lịch sử tìm kiếm của chính mình (trong tổ chức đang làm việc). */
+    public function clearRecent(Request $request)
+    {
+        SearchHistory::where('organization_id', $this->orgId())->where('user_id', $request->user()->id)->delete();
+
+        return $request->expectsJson() ? response()->json(['success' => true]) : back()->with('success', __('Đã xóa lịch sử tìm kiếm.'));
     }
 }

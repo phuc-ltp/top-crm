@@ -133,10 +133,14 @@
 
         <div class="crm-search d-none d-md-block">
             <i class="bi bi-search"></i>
-            <input type="search" id="globalSearch" class="form-control" placeholder="{{ __('Tìm kiếm khách hàng, đơn hàng, công việc...') }}" autocomplete="off" data-url="{{ route('search') }}" aria-label="{{ __('Tìm kiếm') }}">
+            <input type="search" id="globalSearch" class="form-control" placeholder="{{ __('Tìm kiếm khách hàng, đơn hàng, công việc...') }}" autocomplete="off"
+                   data-url="{{ route('search') }}" data-results-url="{{ route('search.results') }}" data-clear-url="{{ route('search.recent.clear') }}"
+                   aria-label="{{ __('Tìm kiếm') }}" role="combobox" aria-expanded="false" aria-controls="globalSearchResults" aria-autocomplete="list">
             <kbd>Ctrl K</kbd>
-            <div id="globalSearchResults" class="crm-search-results"></div>
+            <div id="globalSearchResults" class="crm-search-results" role="listbox"></div>
         </div>
+        {{-- Điện thoại / màn hình nhỏ: mở trang tìm kiếm --}}
+        <a href="{{ route('search.results') }}" class="topbar-icon d-md-none" aria-label="{{ __('Tìm kiếm') }}" title="{{ __('Tìm kiếm') }}"><i class="bi bi-search"></i></a>
 
         <div class="ms-auto d-flex align-items-center gap-2">
             @php($quick = collect([
