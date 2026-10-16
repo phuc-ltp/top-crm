@@ -185,8 +185,9 @@ class DashboardService
     /** Phễu bán hàng: số lượng & giá trị cơ hội theo giai đoạn. */
     public function funnel(): array
     {
-        $stages = PipelineStage::ordered()->get();
-        $rows = Opportunity::visibleTo($this->user)->selectRaw('pipeline_stage_id, COUNT(*) as cnt, SUM(value) as val')
+        // Phễu theo pipeline mặc định (các pipeline khác có giai đoạn riêng, không gộp chung một phễu)
+        $stages = PipelineStage::where('pipeline_id', \App\Models\Pipeline::default()?->id)->ordered()->get();
+        $rows = Opportunity::visibleTo($this->user)->whereIn('pipeline_stage_id', $stages->pluck('id'))->selectRaw('pipeline_stage_id, COUNT(*) as cnt, SUM(value) as val')
             ->groupBy('pipeline_stage_id')->get()->keyBy('pipeline_stage_id');
 
         return [
@@ -371,8 +372,8 @@ class DashboardService
      */
     public function funnelCumulative(): array
     {
-        $stages = PipelineStage::ordered()->where('is_lost', false)->get();
-        $counts = Opportunity::visibleTo($this->user)->selectRaw('pipeline_stage_id, COUNT(*) as cnt')
+        $stages = PipelineStage::where('pipeline_id', \App\Models\Pipeline::default()?->id)->ordered()->where('is_lost', false)->get();
+        $counts = Opportunity::visibleTo($this->user)->whereIn('pipeline_stage_id', $stages->pluck('id'))->selectRaw('pipeline_stage_id, COUNT(*) as cnt')
             ->groupBy('pipeline_stage_id')->pluck('cnt', 'pipeline_stage_id');
 
         $rows = [];

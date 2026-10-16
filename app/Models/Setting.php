@@ -64,6 +64,7 @@ class Setting extends Model
         'notify_lead_assigned', 'notify_task_due', 'notify_deal_stage', 'notify_ticket_new',
         // Form thu lead từ website (bước 2.4)
         'lead_form_enabled', 'lead_form_token', 'lead_form_assignee', 'lead_form_source', 'lead_form_thanks',
+        'provisioned_at',
     ];
 
     private const CACHE_KEY = 'crm.settings';

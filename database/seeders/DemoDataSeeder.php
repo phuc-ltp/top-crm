@@ -52,7 +52,7 @@ class DemoDataSeeder extends Seeder
         $sales = collect([$users['Sales Manager'], $users['Sales Staff'], $users['Sales Staff 2']]);
         $sources = LeadSource::pluck('id')->all();
         $tags = Tag::pluck('id')->all();
-        $stages = PipelineStage::ordered()->get();
+        $stages = PipelineStage::where('pipeline_id', \App\Models\Pipeline::default()?->id)->ordered()->get();
 
         // Sản phẩm
         $catalog = [

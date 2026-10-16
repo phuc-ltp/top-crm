@@ -162,6 +162,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/opportunities/list', [OpportunityController::class, 'list'])->name('opportunities.list');
     Route::get('/opportunities/export', [OpportunityController::class, 'export'])->name('opportunities.export');
     Route::patch('/opportunities/{opportunity}/move', [OpportunityController::class, 'move'])->name('opportunities.move');
+    Route::get('/opportunities/forecast', [\App\Http\Controllers\ForecastController::class, 'index'])->name('opportunities.forecast');
+    Route::post('/opportunities/{opportunity}/attachments', [OpportunityController::class, 'addAttachment'])->name('opportunities.attachments.store')->middleware('throttle:30,1');
+    Route::get('/opportunities/{opportunity}/attachments/{attachment}', [OpportunityController::class, 'downloadAttachment'])->name('opportunities.attachments.download');
+    Route::delete('/opportunities/{opportunity}/attachments/{attachment}', [OpportunityController::class, 'deleteAttachment'])->name('opportunities.attachments.destroy');
     Route::resource('opportunities', OpportunityController::class);
 
     // Công việc
@@ -238,6 +242,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/settings/branding', [SettingController::class, 'branding'])->name('settings.branding');
     Route::get('/settings/custom-fields', [\App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');
+    // Cấu hình pipeline & giai đoạn cơ hội
+    Route::get('/settings/pipelines', [\App\Http\Controllers\PipelineSettingsController::class, 'index'])->name('settings.pipelines');
+    Route::post('/settings/pipelines', [\App\Http\Controllers\PipelineSettingsController::class, 'storePipeline'])->name('settings.pipelines.store');
+    Route::put('/settings/pipelines/{pipeline}', [\App\Http\Controllers\PipelineSettingsController::class, 'updatePipeline'])->name('settings.pipelines.update');
+    Route::delete('/settings/pipelines/{pipeline}', [\App\Http\Controllers\PipelineSettingsController::class, 'destroyPipeline'])->name('settings.pipelines.destroy');
+    Route::post('/settings/pipelines/{pipeline}/stages', [\App\Http\Controllers\PipelineSettingsController::class, 'storeStage'])->name('settings.pipelines.stages.store');
+    Route::put('/settings/pipeline-stages/{pipelineStage}', [\App\Http\Controllers\PipelineSettingsController::class, 'updateStage'])->name('settings.pipelines.stages.update');
+    Route::delete('/settings/pipeline-stages/{pipelineStage}', [\App\Http\Controllers\PipelineSettingsController::class, 'destroyStage'])->name('settings.pipelines.stages.destroy');
     // Cấu hình lead: giai đoạn, lý do thất bại, form website
     Route::get('/settings/leads', [\App\Http\Controllers\LeadSettingsController::class, 'index'])->name('settings.leads');
     Route::post('/settings/leads/stages', [\App\Http\Controllers\LeadSettingsController::class, 'storeStage'])->name('settings.leads.stages.store');

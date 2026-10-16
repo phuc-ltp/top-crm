@@ -154,7 +154,11 @@ class LeadService
 
             $opportunity = null;
             if (! empty($options['create_opportunity'])) {
-                $stage = PipelineStage::ordered()->where('is_won', false)->where('is_lost', false)->firstOrFail();
+                // Cơ hội từ lead vào giai đoạn mở đầu tiên của pipeline mặc định
+                $stage = \App\Models\Pipeline::default()?->firstOpenStage();
+                if (! $stage) {
+                    throw ValidationException::withMessages(['create_opportunity' => __('Pipeline mặc định chưa có giai đoạn đang mở.')]);
+                }
                 $opportunity = Opportunity::create([
                     'title' => $options['opportunity_title'] ?? __('Cơ hội từ :name', ['name' => $lead->name]),
                     'customer_id' => $customer->id,

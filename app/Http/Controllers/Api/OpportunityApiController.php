@@ -12,6 +12,7 @@ class OpportunityApiController extends ApiController
         return [
             'id' => $o->id, 'code' => $o->code, 'title' => $o->title, 'value' => (float) $o->value,
             'probability' => $o->probability, 'weighted_value' => $o->weighted_value,
+            'pipeline' => $o->pipeline?->only(['id', 'name']),
             'stage' => $o->stage?->only(['id', 'name', 'slug']), 'customer' => $o->customer?->only(['id', 'code', 'name']),
             'assigned_to' => $o->assignee?->only(['id', 'name']),
             'expected_close_date' => $o->expected_close_date?->toDateString(), 'closed_at' => $o->closed_at?->toIso8601String(),
@@ -21,7 +22,8 @@ class OpportunityApiController extends ApiController
     public function index(Request $request)
     {
         $this->authorize('viewAny', Opportunity::class);
-        $page = Opportunity::visibleTo($request->user())->with(['stage', 'customer', 'assignee'])
+        $page = Opportunity::visibleTo($request->user())->with(['pipeline', 'stage', 'customer', 'assignee'])
+            ->when($request->filled('pipeline'), fn ($q) => $q->where('pipeline_id', $request->integer('pipeline')))
             ->when($request->filled('stage'), fn ($q) => $q->whereHas('stage', fn ($s) => $s->where('slug', $request->stage)))
             ->latest()->paginate($this->perPage($request));
 
