@@ -92,7 +92,7 @@ class ContactController extends Controller
         $this->authorize('delete', $contact);
         $contact->delete();
 
-        return redirect()->route('contacts.index')->with('success', __('Đã xóa người liên hệ.'));
+        return redirect()->route('contacts.index')->with('success', __('Đã xóa người liên hệ.').' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     public function export(Request $request, ExportService $exporter)

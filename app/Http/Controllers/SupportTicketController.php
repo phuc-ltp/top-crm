@@ -97,7 +97,7 @@ class SupportTicketController extends Controller
         $this->authorize('delete', $ticket);
         $ticket->delete();
 
-        return redirect()->route('tickets.index')->with('success', __('Đã xóa ticket.'));
+        return redirect()->route('tickets.index')->with('success', __('Đã xóa ticket.').' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     /** Phản hồi khách hàng hoặc ghi chú nội bộ; có thể đổi trạng thái cùng lúc. */

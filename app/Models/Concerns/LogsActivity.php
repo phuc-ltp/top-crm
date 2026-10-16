@@ -10,7 +10,8 @@ use App\Services\ActivityLogger;
  */
 trait LogsActivity
 {
-    protected static array $neverLog = ['password', 'remember_token', 'updated_at', 'created_at'];
+    // deleted_at: xóa / khôi phục được ghi bằng hành động riêng ("Xóa" / "Khôi phục"), không ghi thành "Cập nhật"
+    protected static array $neverLog = ['password', 'remember_token', 'updated_at', 'created_at', 'deleted_at'];
 
     public static function bootLogsActivity(): void
     {
@@ -29,6 +30,10 @@ trait LogsActivity
         });
 
         static::deleted(fn ($model) => ActivityLogger::log('deleted', $model, 'Xóa '.$model->activityLabel()));
+
+        if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(static::class), true)) {
+            static::restored(fn ($model) => ActivityLogger::log('restored', $model, 'Khôi phục '.$model->activityLabel()));
+        }
     }
 
     public function activityLabel(): string

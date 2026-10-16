@@ -110,7 +110,7 @@ class LeadController extends Controller
         $this->authorize('delete', $lead);
         $lead->delete();
 
-        return redirect()->route('leads.index')->with('success', __('Đã xóa lead :name.', ['name' => $lead->name]));
+        return redirect()->route('leads.index')->with('success', __('Đã xóa lead :name.', ['name' => $lead->name]).' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     public function convertForm(Request $request, Lead $lead)

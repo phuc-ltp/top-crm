@@ -170,7 +170,7 @@ class OpportunityController extends Controller
         $this->authorize('delete', $opportunity);
         $opportunity->delete();
 
-        return redirect()->route('opportunities.index')->with('success', __('Đã xóa cơ hội.'));
+        return redirect()->route('opportunities.index')->with('success', __('Đã xóa cơ hội.').' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     /** AJAX: kéo thả thẻ Kanban (chỉ trong cùng pipeline; vào cột thất bại phải có lý do) */

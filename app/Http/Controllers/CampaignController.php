@@ -85,7 +85,7 @@ class CampaignController extends Controller
         $this->authorize('delete', $campaign);
         $campaign->delete();
 
-        return redirect()->route('campaigns.index')->with('success', __('Đã xóa chiến dịch.'));
+        return redirect()->route('campaigns.index')->with('success', __('Đã xóa chiến dịch.').' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     public function attachLeads(Request $request, Campaign $campaign)

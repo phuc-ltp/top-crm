@@ -1736,5 +1736,13 @@
     "Đội ngũ & vận hành": "Team & operations",
     "Σ (tổng tiền − đã thanh toán) của các hóa đơn đã phát hành chưa thanh toán đủ, tại thời điểm hiện tại.": "Σ (total − amount paid) of issued invoices not yet fully paid, right now.",
     "Số lead đạt giai đoạn \"đủ điều kiện\" trong kỳ (theo ngày đạt điều kiện). Lead chuyển đổi thẳng mà chưa qua giai đoạn này được tính theo ngày chuyển đổi.": "Leads that reached a \"qualified\" stage in the period (by the date they qualified). Leads converted directly without passing that stage are counted by their conversion date.",
-    "Đang ở giai đoạn đủ điều kiện: :n": "Currently in a qualified stage: :n"
+    "Đang ở giai đoạn đủ điều kiện: :n": "Currently in a qualified stage: :n",
+    "Thùng rác": "Trash",
+    "Bản ghi đã xóa trong phạm vi bạn được xem. Có thể khôi phục bất kỳ lúc nào — dữ liệu không bị xóa vĩnh viễn.": "Deleted records you are allowed to see. They can be restored at any time — nothing is permanently deleted.",
+    "Thùng rác trống": "Trash is empty",
+    "Không có :type nào đã xóa.": "No deleted :type.",
+    "Ngày xóa": "Deleted on",
+    "Người xóa": "Deleted by",
+    "Có thể khôi phục trong Thùng rác.": "You can restore it from the Trash.",
+    "Đã khôi phục \":item\" từ thùng rác.": "Restored \":item\" from the trash."
 }

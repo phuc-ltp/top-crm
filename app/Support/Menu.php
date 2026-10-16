@@ -62,6 +62,7 @@ class Menu
                     ['Cấu hình pipeline', null, 'settings.pipelines', 'settings.manage', 'settings.pipelines*'],
                     ['Đăng nhập & thương hiệu', null, 'settings.branding', 'platform', 'settings.branding'],
                     ['Nhật ký hoạt động', null, 'activity-logs.index', 'activity_logs.view', 'activity-logs.*'],
+                    ['Thùng rác', null, 'trash.index', 'trash', 'trash.*'],
                     ['Design System', null, 'design-system', 'settings.manage', 'design-system'],
                     ['Quản lý tổ chức', null, 'platform.organizations.index', 'platform', 'platform.*'],
                 ]],

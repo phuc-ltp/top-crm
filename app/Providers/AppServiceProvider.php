@@ -61,6 +61,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Khu vực quản trị nền tảng (danh sách tổ chức...) — chỉ quản trị nền tảng
         Gate::define('platform', fn ($user) => $user->isPlatformAdmin());
+        // Thùng rác: có quyền xóa ít nhất một module (chỉ thấy loại mình được xóa)
+        Gate::define('trash', fn ($user) => \App\Http\Controllers\TrashController::allowedTypes($user) !== []);
 
         // Quản trị nền tảng có toàn quyền trên mọi tổ chức
         Gate::before(fn ($user) => $user->isPlatformAdmin() ? true : null);
