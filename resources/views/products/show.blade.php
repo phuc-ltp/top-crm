@@ -19,7 +19,13 @@
                 <dl class="detail-list">
                     <dt>ID</dt><dd>{{ $product->id }}</dd>
                     <dt>SKU</dt><dd>{{ $product->sku }}</dd>
+                    <dt>{{ __('Loại') }}</dt><dd>{!! badge(App\Models\Product::TYPES, $product->type) !!}</dd>
                     <dt>{{ __('Danh mục') }}</dt><dd>{{ $product->category?->name ?? '—' }}</dd>
+                    <dt>{{ __('Nhà cung cấp') }}</dt><dd>@if ($product->supplier) @can('view', $product->supplier)<a href="{{ route('suppliers.show', $product->supplier) }}">{{ $product->supplier->name }}</a>@else {{ $product->supplier->name }} @endcan @else — @endif</dd>
+                    @can('update', $product)
+                        <dt>{{ __('Giá vốn') }}</dt><dd>{{ $product->purchase_price !== null ? money($product->purchase_price) : '—' }}</dd>
+                        <dt title="{{ __('(Giá bán − giá vốn) ÷ giá bán × 100%') }}">{{ __('Lợi nhuận gộp') }}</dt><dd>{{ $product->margin_percent !== null ? number_format($product->margin_percent, 1, ',', '.').'%' : '—' }}</dd>
+                    @endcan
                     <dt>{{ __('Trạng thái') }}</dt><dd>{!! badge(App\Models\Product::STATUSES, $product->status) !!}</dd>
                     <dt>{{ __('Ngày tạo') }}</dt><dd>{{ vn_date($product->created_at, true) }}</dd>
                     <dt>{{ __('Cập nhật') }}</dt><dd>{{ vn_date($product->updated_at, true) }}</dd>

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\User;
+use App\Support\Decimal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -19,11 +20,11 @@ class PaymentService
                 throw ValidationException::withMessages(['amount' => __('Chỉ ghi nhận thanh toán cho hóa đơn đã phát hành.')]);
             }
 
-            $amount = round((float) $data['amount'], 2);
-            if ($amount <= 0) {
+            $amount = Decimal::round(is_numeric($data['amount']) ? (string) $data['amount'] : 0);
+            if (Decimal::cmp($amount, 0) <= 0) {
                 throw ValidationException::withMessages(['amount' => __('Số tiền phải lớn hơn 0.')]);
             }
-            if ($amount > $invoice->balance + 0.001) {
+            if (Decimal::cmp($amount, Decimal::sub($invoice->total, $invoice->amount_paid)) > 0) {
                 throw ValidationException::withMessages([
                     'amount' => __('Số tiền vượt quá số còn phải thu (:amount).', ['amount' => number_format($invoice->balance, 0, ',', '.').' ₫']),
                 ]);
@@ -57,12 +58,11 @@ class PaymentService
     /** Tính lại số đã thu và trạng thái thanh toán từ bảng payments. */
     public function refreshInvoice(Invoice $invoice): void
     {
-        $paid = round((float) $invoice->payments()->sum('amount'), 2);
-        $total = (float) $invoice->total;
+        $paid = Decimal::round($invoice->payments()->sum('amount'));
 
         $status = match (true) {
-            $paid <= 0 => 'unpaid',
-            $paid + 0.001 >= $total => 'paid',
+            Decimal::cmp($paid, 0) <= 0 => 'unpaid',
+            Decimal::cmp($paid, $invoice->total) >= 0 => 'paid',
             default => 'partial',
         };
 

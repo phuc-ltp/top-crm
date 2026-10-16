@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\SalesOrder;
 use App\Models\User;
+use App\Support\Decimal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -25,45 +26,57 @@ class SalesDocumentService
         $productIds = collect($items)->pluck('product_id')->filter()->unique();
         $products = $productIds->isEmpty() ? collect() : Product::withTrashed()->whereIn('id', $productIds)->get()->keyBy('id');
 
+        // Tính bằng số thập phân chính xác (bcmath); làm tròn 2 chữ số ở từng bước giống quy tắc cũ
         $lines = [];
-        $subtotal = 0.0;
+        $subtotal = '0';
 
         foreach ($items as $item) {
             $product = isset($item['product_id']) && $item['product_id'] ? $products->get($item['product_id']) : null;
-            $quantity = max(0, round((float) ($item['quantity'] ?? 0), 2));
-            if ($quantity <= 0) {
+            $quantity = Decimal::round(Decimal::clamp(self::number($item['quantity'] ?? 0), 0));
+            if (Decimal::cmp($quantity, 0) <= 0) {
                 continue;
             }
             $unitPrice = isset($item['unit_price']) && $item['unit_price'] !== '' && $item['unit_price'] !== null
-                ? max(0, round((float) $item['unit_price'], 2))
-                : (float) ($product?->price ?? 0);
-            $discount = min(100, max(0, round((float) ($item['discount_percent'] ?? 0), 2)));
-            $lineTotal = round($quantity * $unitPrice * (1 - $discount / 100), 2);
+                ? Decimal::round(Decimal::clamp(self::number($item['unit_price']), 0))
+                : Decimal::round($product?->price ?? 0);
+            $discount = Decimal::round(Decimal::clamp(self::number($item['discount_percent'] ?? 0), 0, 100));
+            $lineTotal = Decimal::round(Decimal::div(Decimal::mul(Decimal::mul($quantity, $unitPrice), Decimal::sub(100, $discount)), 100));
 
             $lines[] = [
                 'product_id' => $product?->id,
                 'description' => trim((string) ($item['description'] ?? '')) ?: ($product?->name ?? __('Sản phẩm/dịch vụ')),
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'discount_percent' => $discount,
-                'line_total' => $lineTotal,
+                'quantity' => (float) $quantity,
+                'unit_price' => (float) $unitPrice,
+                'discount_percent' => (float) $discount,
+                'line_total' => (float) $lineTotal,
             ];
-            $subtotal += $lineTotal;
+            $subtotal = Decimal::add($subtotal, $lineTotal);
         }
 
-        $subtotal = round($subtotal, 2);
-        $discountAmount = min($subtotal, max(0, round($discountAmount, 2)));
-        $taxRate = min(100, max(0, round($taxRate, 2)));
-        $taxAmount = round(($subtotal - $discountAmount) * $taxRate / 100, 2);
+        $subtotal = Decimal::round($subtotal);
+        $discountAmount = Decimal::round(Decimal::clamp(self::number($discountAmount), 0, $subtotal));
+        $taxRate = Decimal::round(Decimal::clamp(self::number($taxRate), 0, 100));
+        $taxAmount = Decimal::round(Decimal::div(Decimal::mul(Decimal::sub($subtotal, $discountAmount), $taxRate), 100));
 
         return [
             'items' => $lines,
-            'subtotal' => $subtotal,
-            'discount_amount' => $discountAmount,
-            'tax_rate' => $taxRate,
-            'tax_amount' => $taxAmount,
-            'total' => round($subtotal - $discountAmount + $taxAmount, 2),
+            'subtotal' => (float) $subtotal,
+            'discount_amount' => (float) $discountAmount,
+            'tax_rate' => (float) $taxRate,
+            'tax_amount' => (float) $taxAmount,
+            'total' => (float) Decimal::round(Decimal::add(Decimal::sub($subtotal, $discountAmount), $taxAmount)),
         ];
+    }
+
+    /** Giá trị số từ form (chuỗi không phải số → 0, giống cách ép kiểu cũ). */
+    private static function number(mixed $value): string|float|int
+    {
+        if (is_int($value) || is_float($value)) {
+            return $value;
+        }
+        $value = trim((string) $value);
+
+        return preg_match('/^-?\d+(\.\d+)?$/', $value) ? $value : (is_numeric($value) ? (float) $value : 0);
     }
 
     /** Lưu chứng từ + chi tiết trong một transaction. */

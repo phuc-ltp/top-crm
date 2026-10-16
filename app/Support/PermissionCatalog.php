@@ -16,6 +16,7 @@ class PermissionCatalog
         'opportunities' => ['label' => 'Cơ hội / Pipeline', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export', 'assign']],
         'tasks' => ['label' => 'Công việc', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'assign']],
         'products' => ['label' => 'Sản phẩm', 'actions' => ['view', 'create', 'update', 'delete', 'export']],
+        'suppliers' => ['label' => 'Nhà cung cấp', 'actions' => ['view', 'create', 'update', 'delete', 'export']],
         'quotations' => ['label' => 'Báo giá', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export', 'approve']],
         'orders' => ['label' => 'Đơn hàng', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export', 'approve']],
         'invoices' => ['label' => 'Hóa đơn & thanh toán', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export']],
@@ -88,7 +89,7 @@ class PermissionCatalog
                 'dashboard' => '*', 'customers' => '*', 'contacts' => '*', 'leads' => '*', 'opportunities' => '*',
                 'tasks' => '*', 'quotations' => '*', 'orders' => '*', 'invoices' => '*',
                 'products' => ['view', 'export'], 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'],
-                'reports' => '*', 'users' => ['view'],
+                'reports' => '*', 'users' => ['view'], 'suppliers' => ['view'],
             ]),
             'Sales Employee' => $pick([
                 'dashboard' => '*',
@@ -126,7 +127,7 @@ class PermissionCatalog
                 'opportunities' => ['view', 'view_all'], 'tasks' => ['view', 'view_all'], 'products' => ['view'],
                 'quotations' => ['view', 'view_all'], 'orders' => ['view', 'view_all'], 'invoices' => ['view', 'view_all'],
                 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'], 'reports' => ['view'],
-                'activity_logs' => ['view'],
+                'activity_logs' => ['view'], 'suppliers' => ['view'],
             ]),
             'Marketing Manager' => $pick([
                 'dashboard' => '*', 'campaigns' => '*', 'leads' => '*', 'tasks' => '*', 'reports' => '*',
@@ -140,16 +141,16 @@ class PermissionCatalog
             'Finance Manager' => $pick([
                 'dashboard' => '*', 'invoices' => '*', 'reports' => '*',
                 'orders' => ['view', 'view_all', 'export', 'approve'], 'quotations' => ['view', 'view_all', 'export'],
-                'customers' => ['view', 'view_all', 'export'], 'products' => ['view'],
+                'customers' => ['view', 'view_all', 'export'], 'products' => ['view'], 'suppliers' => ['view', 'export'],
                 'tasks' => ['view', 'create', 'update'], 'users' => ['view'],
             ]),
             'Accountant' => $pick([
                 'dashboard' => ['view'], 'invoices' => ['view', 'view_all', 'create', 'update', 'export'],
-                'orders' => ['view', 'view_all'], 'customers' => ['view', 'view_all'], 'products' => ['view'],
+                'orders' => ['view', 'view_all'], 'customers' => ['view', 'view_all'], 'products' => ['view'], 'suppliers' => ['view'],
                 'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'],
             ]),
             'Inventory Manager' => $pick([
-                'dashboard' => ['view'], 'products' => '*', 'orders' => ['view', 'view_all'],
+                'dashboard' => ['view'], 'products' => '*', 'suppliers' => '*', 'orders' => ['view', 'view_all'],
                 'reports' => ['view'], 'tasks' => ['view', 'create', 'update'],
             ]),
             'Project Manager' => $pick([

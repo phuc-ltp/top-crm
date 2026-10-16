@@ -39,6 +39,7 @@ class TrashController extends Controller
             'orders' => ['class' => SalesOrder::class, 'label' => 'Đơn hàng', 'icon' => 'bi-bag-check', 'module' => 'orders', 'show' => 'orders.show'],
             'invoices' => ['class' => Invoice::class, 'label' => 'Hóa đơn', 'icon' => 'bi-receipt', 'module' => 'invoices', 'show' => 'invoices.show'],
             'products' => ['class' => Product::class, 'label' => 'Sản phẩm', 'icon' => 'bi-box-seam', 'module' => 'products', 'show' => 'products.show'],
+            'suppliers' => ['class' => \App\Models\Supplier::class, 'label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'module' => 'suppliers', 'show' => 'suppliers.show'],
             'tasks' => ['class' => Task::class, 'label' => 'Công việc', 'icon' => 'bi-check2-square', 'module' => 'tasks', 'show' => 'tasks.show'],
             'tickets' => ['class' => SupportTicket::class, 'label' => 'Ticket hỗ trợ', 'icon' => 'bi-headset', 'module' => 'tickets', 'show' => 'tickets.show'],
             'campaigns' => ['class' => Campaign::class, 'label' => 'Chiến dịch', 'icon' => 'bi-megaphone', 'module' => 'campaigns', 'show' => 'campaigns.show'],
@@ -57,7 +58,7 @@ class TrashController extends Controller
         $query = $class::onlyTrashed();
 
         // Sản phẩm là danh mục chung của tổ chức (không có người phụ trách); các loại khác lọc theo phạm vi xem
-        return $class === Product::class ? $query : $query->visibleTo($user);
+        return in_array($class, [Product::class, \App\Models\Supplier::class], true) ? $query : $query->visibleTo($user);
     }
 
     /** Tên hiển thị của một bản ghi bất kỳ trong thùng rác. */
