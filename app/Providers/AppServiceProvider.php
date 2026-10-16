@@ -32,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
         // {field} = trường tùy biến của tổ chức đang làm việc (global scope tổ chức → khác tổ chức = 404)
         \Illuminate\Support\Facades\Route::model('field', \App\Models\CustomFieldDefinition::class);
         \Illuminate\Support\Facades\Route::model('stage', \App\Models\LeadStage::class);
+        \Illuminate\Support\Facades\Route::model('pipeline', \App\Models\Pipeline::class);
+        \Illuminate\Support\Facades\Route::model('pipelineStage', \App\Models\PipelineStage::class);
         \Illuminate\Support\Facades\Route::model('reason', \App\Models\LostReason::class);
 
         // Tên ngắn cho quan hệ đa hình (lưu trong DB thay vì tên class đầy đủ)
@@ -52,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
             'department' => \App\Models\Department::class,
             'custom_field' => \App\Models\CustomFieldDefinition::class,
             'lead_stage' => \App\Models\LeadStage::class,
+            'pipeline' => \App\Models\Pipeline::class,
+            'pipeline_stage' => \App\Models\PipelineStage::class,
             'lost_reason' => \App\Models\LostReason::class,
         ]);
 

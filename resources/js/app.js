@@ -229,21 +229,48 @@ function initKanban() {
                 const card = evt.item;
                 const stageId = evt.to.dataset.stage;
                 if (evt.from === evt.to && evt.oldIndex === evt.newIndex) return;
+                const revert = () => { evt.from.insertBefore(card, evt.from.children[evt.oldIndex] || null); refreshTotals(); };
+                const body = { pipeline_stage_id: Number(stageId), position: evt.newDraggableIndex ?? evt.newIndex };
+                // Vào cột thất bại (từ cột khác): hỏi lý do trước khi lưu; hủy → trả thẻ về chỗ cũ
+                if (evt.to.dataset.lost === '1' && evt.from !== evt.to) {
+                    const reason = await askLostReason();
+                    if (!reason) { revert(); return; }
+                    body.lost_reason_id = Number(reason.id);
+                    body.lost_reason = reason.note;
+                }
                 refreshTotals();
                 try {
-                    const res = await api(card.dataset.moveUrl, { method: 'PATCH', body: { pipeline_stage_id: Number(stageId), position: evt.newDraggableIndex ?? evt.newIndex } });
+                    const res = await api(card.dataset.moveUrl, { method: 'PATCH', body });
                     toast('success', res.message);
                     if (res.probability !== undefined) { const p = $('.card-prob', card); if (p) p.textContent = res.probability + '%'; }
                 } catch (e) {
                     toast('error', e.message);
-                    // Hoàn tác vị trí thẻ khi lỗi
-                    evt.from.insertBefore(card, evt.from.children[evt.oldIndex] || null);
-                    refreshTotals();
+                    revert();   // Hoàn tác vị trí thẻ khi lỗi
                 }
             },
         });
     });
     refreshTotals();
+}
+
+/* Hộp chọn lý do thất bại cho Kanban: trả về {id, note} hoặc null nếu hủy */
+function askLostReason() {
+    return new Promise((resolve) => {
+        const el = document.getElementById('lostReasonModal');
+        if (!el) { resolve(null); return; }
+        const select = $('#lostReasonSelect', el), note = $('#lostReasonNote', el), err = $('#lostReasonError', el), ok = $('#lostReasonOk', el);
+        select.value = ''; note.value = ''; err.classList.add('d-none');
+        let result = null;
+        const modal = bootstrap.Modal.getOrCreateInstance(el);
+        const onOk = () => {
+            if (!select.value) { err.classList.remove('d-none'); select.focus(); return; }
+            result = { id: select.value, note: note.value.trim() };
+            modal.hide();
+        };
+        ok.addEventListener('click', onOk);
+        el.addEventListener('hidden.bs.modal', () => { ok.removeEventListener('click', onOk); resolve(result); }, { once: true });
+        modal.show();
+    });
 }
 
 /* ============ Biểu đồ ============ */

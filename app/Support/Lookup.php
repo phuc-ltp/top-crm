@@ -37,7 +37,12 @@ class Lookup
 
     public static function stages(): array
     {
-        return PipelineStage::ordered()->pluck('name', 'id')->all();
+        // "Pipeline · Giai đoạn" khi tổ chức có nhiều pipeline
+        $stages = PipelineStage::with('pipeline:id,name,is_default,position')->get()
+            ->sortBy(fn ($s) => [$s->pipeline?->is_default ? 0 : 1, $s->pipeline?->position, $s->pipeline_id, $s->position]);
+        $many = $stages->pluck('pipeline_id')->unique()->count() > 1;
+
+        return $stages->mapWithKeys(fn ($s) => [$s->id => ($many ? __($s->pipeline?->name).' · ' : '').__($s->name)])->all();
     }
 
     public static function categories(): array

@@ -36,26 +36,39 @@ class OrganizationProvisioner
 
     public const TAGS = [['VIP', '#FF6B00'], ['Doanh nghiệp lớn', '#2563EB'], ['Khách quen', '#16A34A'], ['Cần chăm sóc', '#F59E0B'], ['Đối tác', '#7C3AED']];
 
+    /** Đánh dấu tổ chức đã được tạo dữ liệu mặc định (organization_settings). */
+    public const MARKER = 'provisioned_at';
+
     public function provision(Organization|int $organization): void
     {
         $orgId = $organization instanceof Organization ? $organization->id : $organization;
 
         app(RoleProvisioner::class)->provision($orgId);
 
-        app(CurrentOrganization::class)->run($orgId, function () {
+        // Dữ liệu tham chiếu mặc định chỉ tạo MỘT LẦN cho mỗi tổ chức. Trước đây hàm này chạy lại mỗi lần khởi động
+        // (crm:install) và tạo lại phòng ban / nguồn / thẻ / giai đoạn người dùng đã xóa.
+        $alreadyProvisioned = \App\Models\OrganizationSetting::where('organization_id', $orgId)->where('key', self::MARKER)->exists();
+
+        app(CurrentOrganization::class)->run($orgId, function () use ($alreadyProvisioned) {
+            // Pipeline mặc định luôn phải tồn tại (cơ hội mới / chuyển đổi lead cần nó)
+            $pipeline = \App\Models\Pipeline::where('is_default', true)->first()
+                ?? \App\Models\Pipeline::create(['name' => 'Pipeline bán hàng', 'is_default' => true, 'position' => 1]);
+            if (! $pipeline->stages()->exists()) {
+                foreach (self::STAGES as $i => [$slug, $name, $prob, $color, $won, $lost]) {
+                    PipelineStage::create(['pipeline_id' => $pipeline->id, 'slug' => $slug, 'name' => $name, 'position' => $i + 1,
+                        'probability' => $prob, 'color' => $color, 'is_won' => $won, 'is_lost' => $lost]);
+                }
+            }
+            if ($alreadyProvisioned) {
+                return;
+            }
             foreach (self::DEPARTMENTS as [$code, $name]) {
                 Department::firstOrCreate(['code' => $code], ['name' => $name]);
             }
             foreach (self::LEAD_SOURCES as $name) {
                 LeadSource::firstOrCreate(['name' => $name]);
             }
-            foreach (self::STAGES as $i => [$slug, $name, $prob, $color, $won, $lost]) {
-                // Chỉ tạo giai đoạn còn thiếu — không ghi đè giai đoạn tổ chức đã tự chỉnh
-                PipelineStage::firstOrCreate(['slug' => $slug], [
-                    'name' => $name, 'position' => $i + 1, 'probability' => $prob, 'color' => $color,
-                    'is_won' => $won, 'is_lost' => $lost,
-                ]);
-            }
+
             foreach (self::PRODUCT_CATEGORIES as $name) {
                 ProductCategory::firstOrCreate(['name' => $name]);
             }
@@ -74,6 +87,8 @@ class OrganizationProvisioner
                 }
             }
         });
+
+        \App\Models\OrganizationSetting::firstOrCreate(['organization_id' => $orgId, 'key' => self::MARKER], ['value' => now()->toDateTimeString()]);
 
         // Cài đặt riêng: tên công ty mặc định = tên tổ chức (không ghi đè nếu tổ chức đã tự đặt)
         $name = $organization instanceof Organization ? $organization->name : Organization::whereKey($orgId)->value('name');

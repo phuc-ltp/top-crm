@@ -18,9 +18,40 @@ class Opportunity extends Model
     protected static string $codePrefix = 'CH';
 
     protected $fillable = [
-        'code', 'title', 'customer_id', 'contact_id', 'lead_id', 'pipeline_stage_id', 'value', 'probability',
-        'expected_close_date', 'closed_at', 'lost_reason', 'position', 'assigned_to', 'created_by', 'notes', 'is_demo',
+        'code', 'title', 'customer_id', 'contact_id', 'lead_id', 'pipeline_id', 'pipeline_stage_id', 'value', 'probability',
+        'expected_close_date', 'closed_at', 'lost_reason', 'lost_reason_id', 'position', 'assigned_to', 'created_by', 'notes', 'is_demo',
     ];
+
+    protected static function booted(): void
+    {
+        // pipeline_id luôn khớp với pipeline của giai đoạn (một nguồn sự thật, mọi đường lưu đều đi qua đây)
+        static::saving(function (Opportunity $o) {
+            if ($o->pipeline_stage_id && ($o->isDirty('pipeline_stage_id') || ! $o->pipeline_id)) {
+                $o->pipeline_id = PipelineStage::whereKey($o->pipeline_stage_id)->value('pipeline_id');
+            }
+        });
+    }
+
+    public function pipeline()
+    {
+        return $this->belongsTo(Pipeline::class);
+    }
+
+    /** Sản phẩm / dịch vụ trong cơ hội. */
+    public function items()
+    {
+        return $this->hasMany(OpportunityItem::class)->orderBy('position')->orderBy('id');
+    }
+
+    public function lostReasonRef()
+    {
+        return $this->belongsTo(LostReason::class, 'lost_reason_id');
+    }
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable')->latest();
+    }
 
     protected $casts = [
         'value' => 'decimal:2', 'expected_close_date' => 'date', 'closed_at' => 'datetime', 'is_demo' => 'boolean',
