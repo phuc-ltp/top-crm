@@ -134,6 +134,7 @@ erDiagram
 | `attachments` | Tệp đính kèm (lưu ngoài `public/`, tải qua controller có kiểm tra quyền) — đa hình. |
 | `activity_logs` | Nhật ký hoạt động theo tổ chức (không ghi trường nhạy cảm). |
 | `notifications` | Thông báo trong chuông (kênh database). |
+| `search_histories` | Tìm kiếm gần đây (bước 2.6): riêng từng người dùng trong từng tổ chức, duy nhất theo (tổ chức, người dùng, từ khóa), chỉ giữ 10 từ khóa mới nhất; chỉ ghi khi mở trang kết quả đầy đủ. Người dùng tự xóa được. |
 | `settings` | Cài đặt chung toàn hệ thống (trang đăng nhập, Google/Facebook, trang pháp lý, cờ khởi tạo, bắt buộc 2FA). Secret OAuth lưu mã hóa. |
 | `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs`, `migrations` | Hạ tầng Laravel. |
 

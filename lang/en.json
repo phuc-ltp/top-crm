@@ -1660,5 +1660,16 @@
     "Đã xóa giai đoạn :name, chuyển :count cơ hội sang \":target\".": "Stage :name deleted; :count opportunities moved to \":target\".",
     "Pipeline mặc định chưa có giai đoạn đang mở.": "The default pipeline has no open stage.",
     "Không thể chuyển cơ hội sang giai đoạn của pipeline khác.": "An opportunity cannot be moved to a stage of another pipeline.",
-    ":rate% chỉ tiêu (:months tháng có chỉ tiêu)": ":rate% of target (:months months with a target)"
+    ":rate% chỉ tiêu (:months tháng có chỉ tiêu)": ":rate% of target (:months months with a target)",
+    "Tìm gần đây": "Recent searches",
+    "Xem tất cả kết quả cho “:q”": "See all results for “:q”",
+    "Tìm: :q": "Search: :q",
+    ":count kết quả cho “:q” (trong phạm vi bạn được xem).": ":count results for “:q” (within what you are allowed to see).",
+    "Tên, mã, email, số điện thoại...": "Name, code, email, phone number...",
+    "Từ khóa tìm kiếm": "Search keywords",
+    "Tìm": "Search",
+    "Tìm gần đây:": "Recent searches:",
+    "Xóa lịch sử": "Clear history",
+    "Thử từ khóa khác, mã (VD: KH00012) hoặc số điện thoại.": "Try other keywords, a code (e.g. KH00012) or a phone number.",
+    "Đã xóa lịch sử tìm kiếm.": "Search history cleared."
 }

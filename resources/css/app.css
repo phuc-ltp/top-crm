@@ -298,7 +298,7 @@ body.crm-app { background: var(--crm-bg); min-height: 100vh; }
 .crm-search-results.show { display: block; }
 .crm-search-results .group-title { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--crm-text-muted); padding: 10px 16px 4px; }
 .crm-search-results a { display: flex; gap: 10px; padding: 8px 16px; color: var(--crm-text); }
-.crm-search-results a:hover { background: var(--crm-primary-soft); }
+.crm-search-results a:hover, .crm-search-results a.active { background: var(--crm-primary-soft); }
 .topbar-icon { position: relative; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--crm-text); font-size: 1.12rem; background: transparent; border: 0; transition: background .15s, color .15s; }
 .topbar-icon:hover { background: var(--crm-surface); color: var(--crm-primary-text); box-shadow: var(--crm-shadow); }
 .topbar-icon .dot { position: absolute; top: 3px; right: 3px; min-width: 17px; height: 17px; border-radius: 9px; background: var(--crm-danger); color: #fff; font-size: .6rem; font-weight: 700; display: grid; place-items: center; padding: 0 4px; border: 2px solid var(--crm-surface-solid); }

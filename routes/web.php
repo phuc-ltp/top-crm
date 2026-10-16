@@ -100,7 +100,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
     Route::get('/dashboard/widget/{widget}', [DashboardController::class, 'widget'])->whereIn('widget', ['revenue', 'schedule'])->name('dashboard.widget');
-    Route::get('/search', SearchController::class)->name('search');
+    Route::get('/search', SearchController::class)->name('search')->middleware('throttle:120,1');
+    Route::get('/search/results', [SearchController::class, 'results'])->name('search.results')->middleware('throttle:60,1');
+    Route::delete('/search/recent', [SearchController::class, 'clearRecent'])->name('search.recent.clear');
 
     // Hồ sơ
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
