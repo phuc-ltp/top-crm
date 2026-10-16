@@ -3,7 +3,7 @@
 @section('content')
     @php
         $user = auth()->user();
-        $periods = ['today' => __('Hôm nay'), 'this_month' => __('Tháng này'), 'last_month' => __('Tháng trước'), 'last_30' => __('30 ngày qua'), 'this_quarter' => __('Quý này'), 'this_year' => __('Năm nay'), 'custom' => __('Tùy chọn...')];
+        $periods = ['today' => __('Hôm nay'), 'yesterday' => __('Hôm qua'), 'last_7' => __('7 ngày qua'), 'last_30' => __('30 ngày qua'), 'this_month' => __('Tháng này'), 'last_month' => __('Tháng trước'), 'this_quarter' => __('Quý này'), 'this_year' => __('Năm nay'), 'custom' => __('Tùy chọn...')];
         $hour = now()->hour;
         $greeting = $hour < 11 ? __('Chào buổi sáng') : ($hour < 13 ? __('Chào buổi trưa') : ($hour < 18 ? __('Chào buổi chiều') : __('Chào buổi tối')));
         $firstName = \Illuminate\Support\Str::afterLast(trim($user->name), ' ');
@@ -59,6 +59,9 @@
                     </div>
                 @endforeach
             </div>
+
+            {{-- 20 chỉ số điều hành (bước 2.7) --}}
+            @include('dashboard._metrics')
 
             {{-- Doanh thu + Tỷ lệ cơ hội --}}
             <div class="row g-3">

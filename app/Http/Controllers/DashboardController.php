@@ -10,9 +10,9 @@ class DashboardController extends Controller
     private function period(Request $request): array
     {
         $request->validate([
-            'period' => ['nullable', 'in:today,this_month,last_month,last_30,this_quarter,this_year,custom'],
-            'from' => ['nullable', 'date'],
-            'to' => ['nullable', 'date', 'after_or_equal:from'],
+            'period' => ['nullable', 'in:today,yesterday,last_7,this_month,last_month,last_30,this_quarter,this_year,custom'],
+            'from' => ['nullable', 'date', 'after_or_equal:2000-01-01', 'before_or_equal:2100-12-31'],
+            'to' => ['nullable', 'date', 'after_or_equal:from', 'before_or_equal:2100-12-31'],
         ]);
 
         return DashboardService::range($request->input('period', 'this_month'), $request->input('from'), $request->input('to'));
@@ -28,6 +28,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'kpis' => $service->kpis($from, $to),
+            'metricGroups' => (new \App\Services\ExecutiveMetrics($user, $from, $to))->groups(),
             'from' => $from,
             'to' => $to,
             'invoices' => $service->invoicesIssued($from, $to),

@@ -33,6 +33,8 @@ class DashboardService
 
         return match ($period) {
             'today' => [$now->copy()->startOfDay(), $now->copy()->endOfDay()],
+            'yesterday' => [$now->copy()->subDay()->startOfDay(), $now->copy()->subDay()->endOfDay()],
+            'last_7' => [$now->copy()->subDays(6)->startOfDay(), $now->copy()->endOfDay()],
             'last_30' => [$now->copy()->subDays(29)->startOfDay(), $now->copy()->endOfDay()],
             'this_quarter' => [$now->copy()->firstOfQuarter(), $now->copy()->lastOfQuarter()->endOfDay()],
             'this_year' => [$now->copy()->startOfYear(), $now->copy()->endOfYear()],

@@ -518,6 +518,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initLineItems();
 
     $$('[data-bs-toggle="tooltip"]').forEach((el) => new bootstrap.Tooltip(el));
+    // Công thức chỉ số (ⓘ): bấm để mở — chạy được cả trên điện thoại; mở cái này thì đóng cái khác; bấm ra ngoài để đóng
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.metric-info');
+        $$('.metric-info').forEach((b) => { if (b !== btn) bootstrap.Tooltip.getInstance(b)?.hide(); });
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') $$('.metric-info').forEach((b) => bootstrap.Tooltip.getInstance(b)?.hide()); });
 
     // Hiện / ẩn mật khẩu
     $$('[data-toggle-password]').forEach((btn) => btn.addEventListener('click', () => {
