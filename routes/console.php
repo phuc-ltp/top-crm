@@ -70,9 +70,17 @@ Artisan::command('crm:purge-demo {--force}', function () {
             $u->forceDelete();
         }
         $this->line('  - users: '.$demoUsers->count().' bản ghi');
-        DB::table('interactions')->whereNotIn('interactable_id', DB::table('customers')->select('id'))->where('interactable_type', 'customer')->delete();
+        // Hoạt động / lịch hẹn gắn với bản ghi demo vừa xóa (khách hàng, người liên hệ, lead, cơ hội)
+        $orphans = 0;
+        foreach (['customer' => 'customers', 'contact' => 'contacts', 'lead' => 'leads', 'opportunity' => 'opportunities'] as $type => $table) {
+            $orphans += DB::table('interactions')->where('interactable_type', $type)->whereNotIn('interactable_id', DB::table($table)->select('id'))->delete();
+        }
+        $this->line("  - interactions: $orphans bản ghi");
     });
-    cache()->forget('crm.has_demo');
+    // Cờ "có dữ liệu demo" được cache theo từng tổ chức
+    foreach (DB::table('organizations')->pluck('id') as $orgId) {
+        cache()->forget('crm.has_demo.'.$orgId);
+    }
     $this->info('Đã xóa dữ liệu demo.');
 
     return 0;

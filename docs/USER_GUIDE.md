@@ -21,7 +21,19 @@ Bạn chỉ thấy menu và dữ liệu phù hợp với vai trò của mình. V
 
 ## 3. Bảng điều khiển (Dashboard)
 
-Hiển thị doanh thu đã thu, giá trị pipeline, số khách hàng, lead, tỷ lệ chuyển đổi, công nợ, công việc trễ hạn và các biểu đồ. Đổi khoảng thời gian ở góc trên bên phải (Hôm nay, Tháng này, Quý này, Năm nay, Tùy chọn).
+Trang Tổng quan có 4 thẻ chính (doanh thu, khách hàng mới, cơ hội mới, hóa đơn) và các biểu đồ. Bên dưới là khung **Chỉ số điều hành** gồm 20 chỉ số, chia 4 nhóm:
+- Khách hàng & Lead
+- Bán hàng
+- Tài chính
+- Đội ngũ & vận hành
+
+Đổi khoảng thời gian ở góc trên bên phải: Hôm nay, Hôm qua, 7 ngày qua, 30 ngày qua, Tháng này, Tháng trước, Quý này, Năm nay, Tùy chọn.
+
+- **Xem công thức:** bấm biểu tượng ⓘ cạnh mỗi chỉ số. Danh sách đầy đủ có trong `docs/DASHBOARD_METRICS.md`.
+- **"hiện tại":** chỉ số gắn nhãn này là trạng thái ngay lúc xem, không phụ thuộc kỳ đã chọn.
+- **"—":** chưa có dữ liệu để tính. Lý do ghi ngay bên dưới.
+- **DEMO:** nhóm chỉ số có tính cả dữ liệu demo.
+- **Phạm vi:** mỗi người chỉ thấy số liệu trong phạm vi mình được xem.
 
 **Doanh thu** = số tiền khách **đã thanh toán thực tế**, tính theo ngày thanh toán.
 
@@ -47,14 +59,19 @@ Hiển thị doanh thu đã thu, giá trị pipeline, số khách hàng, lead, t
 
 1. *Leads*, bấm **Tạo lead**, nhập thông tin, nguồn, giá trị ước tính.
 2. **Chấm điểm tự động** (0–100): Nóng ≥ 70, Ấm 40–69, Lạnh < 40. Điểm dựa trên độ đầy đủ thông tin, giá trị, giai đoạn, nguồn giới thiệu và số lần tương tác.
-3. Cập nhật trạng thái: Mới → Đã liên hệ → Đủ điều kiện → Đã gửi đề xuất.
-4. Khi khách đồng ý, bấm **Chuyển đổi** để tạo khách hàng mới (hoặc gắn vào khách đã có) và tạo cơ hội trong Pipeline.
+3. **Cập nhật giai đoạn:** các giai đoạn do tổ chức tự cấu hình ở *Hệ thống › Cấu hình lead*. Khi chuyển sang *Thất bại* phải chọn lý do. Có thể hẹn ngày theo dõi tiếp; hệ thống sẽ nhắc.
+4. **Chuyển đổi:** khi khách đồng ý, bấm **Chuyển đổi** để tạo khách hàng mới (hoặc gắn vào khách đã có) và tạo cơ hội trong Pipeline.
+5. **Nhập từ tệp:** bấm **Nhập CSV / Excel** rồi **Tải tệp mẫu**. Dòng trùng email hoặc số điện thoại với lead hay khách hàng đã có sẽ bị bỏ qua, và mỗi dòng bị bỏ qua đều được báo kèm số dòng.
+6. **Form thu lead từ website** (*Cấu hình lead*): lead điền form trên website sẽ tự vào hệ thống. Trang *Phân tích* xem lead theo nguồn, giai đoạn và tỷ lệ chuyển đổi.
 
 ## 6. Pipeline bán hàng
 
 - Mỗi cột là một giai đoạn: Cơ hội mới → Đánh giá nhu cầu → Gửi đề xuất → Đàm phán → Thắng / Thất bại.
 - **Kéo thả thẻ** sang cột khác để đổi giai đoạn. Hệ thống tự lưu, cập nhật xác suất và ghi lịch sử.
 - Đầu mỗi cột hiện tổng giá trị. Bấm vào thẻ để xem chi tiết, tạo báo giá hoặc công việc.
+- **Nhiều pipeline:** mỗi tổ chức có thể có nhiều pipeline (*Hệ thống › Cấu hình pipeline*). Chọn pipeline bằng các tab phía trên Kanban.
+- **Thất bại:** khi kéo thẻ vào cột *Thất bại*, phải chọn lý do.
+- **Dự báo** (*Cơ hội › Dự báo*): giá trị dự kiến theo tháng = giá trị × xác suất, so với chỉ tiêu.
 
 ## 7. Bán hàng: Báo giá → Đơn hàng → Hóa đơn → Thanh toán
 
@@ -76,7 +93,9 @@ Hiển thị doanh thu đã thu, giá trị pipeline, số khách hàng, lead, t
 
 ## 9. Sản phẩm, Marketing, Hỗ trợ
 
-- **Sản phẩm:** SKU, tên, danh mục, giá, ảnh. Dùng để chọn nhanh khi lập báo giá.
+- **Sản phẩm:** SKU, tên, danh mục, giá, ảnh. Dùng để chọn nhanh khi lập báo giá. Nhập hàng loạt bằng **Nhập CSV / Excel**; SKU đã có sẽ được bỏ qua, không ghi đè sản phẩm cũ.
+- **Người liên hệ:** có thể nhập từ tệp. Để gắn người liên hệ với khách hàng, điền mã khách hàng (VD: KH00012) vào cột `customer`.
+- **Công việc:** bấm **Xuất Excel** để tải danh sách theo bộ lọc đang chọn.
 - **Marketing:** tạo chiến dịch (ngân sách, lead mục tiêu), gắn lead vào chiến dịch, xem tỷ lệ chuyển đổi và chi phí mỗi lead. Hệ thống **không tự gửi email hàng loạt**.
 - **Hỗ trợ khách hàng:** tạo ticket, phản hồi, ghi chú nội bộ (khách không thấy), đổi trạng thái Mới mở → Đang xử lý → Chờ phản hồi → Đã giải quyết → Đã đóng.
 
@@ -84,7 +103,30 @@ Hiển thị doanh thu đã thu, giá trị pipeline, số khách hàng, lead, t
 
 *Báo cáo*: chọn loại báo cáo, lọc theo ngày, nhân viên, trạng thái, rồi bấm **Xuất báo cáo** để tải Excel, CSV hoặc PDF. Mỗi báo cáo ghi rõ **định nghĩa** cách tính chỉ số.
 
-## 11. Đổi mật khẩu và hồ sơ
+## 11. Tìm kiếm toàn cục
+
+Ô tìm kiếm trên thanh trên cùng (phím tắt **Ctrl + K**; trên điện thoại bấm biểu tượng kính lúp) tìm cùng lúc trong 11 loại dữ liệu:
+
+| Nhóm | Loại dữ liệu |
+|---|---|
+| Khách hàng & bán hàng | khách hàng, người liên hệ, lead, cơ hội, báo giá, đơn hàng, hóa đơn |
+| Danh mục & vận hành | sản phẩm, ticket, công việc |
+| Nội bộ | nhân viên |
+
+- **Chọn kết quả:** gõ ít nhất 2 ký tự, chọn bằng phím mũi tên và Enter. Bấm **Xem tất cả kết quả** để mở trang kết quả đầy đủ, có lọc theo loại.
+- **Số điện thoại:** viết kiểu nào cũng tìm được (0901 234 567, 0901.234.567, +84 901…).
+- **Tìm gần đây:** bấm vào ô khi ô đang trống để xem 10 lần tìm mới nhất của bạn. Chỉ bạn thấy danh sách này và có thể xóa nó.
+- **Phạm vi:** chỉ hiện kết quả bạn được phép xem.
+
+## 12. Thùng rác
+
+Bản ghi bị xóa không mất hẳn, mà được chuyển vào *Hệ thống › Thùng rác*. Bạn sẽ thấy ở đó:
+- bản ghi đã xóa của các loại dữ liệu mà bạn có quyền xóa;
+- ngày xóa và người xóa.
+
+Bấm **Khôi phục** để đưa bản ghi trở lại. Việc khôi phục được ghi vào nhật ký hoạt động. Hệ thống không có chức năng xóa vĩnh viễn.
+
+## 13. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
 
@@ -95,6 +137,6 @@ Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số
 
 **Giao diện:** nút mặt trăng/mặt trời trên thanh trên cùng để đổi sáng/tối (lưu theo tài khoản); ô **Tìm chức năng...** ở menu trái để tìm nhanh trang cần mở; chọn ngôn ngữ Việt/Anh ở góc trên phải. Thuộc nhiều tổ chức thì chuyển ở ô **Không gian làm việc** góc dưới menu trái.
 
-## 12. Tắt hệ thống
+## 14. Tắt hệ thống
 
 Bấm đúp **`STOP_CRM.bat`**. Dữ liệu đã lưu trong MySQL nên không bị mất.

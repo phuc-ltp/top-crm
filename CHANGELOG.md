@@ -2,6 +2,63 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [2.0.0] — Phase 2 CRM Core — 16/10/2026
+
+### Thêm mới
+- **2.1 Cài đặt & phòng ban theo tổ chức:**
+  - Mỗi tổ chức có thông tin công ty, múi giờ, tiền tệ, thuế và thông báo riêng.
+  - Phòng ban gắn theo tư cách thành viên, nên một người ở 2 tổ chức có thể thuộc phòng ban khác nhau.
+- **2.2 Hoạt động & dòng thời gian:**
+  - Ghi nhận hoặc lên lịch cuộc gọi, email, cuộc họp, việc theo dõi; có người phụ trách, kết quả và nhắc trước giờ hẹn.
+  - Trang *Hoạt động & lịch hẹn*.
+  - Dòng thời gian trên khách hàng, lead và cơ hội.
+- **2.3 Khách hàng:**
+  - Trường mới: quốc gia, phân khúc, vòng đời, kênh liên lạc, đồng ý marketing (ghi thời điểm và nguồn).
+  - Trường tùy biến theo tổ chức.
+  - Gộp khách hàng trùng.
+  - Nhập Excel (.xlsx), tệp đính kèm, lọc nâng cao.
+- **2.4 Leads:**
+  - Giai đoạn lead do tổ chức tự cấu hình.
+  - Lý do thất bại, hẹn theo dõi, phát hiện trùng.
+  - Form thu lead công khai từ website (chống spam).
+  - Trang phân tích lead.
+- **2.5 Pipeline & cơ hội:**
+  - Nhiều pipeline mỗi tổ chức.
+  - Sản phẩm trong cơ hội, lý do thất bại bắt buộc.
+  - Trang cấu hình pipeline, trang Dự báo so với chỉ tiêu.
+- **2.6 Tìm kiếm toàn cục:**
+  - 11 loại dữ liệu, gợi ý theo nhóm, phím mũi tên, trang kết quả lọc theo loại.
+  - Tìm gần đây (riêng từng người).
+  - Số điện thoại viết kiểu nào cũng tìm được.
+  - Nút tìm kiếm trên điện thoại.
+- **2.7 Dashboard điều hành:**
+  - 20 chỉ số chia 4 nhóm, công thức ở biểu tượng ⓘ.
+  - So sánh với kỳ trước cùng độ dài.
+  - Bộ lọc Hôm qua / 7 ngày qua.
+  - Nhãn DEMO; hiện "—" kèm lý do khi chưa có dữ liệu. Danh sách công thức: `docs/DASHBOARD_METRICS.md`.
+- **2.8 Hoàn thiện:**
+  - **Thùng rác:** xem và khôi phục bản ghi đã xóa của 11 module, theo quyền xóa và phạm vi xem. Nhật ký ghi "Khôi phục".
+  - **Nhập CSV / Excel** cho lead, người liên hệ, sản phẩm (kiểm tra từng dòng như nhập tay, bỏ qua dòng trùng, báo lỗi theo số dòng, cả tệp lưu trong một lần).
+  - **Xuất Excel** danh sách công việc.
+  - Dữ liệu demo bổ sung cho tính năng Phase 2.
+
+### Thay đổi
+- Thông báo khi xóa bản ghi nhắc rằng có thể khôi phục trong Thùng rác.
+- Phản hồi gợi ý tìm kiếm không lặp lại từ khóa đã gõ.
+- Chỉ số "Lead đủ điều kiện" tính cả lead được chuyển đổi thẳng, theo ngày chuyển đổi.
+
+### Sửa lỗi
+- **Lỗ hổng cũ:** trang chi tiết khách hàng, cơ hội và lead từng hiện bản ghi liên quan mà người xem không có quyền xem (sửa ở 2.2).
+- Dữ liệu cấu hình mặc định bị tạo lại mỗi lần khởi động, kể cả khi người dùng đã xóa (sửa ở 2.5).
+- Lệnh `crm:purge-demo`:
+  - không dọn hoạt động gắn với lead, cơ hội và người liên hệ demo;
+  - cờ "có dữ liệu demo" vẫn còn trong bộ nhớ đệm sau khi xóa.
+
+### Bảo mật
+- Mọi tính năng mới đều có kiểm thử về quyền, phạm vi "chỉ của mình" và cách ly giữa các tổ chức.
+- Lịch sử tìm kiếm là riêng tư theo người dùng và tổ chức.
+- Không có chức năng xóa vĩnh viễn trong Thùng rác.
+- `composer audit` và `npm audit`: 0 lỗ hổng (16/10/2026).
 ## [1.0.0] — Phase 1 Foundation — 17/10/2026
 
 ### Thêm mới
