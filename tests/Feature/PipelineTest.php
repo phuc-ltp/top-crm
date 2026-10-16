@@ -232,6 +232,10 @@ class PipelineTest extends TestCase
         $this->assertEquals(40.0, $first['attainment']);
         $this->assertEquals(1000000, $page->viewData('rows')[1]['weighted']);
         $this->assertSame(1, $page->viewData('overdue')['count']);
+        // Tỷ lệ đạt tổng chỉ tính tháng CÓ chỉ tiêu: 8tr / 20tr = 40% (không cộng dự báo của tháng chưa đặt chỉ tiêu → không thành 45%)
+        $this->assertEquals(40.0, $page->viewData('totals')['attainment']);
+        $this->assertSame(1, $page->viewData('totals')['target_months']);
+        $page->assertSee(__(':rate% chỉ tiêu (:months tháng có chỉ tiêu)', ['rate' => 40, 'months' => 1]));
 
         $own = $this->actingAs($sale)->get(route('opportunities.forecast', ['months' => 3]))->assertOk();
         $this->assertEquals(0, $own->viewData('rows')[1]['weighted']);   // cơ hội của người khác không tính

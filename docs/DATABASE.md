@@ -50,7 +50,11 @@ erDiagram
     tags ||--o{ customer_tag : ""
     customers ||--o{ opportunities : ""
     contacts |o--o{ opportunities : ""
+    pipelines ||--o{ pipeline_stages : ""
+    pipelines ||--o{ opportunities : ""
     pipeline_stages ||--o{ opportunities : ""
+    opportunities ||--o{ opportunity_items : ""
+    lost_reasons |o--o{ opportunities : ""
     opportunities ||--o{ opportunity_stage_histories : ""
     opportunities |o--o{ quotations : ""
     customers ||--o{ quotations : ""
@@ -109,8 +113,10 @@ erDiagram
 | `custom_field_definitions` | Trường tùy biến của từng tổ chức (`entity`, `key` duy nhất theo tổ chức, `type`, `options`, bắt buộc/ẩn, thứ tự). |
 | `contacts` | Người liên hệ của khách hàng doanh nghiệp. |
 | `tags`, `customer_tag` | Thẻ phân loại khách hàng. |
-| `pipeline_stages` | Giai đoạn pipeline (thứ tự, xác suất, Thắng/Thất bại). |
-| `opportunities`, `opportunity_stage_histories` | Cơ hội bán hàng và lịch sử chuyển giai đoạn. |
+| `pipelines` | Pipeline bán hàng của từng tổ chức (từ bước 2.5); đúng một pipeline `is_default`, có thể ẩn (`is_active`). |
+| `pipeline_stages` | Giai đoạn của một pipeline (`pipeline_id`, `slug` duy nhất trong pipeline, thứ tự, xác suất, màu, Thắng/Thất bại). |
+| `opportunities`, `opportunity_stage_histories` | Cơ hội bán hàng và lịch sử chuyển giai đoạn. `pipeline_id` luôn khớp pipeline của giai đoạn (gán tự động khi lưu); `lost_reason_id` (lý do có cấu trúc) + `lost_reason` (ghi chú). |
+| `opportunity_items` | Sản phẩm / dịch vụ dự kiến trong cơ hội (SL, đơn giá, chiết khấu %, thành tiền tính ở máy chủ). |
 | `quotations`, `quotation_items` | Báo giá. |
 | `sales_orders`, `sales_order_items` | Đơn hàng (duyệt bởi `approved_by`). |
 | `invoices`, `invoice_items` | Hóa đơn (nháp → phát hành), `amount_paid`, `payment_status`. |

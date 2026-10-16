@@ -1659,5 +1659,6 @@
     "Mỗi pipeline cần ít nhất một giai đoạn mở, một giai đoạn thắng và một giai đoạn thất bại.": "Each pipeline needs at least one open, one won and one lost stage.",
     "Đã xóa giai đoạn :name, chuyển :count cơ hội sang \":target\".": "Stage :name deleted; :count opportunities moved to \":target\".",
     "Pipeline mặc định chưa có giai đoạn đang mở.": "The default pipeline has no open stage.",
-    "Không thể chuyển cơ hội sang giai đoạn của pipeline khác.": "An opportunity cannot be moved to a stage of another pipeline."
+    "Không thể chuyển cơ hội sang giai đoạn của pipeline khác.": "An opportunity cannot be moved to a stage of another pipeline.",
+    ":rate% chỉ tiêu (:months tháng có chỉ tiêu)": ":rate% of target (:months months with a target)"
 }
