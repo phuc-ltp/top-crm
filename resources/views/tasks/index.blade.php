@@ -3,6 +3,7 @@
 @section('content')
     <x-page-header :title="__('Công việc')" :breadcrumbs="['Công việc' => null]" :subtitle="__('Giao việc, theo dõi hạn chót và tiến độ')">
         <a href="{{ route('tasks.calendar') }}" class="btn btn-light"><i class="bi bi-calendar3 me-1"></i>{{ __('Lịch công việc') }}</a>
+        <a href="{{ route('tasks.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>
         @can('create', App\Models\Task::class)<a href="{{ route('tasks.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Tạo công việc') }}</a>@endcan
     </x-page-header>
 

@@ -3,6 +3,7 @@
 @section('content')
     <x-page-header :title="__('Sản phẩm & Dịch vụ')" :breadcrumbs="['Sản phẩm' => null]">
         @can('export', App\Models\Product::class)<a href="{{ route('products.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>@endcan
+        @can('create', App\Models\Product::class)<a href="{{ route('products.import') }}" class="btn btn-light"><i class="bi bi-upload me-1"></i>{{ __('Nhập CSV / Excel') }}</a>@endcan
         @can('create', App\Models\Product::class)<a href="{{ route('products.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Thêm sản phẩm') }}</a>@endcan
     </x-page-header>
     <div class="card">
