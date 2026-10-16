@@ -28,7 +28,7 @@
                 @if ($byStatus->isEmpty())<div class="text-muted small">{{ __('Chưa có lead.') }}</div>@else
                     @php
                         $campaignChart = ['type' => 'doughnut', 'data' => [
-                            'labels' => collect($byStatus)->keys()->map(fn ($k) => label_of(App\Models\Lead::STATUSES, $k))->values(),
+                            'labels' => collect($byStatus)->keys()->map(fn ($k) => label_of(App\Models\Lead::statuses(), $k))->values(),
                             'datasets' => [['data' => collect($byStatus)->values(), 'backgroundColor' => ['#0EA5E9', '#3B82F6', '#F59E0B', '#FF6B00', '#16A34A', '#DC2626']]],
                         ], 'options' => ['plugins' => ['legend' => ['position' => 'bottom']]]];
                     @endphp
@@ -54,7 +54,7 @@
                     <tbody>
                     @forelse ($leads as $l)
                         <tr><td><a href="{{ route('leads.show', $l) }}" class="row-link">{{ $l->name }}</a><div class="small text-muted">{{ $l->code }}</div></td>
-                            <td>{!! badge(App\Models\Lead::STATUSES, $l->status) !!}</td><td>{{ $l->score }}</td><td class="small">{{ $l->assignee?->name }}</td>
+                            <td>{!! badge(App\Models\Lead::statuses(), $l->status) !!}</td><td>{{ $l->score }}</td><td class="small">{{ $l->assignee?->name }}</td>
                             <td class="small">{{ vn_date($l->pivot->created_at) }}</td>
                             <td class="text-end">@can('update', $campaign)<form method="POST" action="{{ route('campaigns.leads.detach', [$campaign, $l]) }}" data-confirm="{{ __('Gỡ lead khỏi chiến dịch?') }}" data-confirm-button="{{ __('Gỡ') }}">@csrf @method('DELETE')<button class="btn btn-light btn-icon btn-sm" title="{{ __('Gỡ') }}"><i class="bi bi-x-lg"></i></button></form>@endcan</td></tr>
                     @empty

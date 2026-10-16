@@ -46,7 +46,7 @@ trait LogsActivity
             'User' => 'người dùng', 'Customer' => 'khách hàng', 'Contact' => 'người liên hệ', 'Lead' => 'lead',
             'Opportunity' => 'cơ hội', 'Task' => 'công việc', 'Product' => 'sản phẩm', 'Quotation' => 'báo giá',
             'SalesOrder' => 'đơn hàng', 'Invoice' => 'hóa đơn', 'Payment' => 'thanh toán', 'Campaign' => 'chiến dịch',
-            'SupportTicket' => 'ticket', 'Department' => 'phòng ban', 'CustomFieldDefinition' => 'trường tùy biến',
+            'SupportTicket' => 'ticket', 'Department' => 'phòng ban', 'CustomFieldDefinition' => 'trường tùy biến', 'LeadStage' => 'giai đoạn lead', 'LostReason' => 'lý do thất bại',
         ][$class] ?? $class;
     }
 }

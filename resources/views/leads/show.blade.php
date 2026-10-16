@@ -29,7 +29,10 @@
                     </div>
                     <dl class="detail-list">
                         <dt>{{ __('Mã') }}</dt><dd>{{ $lead->code }}</dd>
-                        <dt>{{ __('Trạng thái') }}</dt><dd>{!! badge(App\Models\Lead::STATUSES, $lead->status) !!}</dd>
+                        <dt>{{ __('Giai đoạn') }}</dt><dd>{!! badge(App\Models\Lead::statuses(), $lead->status) !!}
+                            @if ($lead->status === 'lost' && $lead->lostReason)<div class="small-xs text-danger">{{ $lead->lostReason->name }}@if ($lead->lost_note) — {{ $lead->lost_note }}@endif</div>@endif</dd>
+                        @if ($lead->qualified_at)<dt>{{ __('Đủ điều kiện từ') }}</dt><dd>{{ vn_date($lead->qualified_at, true) }}</dd>@endif
+                        <dt>{{ __('Marketing') }}</dt><dd>@if ($lead->marketing_consent)<span class="badge badge-soft-success">{{ __('Đã đồng ý') }}</span><div class="small-xs text-muted">{{ $lead->marketing_consent_source }}</div>@else<span class="badge badge-soft-secondary">{{ __('Chưa đồng ý') }}</span>@endif</dd>
                         <dt>{{ __('Công ty') }}</dt><dd>{{ $lead->company ?? '—' }}</dd>
                         <dt>Email</dt><dd>{{ $lead->email ?? '—' }}</dd>
                         <dt>{{ __('Điện thoại') }}</dt><dd>{{ $lead->phone ?? '—' }}</dd>

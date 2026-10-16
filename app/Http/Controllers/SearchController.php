@@ -34,7 +34,7 @@ class SearchController extends Controller
         if ($user->can('leads.view')) {
             $add('Leads', 'bi-funnel', Lead::visibleTo($user)
                 ->where(fn ($q) => $q->where('name', 'like', $term)->orWhere('code', 'like', $term)->orWhere('company', 'like', $term)->orWhere('email', 'like', $term))
-                ->limit(5)->get()->map(fn ($l) => ['title' => $l->name, 'subtitle' => $l->code.' · '.label_of(Lead::STATUSES, $l->status), 'url' => route('leads.show', $l)]));
+                ->limit(5)->get()->map(fn ($l) => ['title' => $l->name, 'subtitle' => $l->code.' · '.label_of(Lead::statuses(), $l->status), 'url' => route('leads.show', $l)]));
         }
         if ($user->can('opportunities.view')) {
             $add(__('Cơ hội'), 'bi-kanban', Opportunity::visibleTo($user)

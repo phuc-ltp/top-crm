@@ -102,7 +102,9 @@ erDiagram
 | Bảng | Mô tả |
 |---|---|
 | `lead_sources` | Nguồn khách (Website, Giới thiệu...). |
-| `leads` | Khách tiềm năng: điểm, trạng thái, giá trị dự kiến, liên kết khi chuyển đổi. |
+| `leads` | Khách tiềm năng: điểm, giai đoạn (`status` = mã trong `lead_stages`, chuỗi), giá trị dự kiến, liên kết khi chuyển đổi; từ bước 2.4: `qualified_at`, `lost_reason_id` + `lost_note`, đồng ý marketing (`marketing_consent`, `_at`, `_source`). |
+| `lead_stages` | Giai đoạn lead của từng tổ chức (`key`, tên, màu, thứ tự, `is_system` cho converted/lost, `is_qualified`). |
+| `lost_reasons` | Lý do thất bại của từng tổ chức (`applies_to`: lead / opportunity / both). |
 | `customers` | Khách hàng (cá nhân/doanh nghiệp), người phụ trách, nguồn, thẻ; từ bước 2.3: `country` (ISO 2 ký tự), `segment`, `lifecycle_stage` + `lifecycle_changed_at`, `preferred_channel`, `marketing_consent` + `_at` + `_source`, `custom_fields` (JSON), `merged_into_id` (bản đã gộp). |
 | `custom_field_definitions` | Trường tùy biến của từng tổ chức (`entity`, `key` duy nhất theo tổ chức, `type`, `options`, bắt buộc/ẩn, thứ tự). |
 | `contacts` | Người liên hệ của khách hàng doanh nghiệp. |
