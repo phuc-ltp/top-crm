@@ -21,6 +21,7 @@ class ActivityLog extends Model
         'created' => ['Tạo mới', 'success'],
         'updated' => ['Cập nhật', 'primary'],
         'deleted' => ['Xóa', 'danger'],
+        'restored' => ['Khôi phục', 'success'],
         'login' => ['Đăng nhập', 'info'],
         'logout' => ['Đăng xuất', 'secondary'],
         'login_failed' => ['Đăng nhập lỗi', 'warning'],

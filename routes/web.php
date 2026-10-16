@@ -103,6 +103,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/search', SearchController::class)->name('search')->middleware('throttle:120,1');
     Route::get('/search/results', [SearchController::class, 'results'])->name('search.results')->middleware('throttle:60,1');
     Route::delete('/search/recent', [SearchController::class, 'clearRecent'])->name('search.recent.clear');
+    Route::get('/trash', [\App\Http\Controllers\TrashController::class, 'index'])->name('trash.index');
+    Route::post('/trash/{type}/{id}/restore', [\App\Http\Controllers\TrashController::class, 'restore'])
+        ->whereIn('type', array_keys(\App\Http\Controllers\TrashController::types()))->whereNumber('id')->name('trash.restore');
 
     // Hồ sơ
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

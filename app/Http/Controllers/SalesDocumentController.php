@@ -167,7 +167,7 @@ abstract class SalesDocumentController extends Controller
         abort_unless($this->editable($doc), 403, __('Không thể xóa :doc ở trạng thái hiện tại.', ['doc' => $this->docName()]));
         $doc->delete();
 
-        return redirect()->route($this->route.'.index')->with('success', __('Đã xóa :doc :number.', ['doc' => $this->docName(), 'number' => $doc->number]));
+        return redirect()->route($this->route.'.index')->with('success', __('Đã xóa :doc :number.', ['doc' => $this->docName(), 'number' => $doc->number]).' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     public function export(Request $request, ExportService $exporter)

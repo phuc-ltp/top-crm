@@ -90,7 +90,7 @@ class ProductController extends Controller
         $this->authorize('delete', $product);
         $product->delete(); // xóa mềm, chứng từ cũ vẫn giữ tham chiếu
 
-        return redirect()->route('products.index')->with('success', __('Đã xóa sản phẩm :name.', ['name' => $product->name]));
+        return redirect()->route('products.index')->with('success', __('Đã xóa sản phẩm :name.', ['name' => $product->name]).' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     public function export(Request $request, ExportService $exporter)

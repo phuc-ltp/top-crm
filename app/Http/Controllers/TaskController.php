@@ -131,7 +131,7 @@ class TaskController extends Controller
         $this->authorize('delete', $task);
         $task->delete();
 
-        return redirect()->route('tasks.index')->with('success', __('Đã xóa công việc.'));
+        return redirect()->route('tasks.index')->with('success', __('Đã xóa công việc.').' '.__('Có thể khôi phục trong Thùng rác.'));
     }
 
     public function updateStatus(Request $request, Task $task)
