@@ -5,7 +5,7 @@
 ## 1. Chạy kiểm thử
 ```powershell
 cd C:\phuc-crm
-php artisan test                                   # toàn bộ (~4–5 phút)
+php artisan test                                   # toàn bộ (~7 phút)
 php artisan test tests/Feature/ApiTokenTest.php    # một tệp
 php artisan test --filter=two_factor               # theo tên
 ```
@@ -14,7 +14,7 @@ php artisan test --filter=two_factor               # theo tên
 - **Không chạy hai bộ test cùng lúc** (dùng chung database test).
 - Giao diện phải được build (`npm run build`) trước khi chạy test trang.
 
-## 2. Phạm vi bao phủ (190 test)
+## 2. Phạm vi bao phủ (271 test)
 
 | Tệp | Số test | Nội dung chính |
 |---|---:|---|
@@ -36,14 +36,24 @@ php artisan test --filter=two_factor               # theo tên
 | PageSmokeTest | 6 | Mọi trang mở được với mọi vai trò, báo cáo/xuất Excel/PDF, AJAX & API trả JSON |
 | LayoutTest | 7 | Sáng/tối theo tài khoản, ô tìm chức năng |
 | LocaleTest | 11 | Song ngữ: mọi câu giao diện có bản dịch tiếng Anh, câu dùng trong JavaScript đã khai báo |
+| OrganizationSettingsTest | 9 | *(Phase 2)* Cài đặt & phòng ban theo tổ chức, không lẫn giữa tổ chức |
+| ActivityTest | 11 | *(Phase 2)* Hoạt động / lịch hẹn, nhắc việc, dòng thời gian qua quyền |
+| DetailPageVisibilityTest | 2 | *(Phase 2)* Trang chi tiết không lộ bản ghi liên quan ngoài quyền |
+| CustomerProfileTest | 9 | *(Phase 2)* Trường hồ sơ mới, trường tùy biến, gộp khách hàng, nhập Excel, tệp đính kèm |
+| LeadManagementTest | 10 | *(Phase 2)* Giai đoạn lead theo tổ chức, lý do thất bại, phát hiện trùng, form website, phân tích |
+| PipelineTest | 12 | *(Phase 2)* Nhiều pipeline, sản phẩm trong cơ hội, kéo thả đúng pipeline, dự báo |
+| GlobalSearchTest | 10 | *(Phase 2)* Tìm kiếm 11 loại qua quyền & tổ chức, điện thoại mọi cách viết, tìm gần đây riêng tư |
+| ExecutiveMetricsTest | 7 | *(Phase 2)* 20 chỉ số điều hành trên dữ liệu mẫu cố định, phạm vi quyền, trạng thái trống, bộ lọc kỳ |
+| TrashTest | 5 | *(Phase 2)* Thùng rác: khôi phục theo quyền xóa, phạm vi xem, tổ chức; nhật ký "Khôi phục" |
+| ImportExportTest | 6 | *(Phase 2)* Nhập lead / người liên hệ / sản phẩm (kiểm tra từng dòng, trùng, quyền, tổ chức), xuất công việc |
 
-## 3. Kiểm thử ngoài PHPUnit (thực hiện mỗi bước Phase 1)
+## 3. Kiểm thử ngoài PHPUnit (thực hiện mỗi bước Phase 1 và 2)
 | Hạng mục | Cách làm |
 |---|---|
 | Migration | Bản sao database thật `orangecrm_migcheck`: 3 vòng migrate/rollback + so sánh schema, rồi xóa bản sao |
 | Giao diện | Edge headless qua DevTools Protocol, database xem thử `orangecrm_preview` (chỉ dữ liệu demo): chụp màn hình sáng/tối, đo tràn ngang ở 1920 / 1366 / 820 / 390 px |
 | Luồng thật | Bật 2FA qua giao diện → QR → nhập mã → mã khôi phục; gọi API bằng HTTP thật (200/401/403) |
-| File SQL | Import vào database trống (2 lần), kiểm tra không có quản trị / dữ liệu thật, không còn migration thiếu |
+| File SQL | `scripts/verify-sql.ps1`: nạp **bản sao đã đổi tên database** vào `orangecrm_sqlcheck` (2 lần), kiểm tra không có quản trị / dữ liệu thật, không còn migration thiếu. **Không bao giờ** nạp thẳng `database/sql/orangecrm_db.sql` để thử — file có lệnh `USE orangecrm_db` (sự cố 16/10/2026) |
 | Lỗ hổng thư viện | `composer audit`, `npm audit` |
 
 ## 4. Quy tắc khi thêm tính năng
@@ -52,9 +62,9 @@ php artisan test --filter=two_factor               # theo tên
 - Không đánh dấu hoàn thành khi chưa chạy toàn bộ `php artisan test`.
 
 ## 5. Kết quả gần nhất
-| Hạng mục | Kết quả (17/10/2026, hết Phase 1) |
+| Hạng mục | Kết quả (16/10/2026, hết Phase 2 — v2.0.0) |
 |---|---|
-| PHPUnit | **190/190 đạt** (5.817 kiểm tra), 293 giây |
+| PHPUnit | **271/271 đạt** (7.891 kiểm tra), 408 giây |
 | `composer audit` / `npm audit` | 0 lỗ hổng |
-| Import file SQL vào database trống (2 lần) | Đạt — 50 bảng, không thiếu migration, không có quản trị / dữ liệu thật |
+| `scripts/verify-sql.ps1` (nạp bản sao vào database tạm, 2 lần) | Đạt — 57 bảng, không thiếu migration, không có quản trị / dữ liệu thật |
 | Môi trường | Windows 11 · XAMPP · PHP 8.2.12 · MariaDB 10.11.19 · Laravel 12.69.3 · Node 24 |

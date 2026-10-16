@@ -266,7 +266,55 @@ class DemoDataSeeder extends Seeder
             }
         }
 
+        $this->phase2Extras($customers, $sales);
+
         $this->command?->info('Đã tạo dữ liệu DEMO (is_demo = 1).');
+    }
+
+    /**
+     * Bổ sung cho tính năng Phase 2 (chạy SAU cùng để không đổi dữ liệu ngẫu nhiên đã sinh ở trên):
+     * phân khúc / vòng đời khách hàng, ngày lead đủ điều kiện, lý do thất bại, lịch hẹn sắp tới.
+     */
+    private function phase2Extras($customers, $sales): void
+    {
+        $segments = array_keys(Customer::SEGMENTS);
+        $stages = array_keys(Customer::LIFECYCLE_STAGES);
+        $channels = array_keys(Customer::CHANNELS);
+        foreach ($customers->values() as $i => $c) {
+            $c->forceFill([
+                'segment' => $segments[$i % count($segments)],
+                'lifecycle_stage' => $stages[$i % count($stages)],
+                'preferred_channel' => $channels[$i % count($channels)],
+                'country' => 'VN',
+            ])->saveQuietly();
+        }
+
+        // Lead đủ điều kiện / đã chuyển đổi: có ngày đạt điều kiện; lead mất: có lý do (danh mục lý do của tổ chức)
+        $leadReason = \App\Models\LostReason::whereIn('applies_to', ['both', 'lead'])->orderBy('position')->value('id');
+        $oppReason = \App\Models\LostReason::whereIn('applies_to', ['both', 'opportunity'])->orderBy('position')->value('id');
+        $qualified = app(\App\Support\LeadStages::class)->all()->where('is_qualified', true)->pluck('key')->push('converted')->all();
+        foreach (\App\Models\Lead::where('is_demo', true)->get() as $lead) {
+            if (in_array($lead->status, $qualified, true)) {
+                $lead->forceFill(['qualified_at' => $lead->converted_at?->copy()->subDays(2) ?? $lead->created_at->copy()->addDays(3)])->saveQuietly();
+            } elseif ($lead->status === 'lost' && $leadReason) {
+                $lead->forceFill(['lost_reason_id' => $leadReason, 'lost_note' => 'Lý do demo.'])->saveQuietly();
+            }
+        }
+        if ($oppReason) {
+            Opportunity::where('is_demo', true)->whereHas('stage', fn ($q) => $q->where('is_lost', true))->update(['lost_reason_id' => $oppReason]);
+        }
+
+        // Lịch hẹn: 6 việc theo dõi sắp tới + 2 đã quá hẹn (để thấy nhắc việc & trang Hoạt động)
+        foreach (range(0, 7) as $i) {
+            $customer = $customers[$i * 3];
+            Interaction::create([
+                'interactable_type' => 'customer', 'interactable_id' => $customer->id,
+                'type' => ['call', 'meeting', 'follow_up', 'email'][$i % 4], 'status' => 'planned',
+                'subject' => ['Gọi lại tư vấn gói', 'Hẹn demo sản phẩm', 'Theo dõi báo giá', 'Gửi tài liệu'][$i % 4].' (demo)',
+                'scheduled_at' => now()->addDays($i < 6 ? $i + 1 : -($i - 4))->setTime(9 + $i, 0),
+                'user_id' => $customer->assigned_to, 'assigned_to' => $customer->assigned_to,
+            ]);
+        }
     }
 
     private function companyName(\Faker\Generator $faker): string

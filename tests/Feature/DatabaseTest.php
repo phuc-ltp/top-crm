@@ -97,6 +97,12 @@ class DatabaseTest extends TestCase
         $this->assertSame(10, Product::count());
         $this->assertSame(5, \App\Models\Campaign::count());
         $this->assertSame(10, \App\Models\SupportTicket::count());
+        // Dữ liệu cho tính năng Phase 2
+        $this->assertSame(0, Customer::whereNull('segment')->count());
+        $this->assertSame(0, \App\Models\Lead::whereIn('status', ['qualified', 'converted'])->whereNull('qualified_at')->count());
+        $this->assertSame(0, \App\Models\Lead::where('status', 'lost')->whereNull('lost_reason_id')->count());
+        $this->assertSame(0, Opportunity::whereHas('stage', fn ($q) => $q->where('is_lost', true))->whereNull('lost_reason_id')->count());
+        $this->assertSame(8, \App\Models\Interaction::where('status', 'planned')->count());
 
         $this->seed(DemoDataSeeder::class); // chạy lại không nhân đôi
         $this->assertSame(30, Customer::count());
@@ -114,8 +120,19 @@ class DatabaseTest extends TestCase
         $this->seed(DemoDataSeeder::class);
         $real = $this->customer(['name' => 'Khách thật']);
 
+        $realLead = \App\Models\Lead::create(['name' => 'Lead thật', 'status' => 'new']);
+        $realLead->interactions()->create(['type' => 'note', 'content' => 'Ghi chú thật', 'user_id' => \App\Models\User::first()->id]);
+        $demoLead = \App\Models\Lead::where('is_demo', true)->firstOrFail();
+        $demoLead->interactions()->create(['type' => 'note', 'content' => 'Ghi chú trên lead demo', 'user_id' => \App\Models\User::first()->id]);
+        $orgId = app(\App\Support\Tenancy\CurrentOrganization::class)->id();
+        cache()->put('crm.has_demo.'.$orgId, true, 600);
+
         $this->artisan('crm:purge-demo', ['--force' => true])->assertSuccessful();
         $this->assertSame(1, Customer::count());
+        $this->assertSame(0, \App\Models\Interaction::where('content', 'Ghi chú trên lead demo')->count(), 'Hoạt động của lead demo phải được dọn');
+        $this->assertSame(1, \App\Models\Interaction::where('content', 'Ghi chú thật')->count(), 'Không được xóa hoạt động của dữ liệu thật');
+        $this->assertSame(0, \App\Models\Interaction::where('subject', 'like', '%(demo)')->count());
+        $this->assertNull(cache()->get('crm.has_demo.'.$orgId));
         $this->assertTrue(Customer::whereKey($real->id)->exists());
         $this->assertSame(0, \App\Models\User::withTrashed()->where('is_demo', true)->count());
     }
