@@ -5,6 +5,7 @@
         @can('create', App\Models\Opportunity::class)<a href="{{ route('opportunities.create', ['customer_id' => $customer->id]) }}" class="btn btn-light"><i class="bi bi-kanban me-1"></i>{{ __('Tạo cơ hội') }}</a>@endcan
         @can('create', App\Models\Quotation::class)<a href="{{ route('quotations.create', ['customer_id' => $customer->id]) }}" class="btn btn-light"><i class="bi bi-file-earmark-text me-1"></i>{{ __('Tạo báo giá') }}</a>@endcan
         @can('update', $customer)<a href="{{ route('customers.edit', $customer) }}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>{{ __('Chỉnh sửa') }}</a>@endcan
+        @can('update', $customer)<a href="{{ route('customers.merge', $customer) }}" class="btn btn-light"><i class="bi bi-intersect me-1"></i>{{ __('Gộp trùng') }}</a>@endcan
         @can('delete', $customer)<x-delete-button :action="route('customers.destroy', $customer)" :message="__('Lưu trữ khách hàng này?')" class="btn btn-light text-danger" :label="__('Lưu trữ')" />@endcan
     </x-page-header>
 
@@ -31,6 +32,11 @@
                         <dt>Email</dt><dd>@if ($customer->email)<a href="mailto:{{ $customer->email }}">{{ $customer->email }}</a>@else — @endif</dd>
                         <dt>{{ __('Công ty') }}</dt><dd>{{ $customer->company ?? '—' }}</dd>
                         <dt>{{ __('Địa chỉ') }}</dt><dd>{{ $customer->address ?? '—' }}</dd>
+                        <dt>{{ __('Quốc gia') }}</dt><dd>{{ country_name($customer->country) }}</dd>
+                        <dt>{{ __('Phân khúc') }}</dt><dd>{!! $customer->segment ? badge(App\Models\Customer::SEGMENTS, $customer->segment) : '—' !!}</dd>
+                        <dt>{{ __('Vòng đời') }}</dt><dd>{!! $customer->lifecycle_stage ? badge(App\Models\Customer::LIFECYCLE_STAGES, $customer->lifecycle_stage) : '—' !!}@if ($customer->lifecycle_changed_at)<div class="small-xs text-muted">{{ __('từ :date', ['date' => vn_date($customer->lifecycle_changed_at)]) }}</div>@endif</dd>
+                        <dt>{{ __('Liên lạc qua') }}</dt><dd>{{ $customer->preferred_channel ? __(App\Models\Customer::CHANNELS[$customer->preferred_channel] ?? $customer->preferred_channel) : '—' }}</dd>
+                        <dt>{{ __('Marketing') }}</dt><dd>@if ($customer->marketing_consent)<span class="badge badge-soft-success">{{ __('Đã đồng ý') }}</span><div class="small-xs text-muted">{{ $customer->marketing_consent_source }}@if ($customer->marketing_consent_at) · {{ vn_date($customer->marketing_consent_at) }}@endif</div>@else<span class="badge badge-soft-secondary">{{ __('Chưa đồng ý') }}</span>@endif</dd>
                         <dt>{{ __('Nguồn') }}</dt><dd>{{ $customer->source?->label ?? "—" }}</dd>
                         <dt>{{ __('Phụ trách') }}</dt><dd>{{ $customer->assignee?->name ?? __('Chưa phân công') }}</dd>
                         <dt>{{ __('Thẻ') }}</dt><dd>@forelse ($customer->tags as $tag)<span class="tag-chip me-1" style="background: {{ $tag->color }}">{{ $tag->name }}</span>@empty — @endforelse</dd>
@@ -38,7 +44,38 @@
                         <dt>{{ __('Ngày tạo') }}</dt><dd>{{ vn_date($customer->created_at, true) }}</dd>
                         <dt>{{ __('Cập nhật') }}</dt><dd>{{ vn_date($customer->updated_at, true) }}</dd>
                     </dl>
+                    @php($customFields = App\Models\CustomFieldDefinition::for('customer')->active()->get())
+                    @if ($customFields->isNotEmpty())
+                        <hr><dl class="detail-list mb-0">
+                            @foreach ($customFields as $f)<dt>{{ $f->label }}</dt><dd>{{ $f->display($customer->custom_fields[$f->key] ?? null) }}</dd>@endforeach
+                        </dl>
+                    @endif
                     @if ($customer->notes)<hr><div class="small" style="white-space: pre-line">{{ $customer->notes }}</div>@endif
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><span><i class="bi bi-paperclip me-1 text-orange"></i>{{ __('Tệp đính kèm (:count)', ['count' => $customer->attachments->count()]) }}</span></div>
+                <div class="card-body">
+                    @forelse ($customer->attachments as $a)
+                        <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+                            <i class="bi bi-file-earmark text-orange"></i>
+                            <div class="min-w-0 flex-grow-1">
+                                <a href="{{ route('customers.attachments.download', [$customer, $a]) }}" class="small d-block text-truncate">{{ $a->original_name }}</a>
+                                <span class="small-xs text-muted">{{ $a->human_size }} · {{ $a->user?->name }} · {{ vn_date($a->created_at) }}</span>
+                            </div>
+                            @can('update', $customer)<x-delete-button :action="route('customers.attachments.destroy', [$customer, $a])" :message="__('Xóa tệp này?')" />@endcan
+                        </div>
+                    @empty
+                        <div class="small text-muted">{{ __('Chưa có tệp nào.') }}</div>
+                    @endforelse
+                    @can('update', $customer)
+                        <form method="POST" action="{{ route('customers.attachments.store', $customer) }}" enctype="multipart/form-data" class="d-flex gap-2 mt-3 needs-validation" novalidate>@csrf
+                            <input type="file" name="file" class="form-control form-control-sm" required aria-label="{{ __('Chọn tệp') }}">
+                            <button class="btn btn-soft-primary btn-sm text-nowrap"><i class="bi bi-upload"></i> {{ __('Tải lên') }}</button>
+                        </form>
+                        <div class="form-text">{{ __('Cho phép: :types — tối đa :size MB.', ['types' => str_replace(',', ', ', config('crm.attachment_mimes')), 'size' => config('crm.attachment_max_kb') / 1024]) }}</div>
+                    @endcan
                 </div>
             </div>
 

@@ -103,7 +103,8 @@ erDiagram
 |---|---|
 | `lead_sources` | Nguồn khách (Website, Giới thiệu...). |
 | `leads` | Khách tiềm năng: điểm, trạng thái, giá trị dự kiến, liên kết khi chuyển đổi. |
-| `customers` | Khách hàng (cá nhân/doanh nghiệp), người phụ trách, nguồn, thẻ. |
+| `customers` | Khách hàng (cá nhân/doanh nghiệp), người phụ trách, nguồn, thẻ; từ bước 2.3: `country` (ISO 2 ký tự), `segment`, `lifecycle_stage` + `lifecycle_changed_at`, `preferred_channel`, `marketing_consent` + `_at` + `_source`, `custom_fields` (JSON), `merged_into_id` (bản đã gộp). |
+| `custom_field_definitions` | Trường tùy biến của từng tổ chức (`entity`, `key` duy nhất theo tổ chức, `type`, `options`, bắt buộc/ẩn, thứ tự). |
 | `contacts` | Người liên hệ của khách hàng doanh nghiệp. |
 | `tags`, `customer_tag` | Thẻ phân loại khách hàng. |
 | `pipeline_stages` | Giai đoạn pipeline (thứ tự, xác suất, Thắng/Thất bại). |

@@ -77,14 +77,9 @@
 ## PHASE 2 — CRM Core (bắt đầu 17/10/2026, kế hoạch: docs/PHASE2_PLAN.md)
 - [x] 2.1 Cài đặt & phòng ban theo tổ chức (17/10): organization_settings (14 khóa theo tổ chức, sao chép giá trị cũ → không đổi gì), Setting tự đọc/ghi theo tổ chức, trang thương hiệu/đăng nhập chỉ quản trị nền tảng, múi giờ có tác dụng thật (hiển thị giờ), tab "Chung" đã dịch; phòng ban theo organization_user.department_id (đã chuyển 8/8 người dùng). OrganizationSettingsTest 9 test, 199 test pass. Thử 3 vòng trên bản sao: dữ liệu khớp 100%.
 - [x] 2.2 Hoạt động & dòng thời gian (17/10): interactions → hoạt động (ghi nhận / lên lịch, người phụ trách, hoàn thành + kết quả, sửa, nhắc trước 1 giờ qua crm:task-reminders, thông báo khi được giao), loại mới "Việc theo dõi", trang /activities (của tôi / tất cả được xem, lọc, bộ đếm), TimelineService (hoạt động + nhật ký + cơ hội/báo giá/đơn/hóa đơn/thanh toán/ticket, qua quyền). SỬA LỖ HỔNG CŨ: trang khách hàng/cơ hội/lead hiện bản ghi liên quan không kiểm tra quyền → Controller::onlyVisible(). ActivityTest 11 + DetailPageVisibilityTest 2, 212 test pass. Dữ liệu cũ giữ nguyên (checksum khớp sau 3 vòng). User chọn CÁCH B (giữ demo ở TOP CRM, tạo tổ chức mới cho dữ liệu thật — chờ tên công ty).
-- [ ] 2.3 Khách hàng (trường mới, gộp, trường tùy biến, xlsx)
+- [x] 2.3 Khách hàng (16/10): quốc gia, phân khúc, vòng đời (tự ghi thời điểm), kênh liên lạc, đồng ý marketing (bắt buộc nguồn, tự ghi thời điểm, rút lại được); trường tùy biến theo tổ chức (6 kiểu, Cài đặt → Trường tùy biến, ẩn không mất dữ liệu); gộp khách hàng (chuyển 10 loại bản ghi + thẻ, bổ sung chỗ trống, lưu trữ bản trùng, nhật ký); nhập CSV + Excel (bù số 0 điện thoại, cột mới + trường tùy biến); tệp đính kèm khách hàng; lọc nâng cao + sắp xếp; xuất đủ cột; API trả trường mới. CustomerProfileTest 9 test, 221 test pass. Tổ chức ToS (#2) đã tạo, chủ sở hữu = phuphuc.
 - [ ] 2.4 Leads (giai đoạn cấu hình, form website, nhắc theo dõi)
 - [ ] 2.5 Nhiều pipeline & deal (sản phẩm, dự báo)
 - [ ] 2.6 Tìm kiếm toàn cục
 - [ ] 2.7 Dashboard 20 chỉ số
 - [ ] 2.8 Hoàn thiện, v2.0.0
-
-## TẠM DỪNG 17/10/2026 (theo yêu cầu user) — khi user nhắn "tiếp tục":
-1. Làm bước 2.3 Khách hàng (trường mới: quốc gia, phân khúc, vòng đời, đồng ý marketing, kênh liên lạc; trường tùy biến theo tổ chức; gộp khách hàng có nhật ký; nhập .xlsx; lọc/sắp xếp nâng cao).
-2. Còn chờ user: tên công ty cho tổ chức dữ liệu thật (Cách B) + xác nhận user làm chủ sở hữu.
-3. Quy trình mỗi bước: worktree .worktrees/<tên> (copy vendor), test đủ, thử migration trên bản sao orangecrm_migcheck (3 vòng + so schema, xóa bản sao), sao lưu SAO_LUU, merge main, migrate DB thật, push.

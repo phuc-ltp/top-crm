@@ -27,14 +27,33 @@ class CustomerRequest extends FormRequest
             'status' => ['required', Rule::in(array_keys(Customer::STATUSES))],
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'notes' => ['nullable', 'string', 'max:5000'],
+            'country' => ['nullable', Rule::in(array_keys(config('crm.countries', [])))],
+            'segment' => ['nullable', Rule::in(array_keys(Customer::SEGMENTS))],
+            'lifecycle_stage' => ['nullable', Rule::in(array_keys(Customer::LIFECYCLE_STAGES))],
+            'preferred_channel' => ['nullable', Rule::in(array_keys(Customer::CHANNELS))],
+            'marketing_consent' => ['sometimes', 'boolean'],
+            // Đồng ý nhận marketing phải ghi rõ nguồn (VD: Form website, Ký hợp đồng, Đồng ý qua điện thoại)
+            'marketing_consent_source' => ['nullable', 'required_if_accepted:marketing_consent', 'string', 'max:100'],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['integer', \App\Support\Tenancy\TenantRule::exists('tags')],
             'confirm_duplicate' => ['nullable', 'boolean'],
-        ];
+            'custom' => ['nullable', 'array'],
+        ] + $this->customFieldRules();
+    }
+
+    /** Quy tắc cho các trường tùy biến đang hiển thị của tổ chức (custom.{key}). */
+    private function customFieldRules(): array
+    {
+        return \App\Models\CustomFieldDefinition::for('customer')->active()->get()
+            ->mapWithKeys(fn ($f) => ['custom.'.$f->key => $f->rules()])->all();
     }
 
     public function attributes(): array
     {
-        return ['name' => __('Tên khách hàng')];
+        $custom = \App\Models\CustomFieldDefinition::for('customer')->active()->pluck('label', 'key')
+            ->mapWithKeys(fn ($label, $key) => ['custom.'.$key => $label])->all();
+
+        return $custom + ['name' => __('Tên khách hàng'), 'country' => __('Quốc gia'), 'segment' => __('Phân khúc'), 'lifecycle_stage' => __('Giai đoạn vòng đời'),
+            'preferred_channel' => __('Kênh liên lạc ưa thích'), 'marketing_consent_source' => __('Nguồn đồng ý')];
     }
 }

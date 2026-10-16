@@ -35,14 +35,26 @@ class CustomerController extends Controller
             ->when($request->filled('source'), fn ($q) => $q->where('lead_source_id', $request->source))
             ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->assigned_to))
             ->when($request->filled('tag'), fn ($q) => $q->whereHas('tags', fn ($t) => $t->where('tags.id', $request->tag)))
+            // Lọc nâng cao (chỉ nhận giá trị trong danh mục cho phép)
+            ->when(array_key_exists((string) $request->segment, Customer::SEGMENTS), fn ($q) => $q->where('segment', $request->segment))
+            ->when(array_key_exists((string) $request->lifecycle, Customer::LIFECYCLE_STAGES), fn ($q) => $q->where('lifecycle_stage', $request->lifecycle))
+            ->when(array_key_exists(strtoupper((string) $request->country), config('crm.countries', [])), fn ($q) => $q->where('country', strtoupper($request->country)))
+            ->when(in_array($request->consent, ['0', '1'], true), fn ($q) => $q->where('marketing_consent', $request->consent === '1'))
+            ->when($this->validDate($request->created_from), fn ($q) => $q->where('created_at', '>=', \Illuminate\Support\Carbon::parse($request->created_from)->startOfDay()))
+            ->when($this->validDate($request->created_to), fn ($q) => $q->where('created_at', '<=', \Illuminate\Support\Carbon::parse($request->created_to)->endOfDay()))
             ->when($request->input('archived') === '1', fn ($q) => $q->onlyTrashed());
+    }
+
+    private function validDate($value): bool
+    {
+        return is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) && strtotime($value) !== false;
     }
 
     public function index(Request $request)
     {
         $this->authorize('viewAny', Customer::class);
 
-        $customers = $this->applySort($this->filtered($request), $request, ['code', 'name', 'created_at', 'status'])
+        $customers = $this->applySort($this->filtered($request), $request, ['code', 'name', 'created_at', 'updated_at', 'status', 'segment', 'lifecycle_stage'])
             ->paginate($this->perPage($request))->withQueryString();
 
         return view('customers.index', [
@@ -87,7 +99,7 @@ class CustomerController extends Controller
         // Bản ghi liên quan chỉ hiện trong phạm vi quyền của người xem (không có quyền module → không thấy)
         $user = request()->user();
         $customer->load([
-            'assignee', 'creator', 'source', 'tags',
+            'assignee', 'creator', 'source', 'tags', 'attachments.user:id,name',
             'contacts' => fn ($q) => $this->onlyVisible($q, 'contacts', $user),
             'opportunities' => fn ($q) => $this->onlyVisible($q, 'opportunities', $user)->with('stage')->latest()->limit(10),
             'invoices' => fn ($q) => $this->onlyVisible($q, 'invoices', $user)->latest('issue_date')->limit(10),
@@ -184,16 +196,97 @@ class CustomerController extends Controller
     {
         $this->authorize('export', Customer::class);
 
+        $customFields = \App\Models\CustomFieldDefinition::for('customer')->active()->get();
         $rows = $this->filtered($request)->orderBy('id')->limit(20000)->get()->map(fn (Customer $c) => [
-            $c->code, $c->name, $c->phone, $c->email, $c->address, $c->company, Customer::TYPES[$c->type] ?? $c->type,
-            $c->source?->label, label_of(Customer::STATUSES, $c->status), $c->assignee?->name,
+            $c->code, $c->name, $c->phone, $c->email, $c->address, $c->country ? country_name($c->country) : '', $c->company, __(Customer::TYPES[$c->type] ?? $c->type),
+            $c->source?->label, label_of(Customer::STATUSES, $c->status),
+            $c->segment ? label_of(Customer::SEGMENTS, $c->segment) : '', $c->lifecycle_stage ? label_of(Customer::LIFECYCLE_STAGES, $c->lifecycle_stage) : '',
+            $c->preferred_channel ? __(Customer::CHANNELS[$c->preferred_channel] ?? $c->preferred_channel) : '',
+            $c->marketing_consent ? __('Có') : __('Không'), $c->marketing_consent_source, $c->assignee?->name,
             $c->tags->pluck('name')->implode(', '), vn_date($c->created_at, true), vn_date($c->updated_at, true),
+            ...$customFields->map(fn ($f) => ($v = ($c->custom_fields[$f->key] ?? null)) === null ? '' : $f->display($v))->all(),
         ]);
 
         return $exporter->download('khach_hang', [
-            __('Mã KH'), __('Tên khách hàng'), __('Điện thoại'), 'Email', __('Địa chỉ'), __('Công ty'), __('Loại'), __('Nguồn'), __('Trạng thái'),
-            __('Phụ trách'), __('Thẻ'), __('Ngày tạo'), __('Cập nhật'),
+            __('Mã KH'), __('Tên khách hàng'), __('Điện thoại'), 'Email', __('Địa chỉ'), __('Quốc gia'), __('Công ty'), __('Loại'), __('Nguồn'), __('Trạng thái'),
+            __('Phân khúc'), __('Giai đoạn vòng đời'), __('Kênh liên lạc ưa thích'), __('Đồng ý marketing'), __('Nguồn đồng ý'),
+            __('Phụ trách'), __('Thẻ'), __('Ngày tạo'), __('Cập nhật'), ...$customFields->pluck('label')->all(),
         ], $rows, $request->input('format', 'xlsx'));
+    }
+
+    /**
+     * Gộp khách hàng trùng: $customer là bản GIỮ LẠI, ?with= là bản sẽ bị gộp (chuyển hết dữ liệu rồi lưu trữ).
+     * Cần quyền sửa bản giữ lại và quyền xóa (lưu trữ) bản bị gộp.
+     */
+    public function mergeForm(Request $request, Customer $customer, \App\Services\CustomerMergeService $merger)
+    {
+        $this->authorize('update', $customer);
+        $user = $request->user();
+
+        $suggestions = $this->service->findDuplicates($customer->email, $customer->phone, $customer->id)
+            ->merge(Customer::visibleTo($user)->whereKeyNot($customer->id)->where('name', $customer->name)->limit(10)->get())
+            ->unique('id')->filter(fn ($c) => $user->can('delete', $c))->values();
+        $results = $request->filled('q')
+            ? Customer::visibleTo($user)->whereKeyNot($customer->id)
+                ->where(fn ($w) => $w->where('name', 'like', $this->like($request->q))->orWhere('code', 'like', $this->like($request->q))
+                    ->orWhere('email', 'like', $this->like($request->q))->orWhere('phone', 'like', $this->like($request->q)))
+                ->limit(15)->get()->filter(fn ($c) => $user->can('delete', $c))->values()
+            : collect();
+
+        $other = null;
+        $preview = null;
+        if ($request->filled('with')) {
+            $other = Customer::visibleTo($user)->whereKeyNot($customer->id)->findOrFail($request->integer('with'));
+            $this->authorize('delete', $other);
+            $preview = $merger->preview($other);
+        }
+
+        return view('customers.merge', compact('customer', 'suggestions', 'results', 'other', 'preview'));
+    }
+
+    public function merge(Request $request, Customer $customer, \App\Services\CustomerMergeService $merger)
+    {
+        $this->authorize('update', $customer);
+        $request->validate(['merge_id' => ['required', 'integer'], 'confirm' => ['accepted']], [], ['confirm' => __('Xác nhận')]);
+        $other = Customer::visibleTo($request->user())->whereKeyNot($customer->id)->findOrFail($request->integer('merge_id'));
+        $this->authorize('delete', $other);
+
+        $result = $merger->merge($customer, $other, $request->user());
+        $total = array_sum($result['moved']);
+
+        return redirect()->route('customers.show', $customer)
+            ->with('success', __('Đã gộp :from vào :to: chuyển :count bản ghi liên quan. Bản :from đã được lưu trữ.', ['from' => $other->code, 'to' => $customer->code, 'count' => $total]));
+    }
+
+    public function addAttachment(Request $request, Customer $customer, \App\Services\UploadService $uploads)
+    {
+        $this->authorize('update', $customer);
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:'.config('crm.attachment_mimes'), 'max:'.config('crm.attachment_max_kb')],
+        ], [], ['file' => __('Tệp đính kèm')]);
+        $attachment = $uploads->attach($customer, $request->file('file'));
+        ActivityLogger::log('updated', $customer, 'Tải lên tệp đính kèm: '.$attachment->original_name);
+
+        return back()->with('success', __('Đã tải lên tệp đính kèm.'));
+    }
+
+    public function downloadAttachment(Customer $customer, \App\Models\Attachment $attachment)
+    {
+        $this->authorize('view', $customer);
+        abort_unless($attachment->attachable_type === 'customer' && (int) $attachment->attachable_id === (int) $customer->id, 404);
+        abort_unless(\Illuminate\Support\Facades\Storage::disk('local')->exists($attachment->path), 404, __('Tệp không còn tồn tại.'));
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($attachment->path, $attachment->original_name);
+    }
+
+    public function deleteAttachment(Customer $customer, \App\Models\Attachment $attachment)
+    {
+        $this->authorize('update', $customer);
+        abort_unless($attachment->attachable_type === 'customer' && (int) $attachment->attachable_id === (int) $customer->id, 404);
+        $attachment->delete();
+        ActivityLogger::log('updated', $customer, 'Xóa tệp đính kèm: '.$attachment->original_name);
+
+        return back()->with('success', __('Đã xóa tệp đính kèm.'));
     }
 
     public function importForm()
@@ -207,7 +300,7 @@ class CustomerController extends Controller
     {
         $this->authorize('create', Customer::class);
         $csv = "\xEF\xBB\xBF".implode(',', CustomerImportService::TEMPLATE_HEADINGS)."\n"
-            ."Nguyễn Văn A,0901234567,nguyenvana@example.com,\"12 Lê Lợi, Q.1, TP.HCM\",Công ty ABC,business,Website,active\n";
+            ."Nguyễn Văn A,0901234567,nguyenvana@example.com,\"12 Lê Lợi, Q.1, TP.HCM\",VN,Công ty ABC,business,Website,active,sme,new,phone,yes,Form website\n";
 
         return response($csv, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -218,7 +311,7 @@ class CustomerController extends Controller
     public function import(Request $request, CustomerImportService $importer)
     {
         $this->authorize('create', Customer::class);
-        $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:5120']], [], ['file' => __('Tệp CSV')]);
+        $request->validate(['file' => ['required', 'file', 'mimes:csv,txt,xlsx', 'max:5120']], [], ['file' => __('Tệp CSV / Excel')]);
 
         $result = $importer->import($request->file('file'), $request->user());
 
@@ -228,7 +321,8 @@ class CustomerController extends Controller
 
     private function formData(): array
     {
-        return ['users' => Lookup::users(), 'sources' => Lookup::sources(), 'tags' => Lookup::tags()];
+        return ['users' => Lookup::users(), 'sources' => Lookup::sources(), 'tags' => Lookup::tags(),
+            'customFields' => \App\Models\CustomFieldDefinition::for('customer')->active()->get()];
     }
 
     /** Người không có quyền phân công không được tự đổi người phụ trách. */

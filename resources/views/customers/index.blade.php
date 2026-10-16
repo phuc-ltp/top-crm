@@ -12,7 +12,7 @@
             </div>
         @endcan
         @can('create', App\Models\Customer::class)
-            <a href="{{ route('customers.import') }}" class="btn btn-light"><i class="bi bi-upload me-1"></i>{{ __('Nhập CSV') }}</a>
+            <a href="{{ route('customers.import') }}" class="btn btn-light"><i class="bi bi-upload me-1"></i>{{ __('Nhập CSV / Excel') }}</a>
             <a href="{{ route('customers.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Thêm khách hàng') }}</a>
         @endcan
     </x-page-header>
@@ -41,8 +41,26 @@
                 @foreach ($tags as $id => $name)<option value="{{ $id }}" @selected(request('tag') == $id)>{{ $name }}</option>@endforeach
             </select>
             <select name="archived" class="form-select"><option value="">{{ __('Đang hoạt động') }}</option><option value="1" @selected(request('archived') === '1')>{{ __('Đã lưu trữ') }}</option></select>
+            @php($advanced = request()->hasAny(['segment', 'lifecycle', 'country', 'consent', 'created_from', 'created_to']))
+            <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#advFilters" aria-expanded="{{ $advanced ? 'true' : 'false' }}"><i class="bi bi-sliders me-1"></i>{{ __('Lọc nâng cao') }}</button>
             <button class="btn btn-soft-primary"><i class="bi bi-funnel me-1"></i>{{ __('Lọc') }}</button>
-            @if (request()->hasAny(['q', 'status', 'type', 'source', 'assigned_to', 'tag', 'archived']))
+            <div class="collapse w-100 {{ $advanced ? 'show' : '' }}" id="advFilters">
+                <div class="d-flex flex-wrap gap-2 pt-1">
+                    <select name="segment" class="form-select" aria-label="{{ __('Phân khúc') }}"><option value="">{{ __('Mọi phân khúc') }}</option>
+                        @foreach (App\Models\Customer::SEGMENTS as $k => $s)<option value="{{ $k }}" @selected(request('segment') === $k)>{{ __($s[0]) }}</option>@endforeach</select>
+                    <select name="lifecycle" class="form-select" aria-label="{{ __('Giai đoạn vòng đời') }}"><option value="">{{ __('Mọi giai đoạn vòng đời') }}</option>
+                        @foreach (App\Models\Customer::LIFECYCLE_STAGES as $k => $s)<option value="{{ $k }}" @selected(request('lifecycle') === $k)>{{ __($s[0]) }}</option>@endforeach</select>
+                    <select name="country" class="form-select" aria-label="{{ __('Quốc gia') }}"><option value="">{{ __('Mọi quốc gia') }}</option>
+                        @foreach (country_options() as $k => $name)<option value="{{ $k }}" @selected(request('country') === $k)>{{ $name }}</option>@endforeach</select>
+                    <select name="consent" class="form-select" aria-label="{{ __('Đồng ý marketing') }}"><option value="">{{ __('Đồng ý marketing: tất cả') }}</option>
+                        <option value="1" @selected(request('consent') === '1')>{{ __('Đã đồng ý marketing') }}</option><option value="0" @selected(request('consent') === '0')>{{ __('Chưa đồng ý marketing') }}</option></select>
+                    <div class="input-group" style="max-width: 340px"><span class="input-group-text small">{{ __('Tạo từ') }}</span>
+                        <input type="date" name="created_from" value="{{ request('created_from') }}" class="form-control" aria-label="{{ __('Tạo từ ngày') }}">
+                        <span class="input-group-text small">{{ __('đến') }}</span>
+                        <input type="date" name="created_to" value="{{ request('created_to') }}" class="form-control" aria-label="{{ __('Đến ngày') }}"></div>
+                </div>
+            </div>
+            @if (request()->hasAny(['q', 'status', 'type', 'source', 'assigned_to', 'tag', 'archived', 'segment', 'lifecycle', 'country', 'consent', 'created_from', 'created_to']))
                 <a href="{{ route('customers.index') }}" class="btn btn-link text-muted">{{ __('Xóa lọc') }}</a>
             @endif
         </form>
