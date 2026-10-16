@@ -48,10 +48,29 @@ class CustomerService
             ->get(['id', 'code', 'name', 'email', 'phone', 'assigned_to']);
     }
 
+    /**
+     * Gộp giá trị trường tùy biến: chỉ nhận khóa của trường đang hiển thị (chuẩn hóa theo kiểu),
+     * giữ nguyên giá trị của trường đang ẩn / đã xóa.
+     */
+    public function mergeCustomFields(Customer $customer, array $input): array
+    {
+        $values = (array) ($customer->custom_fields ?? []);
+        foreach (\App\Models\CustomFieldDefinition::for('customer')->active()->get() as $field) {
+            if (array_key_exists($field->key, $input) || $field->type === 'checkbox') {
+                $values[$field->key] = $field->normalize($input[$field->key] ?? null);
+            }
+        }
+
+        return $values;
+    }
+
     public function save(Customer $customer, array $data, User $actor): Customer
     {
         $tags = $data['tags'] ?? null;
-        unset($data['tags'], $data['confirm_duplicate']);
+        if (array_key_exists('custom', $data)) {
+            $data['custom_fields'] = $this->mergeCustomFields($customer, (array) $data['custom']);
+        }
+        unset($data['tags'], $data['confirm_duplicate'], $data['custom']);
         $data['phone'] = self::normalizePhone($data['phone'] ?? null);
         $data['email'] = isset($data['email']) ? mb_strtolower(trim($data['email'])) : null;
 

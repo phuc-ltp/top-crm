@@ -15,4 +15,17 @@ return [
         'vi' => 'Tiếng Việt',
         'en' => 'English',
     ],
+
+    // Quốc gia của khách hàng: mã ISO 3166-1 alpha-2 => [tên tiếng Việt, tên tiếng Anh]
+    'countries' => [
+        'VN' => ['Việt Nam', 'Vietnam'], 'LA' => ['Lào', 'Laos'], 'KH' => ['Campuchia', 'Cambodia'],
+        'TH' => ['Thái Lan', 'Thailand'], 'MY' => ['Malaysia', 'Malaysia'], 'SG' => ['Singapore', 'Singapore'],
+        'ID' => ['Indonesia', 'Indonesia'], 'PH' => ['Philippines', 'Philippines'], 'MM' => ['Myanmar', 'Myanmar'],
+        'CN' => ['Trung Quốc', 'China'], 'HK' => ['Hồng Kông', 'Hong Kong'], 'TW' => ['Đài Loan', 'Taiwan'],
+        'JP' => ['Nhật Bản', 'Japan'], 'KR' => ['Hàn Quốc', 'South Korea'], 'IN' => ['Ấn Độ', 'India'],
+        'AU' => ['Úc', 'Australia'], 'NZ' => ['New Zealand', 'New Zealand'], 'US' => ['Hoa Kỳ', 'United States'],
+        'CA' => ['Canada', 'Canada'], 'GB' => ['Vương quốc Anh', 'United Kingdom'], 'FR' => ['Pháp', 'France'],
+        'DE' => ['Đức', 'Germany'], 'NL' => ['Hà Lan', 'Netherlands'], 'IT' => ['Ý', 'Italy'],
+        'ES' => ['Tây Ban Nha', 'Spain'], 'RU' => ['Nga', 'Russia'], 'AE' => ['Các Tiểu vương quốc Ả Rập Thống nhất', 'United Arab Emirates'],
+    ],
 ];

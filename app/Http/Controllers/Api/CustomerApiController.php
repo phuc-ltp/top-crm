@@ -18,6 +18,9 @@ class CustomerApiController extends ApiController
             'address' => $c->address, 'company' => $c->company, 'type' => $c->type, 'status' => $c->status,
             'source' => $c->source?->name, 'assigned_to' => $c->assignee ? ['id' => $c->assignee->id, 'name' => $c->assignee->name] : null,
             'tags' => $c->relationLoaded('tags') ? $c->tags->pluck('name') : [],
+            'country' => $c->country, 'segment' => $c->segment, 'lifecycle_stage' => $c->lifecycle_stage,
+            'preferred_channel' => $c->preferred_channel, 'marketing_consent' => $c->marketing_consent,
+            'custom_fields' => (object) ($c->custom_fields ?? []),
             'created_at' => $c->created_at?->toIso8601String(), 'updated_at' => $c->updated_at?->toIso8601String(),
         ];
     }

@@ -137,6 +137,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers/import/template', [CustomerController::class, 'importTemplate'])->name('customers.import.template');
     Route::get('/customers/check-duplicate', [CustomerController::class, 'checkDuplicate'])->name('customers.check-duplicate');
     Route::post('/customers/bulk-assign', [CustomerController::class, 'bulkAssign'])->name('customers.bulk-assign');
+    Route::post('/customers/{customer}/attachments', [CustomerController::class, 'addAttachment'])->name('customers.attachments.store')->middleware('throttle:30,1');
+    Route::get('/customers/{customer}/attachments/{attachment}', [CustomerController::class, 'downloadAttachment'])->name('customers.attachments.download');
+    Route::delete('/customers/{customer}/attachments/{attachment}', [CustomerController::class, 'deleteAttachment'])->name('customers.attachments.destroy');
+    Route::get('/customers/{customer}/merge', [CustomerController::class, 'mergeForm'])->name('customers.merge');
+    Route::post('/customers/{customer}/merge', [CustomerController::class, 'merge'])->name('customers.merge.store')->middleware('throttle:20,1');
     Route::resource('customers', CustomerController::class);
 
     Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
@@ -227,6 +232,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/settings/branding', [SettingController::class, 'branding'])->name('settings.branding');
+    Route::get('/settings/custom-fields', [\App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');
+    Route::post('/settings/custom-fields', [\App\Http\Controllers\CustomFieldController::class, 'store'])->name('settings.custom-fields.store');
+    Route::put('/settings/custom-fields/{field}', [\App\Http\Controllers\CustomFieldController::class, 'update'])->name('settings.custom-fields.update');
+    Route::delete('/settings/custom-fields/{field}', [\App\Http\Controllers\CustomFieldController::class, 'destroy'])->name('settings.custom-fields.destroy');
     Route::get('/design-system', function () {
         abort_unless(auth()->user()->can('settings.manage'), 403);
 

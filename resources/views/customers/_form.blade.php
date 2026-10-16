@@ -31,6 +31,56 @@
                 </div>
             </div>
         </div>
+        @if (($customFields ?? collect())->isNotEmpty())
+            <div class="card mb-4">
+                <div class="card-header"><span>{{ __('Thông tin bổ sung') }}</span>
+                    @can('settings.manage')<a href="{{ route('settings.custom-fields') }}" class="small">{{ __('Quản lý trường') }}</a>@endcan</div>
+                <div class="card-body"><div class="row">
+                    @foreach ($customFields as $f)
+                        @php($val = old('custom.'.$f->key, $customer->custom_fields[$f->key] ?? null))
+                        @switch($f->type)
+                            @case('textarea')
+                                <x-textarea :name="'custom['.$f->key.']'" :id="'cf_'.$f->key" :label="$f->label" :value="$val" rows="3" maxlength="2000" :required="$f->is_required" col="col-12 mb-3" />
+                                @break
+                            @case('select')
+                                <x-select :name="'custom['.$f->key.']'" :id="'cf_'.$f->key" :label="$f->label" :options="array_combine($f->options ?? [], $f->options ?? [])" :value="$val" :required="$f->is_required" :translate="false" :placeholder="__('— Chọn —')" col="col-md-6 mb-3" />
+                                @break
+                            @case('checkbox')
+                                <div class="col-md-6 mb-3 d-flex align-items-end"><div class="form-check form-switch">
+                                    <input type="hidden" name="custom[{{ $f->key }}]" value="0">
+                                    <input class="form-check-input" type="checkbox" role="switch" name="custom[{{ $f->key }}]" value="1" id="cf_{{ $f->key }}" @checked((bool) $val)>
+                                    <label class="form-check-label" for="cf_{{ $f->key }}">{{ $f->label }}</label></div></div>
+                                @break
+                            @default
+                                <x-input :name="'custom['.$f->key.']'" :id="'cf_'.$f->key" :type="['number' => 'number', 'date' => 'date'][$f->type] ?? 'text'" :label="$f->label" :value="$val" :required="$f->is_required"
+                                         :step="$f->type === 'number' ? 'any' : null" :maxlength="$f->type === 'text' ? 255 : null" col="col-md-6 mb-3" />
+                        @endswitch
+                    @endforeach
+                </div></div>
+            </div>
+        @endif
+        <div class="card mb-4">
+            <div class="card-header">{{ __('Hồ sơ & liên lạc') }}</div>
+            <div class="card-body">
+                <div class="row">
+                    <x-select name="country" :label="__('Quốc gia')" :options="country_options()" :value="$customer->country" :placeholder="__('— Chưa xác định —')" col="col-md-6 mb-3" />
+                    <x-select name="preferred_channel" :label="__('Kênh liên lạc ưa thích')" :options="collect(App\Models\Customer::CHANNELS)->map(fn ($l) => __($l))->all()" :value="$customer->preferred_channel" :placeholder="__('— Chưa xác định —')" col="col-md-6 mb-3" />
+                    <x-select name="segment" :label="__('Phân khúc')" :options="App\Models\Customer::SEGMENTS" :value="$customer->segment" :placeholder="__('— Chưa xác định —')" col="col-md-6 mb-3" />
+                    <x-select name="lifecycle_stage" :label="__('Giai đoạn vòng đời')" :options="App\Models\Customer::LIFECYCLE_STAGES" :value="$customer->lifecycle_stage" :placeholder="__('— Chưa xác định —')" col="col-md-6 mb-3" />
+                    <div class="col-12">
+                        <div class="p-3 rounded-3 bg-body-tertiary">
+                            <input type="hidden" name="marketing_consent" value="0">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" role="switch" name="marketing_consent" value="1" id="marketing_consent" @checked(old('marketing_consent', $customer->marketing_consent))>
+                                <label class="form-check-label fw-semibold" for="marketing_consent">{{ __('Khách hàng đồng ý nhận thông tin marketing') }}</label>
+                            </div>
+                            <x-input name="marketing_consent_source" :label="__('Nguồn đồng ý')" :value="$customer->marketing_consent_source" maxlength="100" col="mb-1" :placeholder="__('VD: Form website, Ký hợp đồng, Đồng ý qua điện thoại')" />
+                            <div class="form-text">{{ __('Chỉ bật khi khách đã đồng ý rõ ràng. Thời điểm đồng ý / rút lại được hệ thống tự ghi.') }}@if ($customer->marketing_consent_at) {{ __('Lần thay đổi gần nhất: :time.', ['time' => vn_date($customer->marketing_consent_at, true)]) }}@endif</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="col-lg-4">
         <div class="card mb-4">

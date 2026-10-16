@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
         // {user} trên route chỉ tìm trong thành viên của tổ chức đang làm việc (ngoài tổ chức → 404)
         \Illuminate\Support\Facades\Route::bind('user', fn ($value) => \App\Models\User::inOrganization(null, false)->findOrFail($value));
+        // {field} = trường tùy biến của tổ chức đang làm việc (global scope tổ chức → khác tổ chức = 404)
+        \Illuminate\Support\Facades\Route::model('field', \App\Models\CustomFieldDefinition::class);
 
         // Tên ngắn cho quan hệ đa hình (lưu trong DB thay vì tên class đầy đủ)
         Relation::morphMap([
@@ -45,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             'campaign' => \App\Models\Campaign::class,
             'ticket' => \App\Models\SupportTicket::class,
             'department' => \App\Models\Department::class,
+            'custom_field' => \App\Models\CustomFieldDefinition::class,
         ]);
 
         // Khu vực quản trị nền tảng (danh sách tổ chức...) — chỉ quản trị nền tảng

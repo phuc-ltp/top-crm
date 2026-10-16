@@ -131,7 +131,7 @@ class LocaleTest extends TestCase
                 }
             }
         };
-        $skip = ['DEFAULTS', 'TIMEZONES', 'DATE_FORMATS', 'ROLES', 'ALIASES', 'SCOPE_PERMISSIONS', 'ORGANIZATION_KEYS', 'SUBJECTS'];
+        $skip = ['DEFAULTS', 'TIMEZONES', 'DATE_FORMATS', 'ROLES', 'ALIASES', 'SCOPE_PERMISSIONS', 'ORGANIZATION_KEYS', 'SUBJECTS', 'ENTITIES'];
         $classes = array_map(fn ($f) => 'App\\Models\\'.basename($f, '.php'), glob(app_path('Models/*.php')));
         $classes = array_merge($classes, [\App\Support\PermissionCatalog::class, \App\Services\ReportService::class, \App\Http\Controllers\SettingController::class]);
         foreach ($classes as $class) {

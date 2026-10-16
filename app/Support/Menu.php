@@ -57,6 +57,7 @@ class Menu
                 ]],
                 ['Hệ thống', 'bi-gear-fill', null, null, null, [
                     ['Cài đặt tổ chức', null, 'settings.edit', 'settings.manage', 'settings.edit'],
+                    ['Trường tùy biến', null, 'settings.custom-fields', 'settings.manage', 'settings.custom-fields*'],
                     ['Đăng nhập & thương hiệu', null, 'settings.branding', 'platform', 'settings.branding'],
                     ['Nhật ký hoạt động', null, 'activity-logs.index', 'activity_logs.view', 'activity-logs.*'],
                     ['Design System', null, 'design-system', 'settings.manage', 'design-system'],

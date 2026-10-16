@@ -33,6 +33,27 @@ if (! function_exists('money_short')) {
     }
 }
 
+if (! function_exists('country_options')) {
+    /** Danh sách quốc gia [mã => tên] theo ngôn ngữ giao diện, sắp theo tên (Việt Nam luôn đứng đầu). */
+    function country_options(): array
+    {
+        $i = app()->getLocale() === 'en' ? 1 : 0;
+        $list = array_map(fn ($names) => $names[$i], config('crm.countries', []));
+        $vn = ['VN' => $list['VN'] ?? 'Việt Nam'];
+        unset($list['VN']);
+        asort($list);
+
+        return $vn + $list;
+    }
+}
+
+if (! function_exists('country_name')) {
+    function country_name(?string $code): string
+    {
+        return $code ? (country_options()[strtoupper($code)] ?? strtoupper($code)) : '—';
+    }
+}
+
 if (! function_exists('crm_timezone')) {
     /** Múi giờ hiển thị của tổ chức đang làm việc (chỉ chấp nhận giá trị trong danh sách cho phép). */
     function crm_timezone(): string
