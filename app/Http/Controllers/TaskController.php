@@ -52,6 +52,21 @@ class TaskController extends Controller
         return view('tasks.index', ['tasks' => $tasks, 'counts' => $counts, 'users' => Lookup::users()]);
     }
 
+    /** Xuất công việc theo bộ lọc đang xem — chỉ những việc người dùng được xem (không có quyền xuất riêng). */
+    public function export(Request $request, \App\Services\ExportService $exporter)
+    {
+        $this->authorize('viewAny', Task::class);
+        $rows = $this->filtered($request)->orderBy('due_date')->limit(20000)->get()->map(fn (Task $t) => [
+            $t->title, label_of(Task::STATUSES, $t->status), label_of(Task::PRIORITIES, $t->priority),
+            $t->due_date ? vn_date($t->due_date, true) : '', $t->completed_at ? vn_date($t->completed_at, true) : '',
+            $t->assignee?->name, vn_date($t->created_at),
+        ]);
+        \App\Services\ActivityLogger::log('exported', null, 'Xuất danh sách công việc ('.$rows->count().' dòng)');
+
+        return $exporter->download('cong_viec', [__('Tiêu đề'), __('Trạng thái'), __('Mức ưu tiên'), __('Hạn chót'), __('Hoàn thành lúc'), __('Người phụ trách'), __('Ngày tạo')],
+            $rows, $request->input('format', 'xlsx'));
+    }
+
     public function calendar(Request $request)
     {
         $this->authorize('viewAny', Task::class);

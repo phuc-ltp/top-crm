@@ -154,10 +154,16 @@ Route::middleware('auth')->group(function () {
     Route::resource('customers', CustomerController::class);
 
     Route::get('/contacts/export', [ContactController::class, 'export'])->name('contacts.export');
+    Route::get('/contacts/import', [\App\Http\Controllers\ImportController::class, 'form'])->defaults('module', 'contacts')->name('contacts.import');
+    Route::post('/contacts/import', [\App\Http\Controllers\ImportController::class, 'store'])->defaults('module', 'contacts')->name('contacts.import.store');
+    Route::get('/contacts/import/template', [\App\Http\Controllers\ImportController::class, 'template'])->defaults('module', 'contacts')->name('contacts.import.template');
     Route::resource('contacts', ContactController::class);
 
     // Leads
     Route::get('/leads/export', [LeadController::class, 'export'])->name('leads.export');
+    Route::get('/leads/import', [\App\Http\Controllers\ImportController::class, 'form'])->defaults('module', 'leads')->name('leads.import');
+    Route::post('/leads/import', [\App\Http\Controllers\ImportController::class, 'store'])->defaults('module', 'leads')->name('leads.import.store');
+    Route::get('/leads/import/template', [\App\Http\Controllers\ImportController::class, 'template'])->defaults('module', 'leads')->name('leads.import.template');
     Route::get('/leads/{lead}/convert', [LeadController::class, 'convertForm'])->name('leads.convert');
     Route::post('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert.store');
     Route::get('/leads/analytics', [\App\Http\Controllers\LeadAnalyticsController::class, 'index'])->name('leads.analytics');
@@ -175,6 +181,7 @@ Route::middleware('auth')->group(function () {
 
     // Công việc
     Route::get('/tasks/calendar', [TaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::get('/tasks/export', [TaskController::class, 'export'])->name('tasks.export');
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.status');
     Route::post('/tasks/{task}/checklist', [TaskController::class, 'addChecklist'])->name('tasks.checklist.store');
     Route::patch('/tasks/{task}/checklist/{item}', [TaskController::class, 'toggleChecklist'])->name('tasks.checklist.toggle');
@@ -187,6 +194,9 @@ Route::middleware('auth')->group(function () {
 
     // Sản phẩm
     Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
+    Route::get('/products/import', [\App\Http\Controllers\ImportController::class, 'form'])->defaults('module', 'products')->name('products.import');
+    Route::post('/products/import', [\App\Http\Controllers\ImportController::class, 'store'])->defaults('module', 'products')->name('products.import.store');
+    Route::get('/products/import/template', [\App\Http\Controllers\ImportController::class, 'template'])->defaults('module', 'products')->name('products.import.template');
     Route::resource('products', ProductController::class);
 
     // Bán hàng

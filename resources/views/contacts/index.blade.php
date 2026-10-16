@@ -6,6 +6,7 @@
             <a href="{{ route('contacts.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>
         @endcan
         @can('create', App\Models\Contact::class)
+            <a href="{{ route('contacts.import') }}" class="btn btn-light"><i class="bi bi-upload me-1"></i>{{ __('Nhập CSV / Excel') }}</a>
             <a href="{{ route('contacts.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Thêm người liên hệ') }}</a>
         @endcan
     </x-page-header>

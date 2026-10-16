@@ -10,6 +10,7 @@
             <a href="{{ route('leads.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>
         @endcan
         @can('create', App\Models\Lead::class)
+            <a href="{{ route('leads.import') }}" class="btn btn-light"><i class="bi bi-upload me-1"></i>{{ __('Nhập CSV / Excel') }}</a>
             <a href="{{ route('leads.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Tạo lead') }}</a>
         @endcan
     </x-page-header>
