@@ -27,6 +27,11 @@ class LeadController extends Controller
             ->when($request->filled('source'), fn ($q) => $q->where('lead_source_id', $request->source))
             ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->assigned_to))
             ->when($request->filled('campaign'), fn ($q) => $q->whereHas('campaigns', fn ($c) => $c->where('campaigns.id', $request->campaign)))
+            // Theo dõi tiếp = hoạt động đã lên lịch sớm nhất của lead
+            ->withMin(['interactions as next_follow_up' => fn ($q) => $q->where('status', 'planned')], 'scheduled_at')
+            ->when($request->follow_up === 'overdue', fn ($q) => $q->whereHas('interactions', fn ($i) => $i->where('status', 'planned')->where('scheduled_at', '<', now())))
+            ->when($request->follow_up === 'today', fn ($q) => $q->whereHas('interactions', fn ($i) => $i->where('status', 'planned')->whereBetween('scheduled_at', [now()->startOfDay(), now()->endOfDay()])))
+            ->when($request->follow_up === 'none', fn ($q) => $q->whereIn('status', Lead::openStatuses())->whereDoesntHave('interactions', fn ($i) => $i->where('status', 'planned')))
             ->when($request->filled('score'), fn ($q) => match ($request->score) {
                 'hot' => $q->where('score', '>=', 70), 'warm' => $q->whereBetween('score', [40, 69]), 'cold' => $q->where('score', '<', 40), default => $q,
             });
@@ -59,6 +64,13 @@ class LeadController extends Controller
     {
         $this->authorize('create', Lead::class);
         $data = $this->guardAssignment($request, $request->validated());
+        if (! $request->boolean('confirm_duplicate')) {
+            $dups = $this->service->findDuplicates($data['email'] ?? null, $data['phone'] ?? null);
+            if ($dups['leads']->isNotEmpty() || $dups['customers']->isNotEmpty()) {
+                return back()->withInput()->with('lead_duplicates', $dups)
+                    ->with('warning', __('Phát hiện lead hoặc khách hàng có thể bị trùng. Kiểm tra lại hoặc chọn "Vẫn lưu lead này".'));
+            }
+        }
         $lead = $this->service->save(new Lead, $data, $request->user(), $request->boolean('auto_score', true));
 
         return redirect()->route('leads.show', $lead)->with('success', __('Đã tạo lead :name (điểm: :score).', ['name' => $lead->name, 'score' => $lead->score]));
@@ -68,7 +80,7 @@ class LeadController extends Controller
     {
         $this->authorize('view', $lead);
         $user = request()->user();
-        $lead->load(['assignee', 'creator', 'source',
+        $lead->load(['assignee', 'creator', 'source', 'lostReason',
             'campaigns' => fn ($q) => $this->onlyVisible($q, 'campaigns', $user),
             'convertedCustomer' => fn ($q) => $this->onlyVisible($q, 'customers', $user),
             'convertedOpportunity' => fn ($q) => $this->onlyVisible($q, 'opportunities', $user)]);
@@ -80,7 +92,7 @@ class LeadController extends Controller
     {
         $this->authorize('update', $lead);
 
-        return view('leads.form', $this->formData() + ['lead' => $lead->load('campaigns')]);
+        return view('leads.form', $this->formData() + ['lead' => $lead->load('campaigns', 'lostReason')]);
     }
 
     public function update(LeadRequest $request, Lead $lead)
@@ -148,7 +160,7 @@ class LeadController extends Controller
     {
         $this->authorize('export', Lead::class);
         $rows = $this->filtered($request)->orderBy('id')->limit(20000)->get()->map(fn (Lead $l) => [
-            $l->code, $l->name, $l->company, $l->email, $l->phone, $l->source?->label, label_of(Lead::STATUSES, $l->status),
+            $l->code, $l->name, $l->company, $l->email, $l->phone, $l->source?->label, label_of(Lead::statuses(), $l->status),
             $l->score, (float) $l->estimated_value, $l->assignee?->name, vn_date($l->created_at), vn_date($l->converted_at),
         ]);
 
@@ -158,7 +170,8 @@ class LeadController extends Controller
 
     private function formData(): array
     {
-        return ['users' => Lookup::users(), 'sources' => Lookup::sources(), 'campaigns' => Lookup::campaigns()];
+        return ['users' => Lookup::users(), 'sources' => Lookup::sources(), 'campaigns' => Lookup::campaigns(),
+            'lostReasons' => \App\Models\LostReason::forLeads()->pluck('name', 'id')->all()];
     }
 
     private function guardAssignment(Request $request, array $data, ?Lead $existing = null): array

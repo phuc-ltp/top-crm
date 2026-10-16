@@ -29,8 +29,17 @@ class LeadService
         $value = (float) $lead->estimated_value;
         $score += $value >= 100_000_000 ? 25 : ($value >= 30_000_000 ? 15 : ($value > 0 ? 5 : 0));
 
-        $score += match ($lead->status) {
-            'contacted' => 10, 'qualified' => 25, 'proposal', 'converted' => 35, default => 0,
+        // Giai đoạn (tối đa 35): theo tiến độ trong các giai đoạn đang mở; giai đoạn "đủ điều kiện" ít nhất 25; đã chuyển đổi 35
+        $open = Lead::openStatuses();
+        $index = array_search($lead->status, $open, true);
+        // Giai đoạn mặc định giữ đúng điểm như trước (điểm lead hiện có không đổi); giai đoạn tự thêm tính theo tiến độ
+        $legacy = ['new' => 0, 'contacted' => 10, 'qualified' => 25, 'proposal' => 35];
+        $score += match (true) {
+            $lead->status === \App\Models\LeadStage::CONVERTED => 35,
+            isset($legacy[$lead->status]) => $legacy[$lead->status],
+            $index === false => 0,
+            default => max(app(\App\Support\LeadStages::class)->isQualified($lead->status) ? 25 : 0,
+                count($open) > 1 ? (int) round(35 * $index / (count($open) - 1)) : 0),
         };
 
         if ($lead->source && mb_strtolower($lead->source->name) === 'giới thiệu') {
@@ -44,10 +53,36 @@ class LeadService
         return min(100, $score);
     }
 
+    /** Lead / khách hàng đã có cùng email hoặc số điện thoại (trong tổ chức đang làm việc). */
+    public function findDuplicates(?string $email, ?string $phone, ?int $exceptLeadId = null): array
+    {
+        $email = $email ? mb_strtolower(trim($email)) : null;
+        $phone = CustomerService::normalizePhone($phone);
+        if (! $email && ! $phone) {
+            return ['leads' => collect(), 'customers' => collect()];
+        }
+        $match = function ($q) use ($email, $phone) {
+            $q->where(function ($w) use ($email, $phone) {
+                if ($email) {
+                    $w->orWhereRaw('LOWER(email) = ?', [$email]);
+                }
+                if ($phone) {
+                    $w->orWhere('phone', $phone);
+                }
+            });
+        };
+
+        return [
+            'leads' => Lead::query()->when($exceptLeadId, fn ($q) => $q->whereKeyNot($exceptLeadId))->tap($match)->with('assignee:id,name')->limit(5)->get(),
+            'customers' => Customer::query()->tap($match)->with('assignee:id,name')->limit(5)->get(),
+        ];
+    }
+
     public function save(Lead $lead, array $data, User $actor, bool $autoScore = true): Lead
     {
         $campaignIds = $data['campaign_ids'] ?? null;
-        unset($data['campaign_ids'], $data['auto_score']);
+        $followUpAt = $data['follow_up_at'] ?? null;
+        unset($data['campaign_ids'], $data['auto_score'], $data['follow_up_at'], $data['confirm_duplicate']);
         if (array_key_exists('score', $data)) {
             $data['score'] = (int) ($data['score'] ?? 0);
         }
@@ -56,7 +91,7 @@ class LeadService
         }
         $previousAssignee = $lead->assigned_to;
 
-        $lead = DB::transaction(function () use ($lead, $data, $actor, $autoScore, $campaignIds) {
+        $lead = DB::transaction(function () use ($lead, $data, $actor, $autoScore, $campaignIds, $followUpAt) {
             if (! $lead->exists) {
                 $data['created_by'] = $actor->id;
             }
@@ -67,6 +102,12 @@ class LeadService
             $lead->save();
             if ($campaignIds !== null) {
                 $lead->campaigns()->syncWithPivotValues($campaignIds, ['created_at' => now()]);
+            }
+            if ($followUpAt) {
+                $lead->interactions()->create([
+                    'type' => 'follow_up', 'status' => 'planned', 'subject' => __('Theo dõi lead :name', ['name' => $lead->name]),
+                    'scheduled_at' => $followUpAt, 'user_id' => $actor->id, 'assigned_to' => $lead->assigned_to ?? $actor->id,
+                ]);
             }
 
             return $lead;
@@ -105,6 +146,9 @@ class LeadService
                     'assigned_to' => $lead->assigned_to ?? $actor->id,
                     'notes' => __('Chuyển đổi từ Lead :code', ['code' => $lead->code]).($lead->notes ? "\n".$lead->notes : ''),
                     'is_demo' => $lead->is_demo,
+                    // Đồng ý nhận marketing của lead (VD: tích ở form website) được chuyển sang khách hàng kèm nguồn
+                    'marketing_consent' => $lead->marketing_consent,
+                    'marketing_consent_source' => $lead->marketing_consent ? ($lead->marketing_consent_source ?: __('Lead :code', ['code' => $lead->code])) : null,
                 ], $actor);
             }
 

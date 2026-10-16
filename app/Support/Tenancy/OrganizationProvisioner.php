@@ -62,6 +62,17 @@ class OrganizationProvisioner
             foreach (self::TAGS as [$name, $color]) {
                 Tag::firstOrCreate(['name' => $name], ['color' => $color]);
             }
+            // Giai đoạn lead & lý do thất bại: chỉ tạo khi tổ chức chưa có (không ghi đè cấu hình đã chỉnh)
+            if (! \App\Models\LeadStage::exists()) {
+                foreach (\App\Models\LeadStage::DEFAULTS as $i => [$key, $name, $color, $system, $qualified]) {
+                    \App\Models\LeadStage::create(['key' => $key, 'name' => $name, 'color' => $color, 'position' => $i + 1, 'is_system' => $system, 'is_qualified' => $qualified]);
+                }
+            }
+            if (! \App\Models\LostReason::exists()) {
+                foreach (\App\Models\LostReason::DEFAULTS as $i => $name) {
+                    \App\Models\LostReason::create(['name' => $name, 'applies_to' => 'both', 'position' => $i + 1]);
+                }
+            }
         });
 
         // Cài đặt riêng: tên công ty mặc định = tên tổ chức (không ghi đè nếu tổ chức đã tự đặt)

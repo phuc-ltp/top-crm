@@ -25,7 +25,7 @@ class LeadPipelineTest extends TestCase
         $this->assertSame(10 + 10 + 10 + 25 + 25, $lead->score);
         $this->assertDatabaseHas('notifications', ['notifiable_id' => $staff->id]);
 
-        $this->put(route('leads.update', $lead), ['name' => 'Lead Nóng', 'status' => 'lost', 'auto_score' => 0, 'score' => 5])->assertRedirect();
+        $this->put(route('leads.update', $lead), ['name' => 'Lead Nóng', 'status' => 'lost', 'lost_reason_id' => \App\Models\LostReason::first()->id, 'auto_score' => 0, 'score' => 5])->assertRedirect();
         $this->assertSame(5, $lead->fresh()->score);
 
         // Không được tự đặt trạng thái "converted" qua form

@@ -136,7 +136,7 @@ class ReportService
             $total = $g->count();
             $converted = $g->where('status', 'converted')->count();
 
-            return [isset($sources[$sourceId]) ? __($sources[$sourceId]) : __('Không rõ'), $total, $g->whereIn('status', ['new', 'contacted', 'qualified', 'proposal'])->count(),
+            return [isset($sources[$sourceId]) ? __($sources[$sourceId]) : __('Không rõ'), $total, $g->whereIn('status', Lead::openStatuses())->count(),
                 $converted, $g->where('status', 'lost')->count(), $total ? round($converted / $total * 100, 1).'%' : '0%', (float) $g->sum('estimated_value')];
         })->sortByDesc(1)->values();
 
@@ -145,7 +145,7 @@ class ReportService
 
         return [
             'definition' => __('Lead tạo trong kỳ, nhóm theo nguồn. Tỷ lệ chuyển đổi = lead đã chuyển đổi / tổng lead của nguồn.'),
-            'statuses' => Lead::STATUSES,
+            'statuses' => Lead::statuses(),
             'headings' => [__('Nguồn'), __('Tổng lead'), __('Đang xử lý'), __('Đã chuyển đổi'), __('Thất bại'), __('Tỷ lệ chuyển đổi'), __('Giá trị ước tính')],
             'money_cols' => [6],
             'rows' => $rows->all(),

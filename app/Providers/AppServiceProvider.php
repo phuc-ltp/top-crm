@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Tổ chức đang làm việc — một thể hiện cho mỗi yêu cầu / mỗi job
         $this->app->scoped(\App\Support\Tenancy\CurrentOrganization::class);
+        $this->app->scoped(\App\Support\LeadStages::class);
     }
 
     public function boot(): void
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Route::bind('user', fn ($value) => \App\Models\User::inOrganization(null, false)->findOrFail($value));
         // {field} = trường tùy biến của tổ chức đang làm việc (global scope tổ chức → khác tổ chức = 404)
         \Illuminate\Support\Facades\Route::model('field', \App\Models\CustomFieldDefinition::class);
+        \Illuminate\Support\Facades\Route::model('stage', \App\Models\LeadStage::class);
+        \Illuminate\Support\Facades\Route::model('reason', \App\Models\LostReason::class);
 
         // Tên ngắn cho quan hệ đa hình (lưu trong DB thay vì tên class đầy đủ)
         Relation::morphMap([
@@ -48,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
             'ticket' => \App\Models\SupportTicket::class,
             'department' => \App\Models\Department::class,
             'custom_field' => \App\Models\CustomFieldDefinition::class,
+            'lead_stage' => \App\Models\LeadStage::class,
+            'lost_reason' => \App\Models\LostReason::class,
         ]);
 
         // Khu vực quản trị nền tảng (danh sách tổ chức...) — chỉ quản trị nền tảng

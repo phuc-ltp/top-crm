@@ -46,6 +46,11 @@ class Setting extends Model
         'notify_ticket_new' => '1',
         // Bảo mật: bắt buộc xác thực 2 lớp cho tài khoản quản trị (chỉ quản trị nền tảng đổi được)
         'require_2fa_admins' => '0',
+        'lead_form_enabled' => '0',
+        'lead_form_token' => '',
+        'lead_form_assignee' => '',
+        'lead_form_source' => '',
+        'lead_form_thanks' => '',
     ];
 
     /**
@@ -57,6 +62,8 @@ class Setting extends Model
         'company_name', 'company_email', 'company_phone', 'company_address', 'company_logo', 'brand_color',
         'timezone', 'currency', 'date_format', 'default_tax_rate',
         'notify_lead_assigned', 'notify_task_due', 'notify_deal_stage', 'notify_ticket_new',
+        // Form thu lead từ website (bước 2.4)
+        'lead_form_enabled', 'lead_form_token', 'lead_form_assignee', 'lead_form_source', 'lead_form_thanks',
     ];
 
     private const CACHE_KEY = 'crm.settings';

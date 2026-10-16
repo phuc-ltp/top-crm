@@ -2,6 +2,10 @@
 @section('title', 'Leads')
 @section('content')
     <x-page-header title="Leads" :breadcrumbs="['Leads' => null]" :subtitle="__('Khách hàng tiềm năng — chấm điểm, phân công và chuyển đổi')">
+        <a href="{{ route('leads.analytics') }}" class="btn btn-light"><i class="bi bi-graph-up me-1"></i>{{ __('Phân tích') }}</a>
+        @can('settings.manage')
+            <a href="{{ route('settings.leads') }}" class="btn btn-light"><i class="bi bi-sliders me-1"></i>{{ __('Cấu hình lead') }}</a>
+        @endcan
         @can('export', App\Models\Lead::class)
             <a href="{{ route('leads.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>
         @endcan
@@ -11,7 +15,7 @@
     </x-page-header>
 
     <div class="row g-3 mb-4">
-        @foreach (App\Models\Lead::STATUSES as $key => [$label, $color])
+        @foreach (App\Models\Lead::statuses() as $key => [$label, $color])
             <div class="col-6 col-md-4 col-xl-2">
                 <a href="{{ route('leads.index', ['status' => $key]) }}" class="card card-hover p-3 d-block text-reset {{ request('status') === $key ? 'border-warning' : '' }}">
                     <div class="small text-muted">{{ __($label) }}</div>
@@ -28,7 +32,7 @@
                 <input type="search" name="q" value="{{ request('q') }}" class="form-control" placeholder="{{ __('Tên, mã, email, công ty...') }}">
             </div>
             <select name="status" class="form-select"><option value="">{{ __('Mọi trạng thái') }}</option>
-                @foreach (App\Models\Lead::STATUSES as $k => $s)<option value="{{ $k }}" @selected(request('status') === $k)>{{ __($s[0]) }}</option>@endforeach
+                @foreach (App\Models\Lead::statuses() as $k => $s)<option value="{{ $k }}" @selected(request('status') === $k)>{{ __($s[0]) }}</option>@endforeach
             </select>
             <select name="source" class="form-select"><option value="">{{ __('Mọi nguồn') }}</option>
                 @foreach ($sources as $id => $name)<option value="{{ $id }}" @selected(request('source') == $id)>{{ $name }}</option>@endforeach
@@ -46,8 +50,13 @@
                     @foreach ($users as $id => $name)<option value="{{ $id }}" @selected(request('assigned_to') == $id)>{{ $name }}</option>@endforeach
                 </select>
             @endcan
+            <select name="follow_up" class="form-select" aria-label="{{ __('Theo dõi tiếp') }}"><option value="">{{ __('Mọi lịch theo dõi') }}</option>
+                <option value="overdue" @selected(request('follow_up') === 'overdue')>{{ __('Theo dõi quá hạn') }}</option>
+                <option value="today" @selected(request('follow_up') === 'today')>{{ __('Theo dõi hôm nay') }}</option>
+                <option value="none" @selected(request('follow_up') === 'none')>{{ __('Đang mở, chưa có lịch theo dõi') }}</option>
+            </select>
             <button class="btn btn-soft-primary"><i class="bi bi-funnel me-1"></i>{{ __('Lọc') }}</button>
-            @if (request()->hasAny(['q', 'status', 'source', 'score', 'campaign', 'assigned_to']))<a href="{{ route('leads.index') }}" class="btn btn-link text-muted">{{ __('Xóa lọc') }}</a>@endif
+            @if (request()->hasAny(['q', 'status', 'source', 'score', 'campaign', 'assigned_to', 'follow_up']))<a href="{{ route('leads.index') }}" class="btn btn-link text-muted">{{ __('Xóa lọc') }}</a>@endif
         </form>
 
         @if ($leads->isEmpty())
@@ -61,7 +70,8 @@
                         <th>{{ __('Nguồn') }}</th>
                         <th><x-sort-link column="score" :label="__('Điểm')" /></th>
                         <th class="text-end"><x-sort-link column="estimated_value" :label="__('Giá trị ước tính')" /></th>
-                        <th><x-sort-link column="status" :label="__('Trạng thái')" /></th>
+                        <th><x-sort-link column="status" :label="__('Giai đoạn')" /></th>
+                        <th>{{ __('Theo dõi tiếp') }}</th>
                         <th>{{ __('Phụ trách') }}</th>
                         <th class="text-end">{{ __('Thao tác') }}</th>
                     </tr></thead>
@@ -79,7 +89,9 @@
                                 <span class="badge badge-soft-{{ $l->score_level[1] }} mt-1">{{ $l->score_level[0] }}</span>
                             </td>
                             <td class="text-end small fw-semibold">{{ money($l->estimated_value) }}</td>
-                            <td>{!! badge(App\Models\Lead::STATUSES, $l->status) !!}</td>
+                            <td>{!! badge(App\Models\Lead::statuses(), $l->status) !!}</td>
+                            @php($next = $l->next_follow_up ? \Illuminate\Support\Carbon::parse($l->next_follow_up) : null)
+                            <td class="small text-nowrap {{ $next?->isPast() ? 'text-danger fw-semibold' : '' }}">{{ $next ? vn_date($next, true) : '—' }}</td>
                             <td class="small">{{ $l->assignee?->name ?? '—' }}</td>
                             <td class="table-actions">
                                 @if (! $l->isConverted())

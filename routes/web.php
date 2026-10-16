@@ -37,6 +37,10 @@ Route::get('/dieu-khoan-su-dung', [PageController::class, 'show'])->defaults('sl
 Route::get('/chinh-sach-bao-mat', [PageController::class, 'show'])->defaults('slug', 'privacy')->name('pages.privacy');
 Route::get('/ho-tro', [PageController::class, 'show'])->defaults('slug', 'support')->name('pages.support');
 
+// Form thu lead công khai của từng tổ chức (không cần đăng nhập; chống spam: token, honeypot, thời gian điền, giới hạn tần suất)
+Route::get('/f/{token}', [\App\Http\Controllers\WebLeadFormController::class, 'show'])->name('lead-form.show')->middleware('throttle:60,1');
+Route::post('/f/{token}', [\App\Http\Controllers\WebLeadFormController::class, 'submit'])->name('lead-form.submit')->middleware('throttle:5,1');
+
 // Đổi ngôn ngữ giao diện (khách và người dùng đã đăng nhập)
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update')->middleware('throttle:30,1');
 
@@ -151,6 +155,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/leads/export', [LeadController::class, 'export'])->name('leads.export');
     Route::get('/leads/{lead}/convert', [LeadController::class, 'convertForm'])->name('leads.convert');
     Route::post('/leads/{lead}/convert', [LeadController::class, 'convert'])->name('leads.convert.store');
+    Route::get('/leads/analytics', [\App\Http\Controllers\LeadAnalyticsController::class, 'index'])->name('leads.analytics');
     Route::resource('leads', LeadController::class);
 
     // Pipeline
@@ -233,6 +238,16 @@ Route::middleware('auth')->group(function () {
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/settings/branding', [SettingController::class, 'branding'])->name('settings.branding');
     Route::get('/settings/custom-fields', [\App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');
+    // Cấu hình lead: giai đoạn, lý do thất bại, form website
+    Route::get('/settings/leads', [\App\Http\Controllers\LeadSettingsController::class, 'index'])->name('settings.leads');
+    Route::post('/settings/leads/stages', [\App\Http\Controllers\LeadSettingsController::class, 'storeStage'])->name('settings.leads.stages.store');
+    Route::put('/settings/leads/stages/{stage}', [\App\Http\Controllers\LeadSettingsController::class, 'updateStage'])->name('settings.leads.stages.update');
+    Route::delete('/settings/leads/stages/{stage}', [\App\Http\Controllers\LeadSettingsController::class, 'destroyStage'])->name('settings.leads.stages.destroy');
+    Route::post('/settings/leads/reasons', [\App\Http\Controllers\LeadSettingsController::class, 'storeReason'])->name('settings.leads.reasons.store');
+    Route::put('/settings/leads/reasons/{reason}', [\App\Http\Controllers\LeadSettingsController::class, 'updateReason'])->name('settings.leads.reasons.update');
+    Route::delete('/settings/leads/reasons/{reason}', [\App\Http\Controllers\LeadSettingsController::class, 'destroyReason'])->name('settings.leads.reasons.destroy');
+    Route::put('/settings/leads/form', [\App\Http\Controllers\LeadSettingsController::class, 'updateForm'])->name('settings.leads.form');
+    Route::post('/settings/leads/form/token', [\App\Http\Controllers\LeadSettingsController::class, 'regenerateToken'])->name('settings.leads.form.token');
     Route::post('/settings/custom-fields', [\App\Http\Controllers\CustomFieldController::class, 'store'])->name('settings.custom-fields.store');
     Route::put('/settings/custom-fields/{field}', [\App\Http\Controllers\CustomFieldController::class, 'update'])->name('settings.custom-fields.update');
     Route::delete('/settings/custom-fields/{field}', [\App\Http\Controllers\CustomFieldController::class, 'destroy'])->name('settings.custom-fields.destroy');

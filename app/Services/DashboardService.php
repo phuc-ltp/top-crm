@@ -201,12 +201,15 @@ class DashboardService
     {
         $rows = Lead::visibleTo($this->user)->whereBetween('created_at', [$from, $to])
             ->selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt', 'status');
-        $colors = ['new' => '#0EA5E9', 'contacted' => '#3B82F6', 'qualified' => '#F59E0B', 'proposal' => '#FF6B00', 'converted' => '#16A34A', 'lost' => '#DC2626'];
+        // Màu biểu đồ theo màu badge của từng giai đoạn (tổ chức tự cấu hình)
+        $hex = ['info' => '#0EA5E9', 'primary' => '#3B82F6', 'warning' => '#F59E0B', 'orange' => '#FF6B00', 'success' => '#16A34A',
+            'danger' => '#DC2626', 'purple' => '#8B5CF6', 'secondary' => '#94A3B8'];
+        $stages = Lead::statuses();
 
         return [
-            'labels' => array_map(fn ($s) => $s[0], array_values(Lead::STATUSES)),
-            'counts' => array_map(fn ($k) => (int) ($rows[$k] ?? 0), array_keys(Lead::STATUSES)),
-            'colors' => array_values($colors),
+            'labels' => array_map(fn ($s) => __($s[0]), array_values($stages)),
+            'counts' => array_map(fn ($k) => (int) ($rows[$k] ?? 0), array_keys($stages)),
+            'colors' => array_map(fn ($s) => $hex[$s[1]] ?? '#94A3B8', array_values($stages)),
         ];
     }
 
