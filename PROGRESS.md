@@ -86,3 +86,12 @@
   - **SỰ CỐ 16/10 21:40 (đã khắc phục):** khi thử file SQL vừa tạo, lệnh `USE orangecrm_db` trong file làm dữ liệu mẫu bị nạp vào database thật — 212 dòng bị THÊM (không dòng nào bị xóa/sửa), toàn bộ trong tổ chức demo TOP CRM hoặc dòng rác; tổ chức ToP và tài khoản thật không bị ảnh hưởng. User duyệt phương án: sao lưu trạng thái lỗi (20261016_2145), xóa đúng 212 dòng trong 1 giao dịch (khớp từng con số), đối chiếu checksum: 55/55 bảng giống hệt bản sao lưu 21:30 (chỉ khác cache/sessions). Phòng ngừa: scripts/verify-sql.ps1 (đổi tên database trong bản sao, từ chối nếu còn trỏ tới orangecrm_db).
 
 **PHASE 2 HOÀN TẤT (16/10/2026) — v2.0.0.** Tiếp theo theo lộ trình: Phase 3.
+
+## PHASE 3 — Vận hành bán hàng (bắt đầu 16/10/2026, kế hoạch: docs/PHASE3_PLAN.md)
+- [x] 3.1a Tiền chính xác & nhà cung cấp (16/10): App\Support\Decimal (bcmath, làm tròn nửa lên) cho tính tiền chứng từ & thanh toán — tính lại 29/29 chứng từ cũ (demo + thật, chỉ đọc) không lệch; bảng suppliers + CRUD/tìm/lọc/sắp xếp/xuất/thùng rác/tìm kiếm toàn cục, quyền suppliers.* (migration gán theo vai trò ở mọi tổ chức); sản phẩm: loại sản phẩm/dịch vụ, giá vốn (chỉ người sửa sản phẩm thấy) + lợi nhuận gộp, nhà cung cấp; menu Sản phẩm & Dịch vụ › Nhà cung cấp. SupplierCatalogTest 5 + DecimalTest 5.
+- [ ] 3.1b Biến thể, bảng giá, lịch sử sản phẩm
+- [ ] 3.2 Kho hàng
+- [ ] 3.3 Đơn hàng ↔ kho
+- [ ] 3.4 Báo giá: mẫu, duyệt, hết hạn
+- [ ] 3.5 Hóa đơn & thanh toán: giảm trừ, hoàn tiền, nhắc, đối soát
+- [ ] 3.6 Báo cáo & hoàn thiện v3.0.0

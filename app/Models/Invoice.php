@@ -56,7 +56,7 @@ class Invoice extends Model
 
     public function getBalanceAttribute(): float
     {
-        return max(0, round((float) $this->total - (float) $this->amount_paid, 2));
+        return (float) \App\Support\Decimal::round(\App\Support\Decimal::clamp(\App\Support\Decimal::sub($this->total, $this->amount_paid), 0));
     }
 
     /** Quá hạn: đã phát hành, chưa trả đủ và quá ngày đến hạn. */

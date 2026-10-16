@@ -43,6 +43,7 @@ class GlobalSearch
             'orders' => ['label' => 'Đơn hàng', 'icon' => 'bi-bag-check', 'permission' => 'orders.view'],
             'invoices' => ['label' => 'Hóa đơn', 'icon' => 'bi-receipt', 'permission' => 'invoices.view'],
             'products' => ['label' => 'Sản phẩm', 'icon' => 'bi-box-seam', 'permission' => 'products.view'],
+            'suppliers' => ['label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'permission' => 'suppliers.view'],
             'tickets' => ['label' => 'Ticket hỗ trợ', 'icon' => 'bi-headset', 'permission' => 'tickets.view'],
             'tasks' => ['label' => 'Công việc', 'icon' => 'bi-check2-square', 'permission' => 'tasks.view'],
             'employees' => ['label' => 'Nhân viên', 'icon' => 'bi-person-badge', 'permission' => 'users.view'],
@@ -119,6 +120,12 @@ class GlobalSearch
             'invoices' => Invoice::visibleTo($user)->with('customer:id,name')
                 ->where(fn ($w) => $w->where('number', 'like', $term)->orWhereHas('customer', fn ($c) => $c->where('name', 'like', $term)))->latest(),
             'products' => Product::query()->where($text(['name', 'sku']))->orderBy('name'),
+            'suppliers' => \App\Models\Supplier::query()->where(function ($w) use ($text, $phoneTerm) {
+                $w->where($text(['name', 'code', 'contact_name', 'email', 'tax_code']));
+                if ($phoneTerm) {
+                    $this->phoneMatch($w, $phoneTerm);
+                }
+            })->orderBy('name'),
             'tickets' => SupportTicket::visibleTo($user)->with('customer:id,name')->where($text(['subject', 'code']))->latest(),
             'tasks' => Task::visibleTo($user)->with('assignee:id,name')->where($text(['title']))->orderByRaw('due_date IS NULL, due_date'),
             'employees' => User::inOrganization()->where($text(['name', 'email', 'phone', 'position']))->orderBy('name'),
@@ -138,6 +145,7 @@ class GlobalSearch
             'orders' => ['title' => $m->number, 'subtitle' => ($m->customer?->name ?? '').' · '.money($m->total), 'url' => route('orders.show', $m)],
             'invoices' => ['title' => $m->number, 'subtitle' => ($m->customer?->name ?? '').' · '.money($m->total), 'url' => route('invoices.show', $m)],
             'products' => ['title' => $m->name, 'subtitle' => $m->sku.' · '.money($m->price), 'url' => route('products.show', $m)],
+            'suppliers' => ['title' => $m->name, 'subtitle' => trim($m->code.' · '.($m->contact_name ?? $m->phone ?? ''), ' ·'), 'url' => route('suppliers.show', $m)],
             'tickets' => ['title' => $m->subject, 'subtitle' => $m->code.' · '.label_of(SupportTicket::STATUSES, $m->status), 'url' => route('tickets.show', $m)],
             'tasks' => ['title' => $m->title, 'subtitle' => vn_date($m->due_date, true).($m->assignee ? ' · '.$m->assignee->name : ''), 'url' => route('tasks.show', $m)],
             'employees' => ['title' => $m->name, 'subtitle' => trim(($m->position ? $m->position.' · ' : '').$m->email), 'url' => route('users.show', $m)],

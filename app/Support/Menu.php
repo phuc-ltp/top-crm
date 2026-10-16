@@ -37,7 +37,10 @@ class Menu
                     ['Hóa đơn', null, 'invoices.index', 'invoices.view', 'invoices.*'],
                     ['Chỉ tiêu doanh số', null, 'targets.index', 'reports.view', 'targets.*'],
                 ]],
-                ['Sản phẩm & Dịch vụ', 'bi-box-seam-fill', 'products.index', 'products.view', 'products.*'],
+                ['Sản phẩm & Dịch vụ', 'bi-box-seam-fill', null, null, null, [
+                    ['Danh sách sản phẩm', null, 'products.index', 'products.view', 'products.*'],
+                    ['Nhà cung cấp', null, 'suppliers.index', 'suppliers.view', 'suppliers.*'],
+                ]],
             ],
             'Vận hành' => [
                 ['Công việc', 'bi-check2-square', null, null, null, [

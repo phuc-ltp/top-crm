@@ -10,8 +10,13 @@
                 <x-input name="name" :label="__('Tên sản phẩm')" :value="$product->name" required maxlength="255" col="col-md-8 mb-3" />
                 <x-select name="product_category_id" :label="__('Danh mục')" :options="$categories" :value="$product->product_category_id" :placeholder="__('— Chọn danh mục —')" col="col-md-6 mb-3" />
                 <x-select name="status" :label="__('Trạng thái')" :options="App\Models\Product::STATUSES" :value="$product->status" required col="col-md-6 mb-3" />
-                <x-input name="price" type="number" :label="__('Đơn giá (₫)')" :value="$product->exists ? (int) $product->price : null" required min="0" step="1000" col="col-md-6 mb-3" />
-                <x-input name="unit" :label="__('Đơn vị tính')" :value="$product->unit" required maxlength="30" col="col-md-6 mb-3" />
+                <x-select name="type" :label="__('Loại')" :options="App\Models\Product::TYPES" :value="$product->type" required col="col-md-6 mb-3"
+                          :help="__('Dịch vụ không theo dõi tồn kho.')" />
+                <x-select name="supplier_id" :label="__('Nhà cung cấp')" :options="$suppliers" :value="$product->supplier_id" :placeholder="__('— Không có —')" col="col-md-6 mb-3" />
+                <x-input name="price" type="number" :label="__('Đơn giá bán (₫)')" :value="$product->exists ? (int) $product->price : null" required min="0" step="1000" col="col-md-4 mb-3" />
+                <x-input name="purchase_price" type="number" :label="__('Giá vốn (₫)')" :value="$product->purchase_price !== null ? (int) $product->purchase_price : null" min="0" step="1"
+                         col="col-md-4 mb-3" :help="__('Chỉ người được sửa sản phẩm mới thấy.')" />
+                <x-input name="unit" :label="__('Đơn vị tính')" :value="$product->unit" required maxlength="30" col="col-md-4 mb-3" />
                 <x-textarea name="description" :label="__('Mô tả')" :value="$product->description" rows="5" maxlength="5000" col="col-12 mb-0" />
             </div></div></div></div>
             <div class="col-lg-4">

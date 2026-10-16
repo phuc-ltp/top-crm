@@ -13,6 +13,9 @@
             <select name="category" class="form-select"><option value="">{{ __('Mọi danh mục') }}</option>
                 @foreach ($categories as $id => $name)<option value="{{ $id }}" @selected(request('category') == $id)>{{ $name }}</option>@endforeach
             </select>
+            <select name="type" class="form-select" aria-label="{{ __('Loại') }}"><option value="">{{ __('Mọi loại') }}</option>
+                @foreach (App\Models\Product::TYPES as $k => $s)<option value="{{ $k }}" @selected(request('type') === $k)>{{ __($s[0]) }}</option>@endforeach
+            </select>
             <select name="status" class="form-select"><option value="">{{ __('Mọi trạng thái') }}</option>
                 @foreach (App\Models\Product::STATUSES as $k => $s)<option value="{{ $k }}" @selected(request('status') === $k)>{{ __($s[0]) }}</option>@endforeach
             </select>
@@ -31,7 +34,7 @@
                     <tr>
                         <td style="width:56px">@if ($p->image_url)<img src="{{ $p->image_url }}" alt="" class="rounded" style="width:40px;height:40px;object-fit:cover">@else<span class="avatar tone-orange" style="border-radius:8px"><i class="bi bi-box"></i></span>@endif</td>
                         <td class="small text-muted">{{ $p->sku }}</td>
-                        <td><a href="{{ route('products.show', $p) }}" class="row-link">{{ $p->name }}</a></td>
+                        <td><a href="{{ route('products.show', $p) }}" class="row-link">{{ $p->name }}</a>@if ($p->type === 'service') <span class="badge badge-soft-info">{{ __('Dịch vụ') }}</span>@endif</td>
                         <td class="small">{{ $p->category?->name ?? '—' }}</td>
                         <td class="text-end fw-semibold">{{ money($p->price) }}<div class="small text-muted fw-normal">/ {{ $p->unit }}</div></td>
                         <td>{!! badge(App\Models\Product::STATUSES, $p->status) !!}</td>

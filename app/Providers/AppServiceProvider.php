@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
             'opportunity' => \App\Models\Opportunity::class,
             'task' => \App\Models\Task::class,
             'product' => \App\Models\Product::class,
+            'supplier' => \App\Models\Supplier::class,
             'quotation' => \App\Models\Quotation::class,
             'sales_order' => \App\Models\SalesOrder::class,
             'invoice' => \App\Models\Invoice::class,

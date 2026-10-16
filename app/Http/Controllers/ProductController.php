@@ -20,6 +20,8 @@ class ProductController extends Controller
             })
             ->when($request->filled('category'), fn ($q) => $q->where('product_category_id', $request->category))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))
+            ->when($request->filled('supplier'), fn ($q) => $q->where('supplier_id', $request->supplier))
             ->when($request->filled('min_price'), fn ($q) => $q->where('price', '>=', (float) $request->min_price))
             ->when($request->filled('max_price'), fn ($q) => $q->where('price', '<=', (float) $request->max_price));
     }
@@ -37,7 +39,7 @@ class ProductController extends Controller
     {
         $this->authorize('create', Product::class);
 
-        return view('products.form', ['product' => new Product(['status' => 'active', 'unit' => 'cái']), 'categories' => Lookup::categories()]);
+        return view('products.form', ['product' => new Product(['status' => 'active', 'unit' => 'cái', 'type' => 'product']), 'categories' => Lookup::categories(), 'suppliers' => $this->supplierOptions()]);
     }
 
     public function store(Request $request, UploadService $uploads)
@@ -55,7 +57,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $this->authorize('view', $product);
-        $product->load('category');
+        $product->load('category', 'supplier');
         $sales = \App\Models\InvoiceItem::where('product_id', $product->id)
             ->whereHas('invoice', fn ($q) => $q->where('status', 'issued'))
             ->selectRaw('COALESCE(SUM(quantity),0) as qty, COALESCE(SUM(line_total),0) as revenue')->first();
@@ -67,7 +69,7 @@ class ProductController extends Controller
     {
         $this->authorize('update', $product);
 
-        return view('products.form', ['product' => $product, 'categories' => Lookup::categories()]);
+        return view('products.form', ['product' => $product, 'categories' => Lookup::categories(), 'suppliers' => $this->supplierOptions($product->supplier_id)]);
     }
 
     public function update(Request $request, Product $product, UploadService $uploads)
@@ -103,10 +105,20 @@ class ProductController extends Controller
         return $exporter->download('san_pham', ['ID', 'SKU', __('Tên sản phẩm'), __('Danh mục'), __('Giá'), __('Đơn vị'), __('Trạng thái'), __('Ngày tạo')], $rows, $request->input('format', 'xlsx'));
     }
 
+    /** Nhà cung cấp đang hợp tác (+ nhà cung cấp hiện tại của sản phẩm dù đã ngừng). */
+    private function supplierOptions(?int $current = null): array
+    {
+        return \App\Models\Supplier::where(fn ($q) => $q->active()->when($current, fn ($w) => $w->orWhere('id', $current)))
+            ->orderBy('name')->pluck('name', 'id')->all();
+    }
+
     private function validated(Request $request, ?Product $product = null): array
     {
         $data = $request->validate([
             'sku' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9\-_.]+$/', \App\Support\Tenancy\TenantRule::unique('products', 'sku')->ignore($product?->id)],
+            'type' => ['sometimes', 'required', Rule::in(array_keys(Product::TYPES))],   // không gửi: tạo mới = sản phẩm, sửa = giữ nguyên
+            'supplier_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('suppliers')->whereNull('deleted_at')],
+            'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
             'name' => ['required', 'string', 'max:255'],
             'product_category_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('product_categories')],
             'description' => ['nullable', 'string', 'max:5000'],
