@@ -66,6 +66,7 @@
         <tr><td class="muted">{{ __('Thuế VAT (:rate%)', ['rate' => (float) $doc->tax_rate]) }}</td><td class="right">{{ money($doc->tax_amount) }}</td></tr>
         <tr class="grand"><td>{{ __('TỔNG CỘNG') }}</td><td class="right">{{ money($doc->total) }}</td></tr>
         @if ($cfg['route'] === 'invoices')
+            @if ((float) $doc->credited_amount > 0)<tr><td class="muted">{{ __('Giảm trừ') }}</td><td class="right">− {{ money($doc->credited_amount) }}</td></tr>@endif
             <tr><td class="muted">{{ __('Đã thanh toán') }}</td><td class="right">{{ money($doc->amount_paid) }}</td></tr>
             <tr><td><strong>{{ __('Còn phải thu') }}</strong></td><td class="right"><strong>{{ money($doc->balance) }}</strong></td></tr>
         @endif

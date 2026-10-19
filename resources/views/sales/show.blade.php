@@ -51,6 +51,7 @@
                         <div class="d-flex justify-content-between py-1"><span class="text-muted">{{ __('Thuế VAT (:rate%)', ['rate' => (float) $doc->tax_rate]) }}</span><span>{{ money($doc->tax_amount) }}</span></div>
                         <div class="d-flex justify-content-between py-2 border-top fs-5 fw-bold"><span>{{ __('Tổng cộng') }}</span><span class="text-orange">{{ money($doc->total) }}</span></div>
                         @if ($r === 'invoices')
+                            @if ((float) $doc->credited_amount > 0)<div class="d-flex justify-content-between py-1"><span class="text-muted">{{ __('Giảm trừ') }}</span><span class="text-danger">− {{ money($doc->credited_amount) }}</span></div>@endif
                             <div class="d-flex justify-content-between py-1"><span class="text-muted">{{ __('Đã thanh toán') }}</span><span class="text-success">{{ money($doc->amount_paid) }}</span></div>
                             <div class="d-flex justify-content-between py-1 fw-semibold"><span>{{ __('Còn phải thu') }}</span><span class="text-danger">{{ money($doc->balance) }}</span></div>
                         @endif

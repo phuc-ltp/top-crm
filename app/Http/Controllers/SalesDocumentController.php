@@ -146,7 +146,7 @@ abstract class SalesDocumentController extends Controller
 
     protected function showRelations(): array
     {
-        return ['customer', 'items.product', 'creator', 'assignee'];
+        return ['customer', 'items.product', 'creator', 'assignee'] + ($this->modelClass() === \App\Models\Invoice::class ? [4 => 'payments.recorder', 5 => 'creditNotes.creator'] : []);
     }
 
     public function edit(Request $request, $id)
@@ -228,7 +228,14 @@ abstract class SalesDocumentController extends Controller
             'customer_id' => ['required', \App\Support\Tenancy\TenantRule::exists('customers')],
             $this->dateField => ['required', 'date'],
             'discount_amount' => ['nullable', 'numeric', 'min:0'],
-            'tax_rate' => ['required', 'numeric', 'min:0', 'max:100'],
+            // Thuế suất theo danh sách của tổ chức (nếu có); chứng từ cũ được giữ thuế suất đang dùng
+            'tax_rate' => array_merge(['required', 'numeric', 'min:0', 'max:100'], Setting::taxRates()
+                ? [function ($attr, $value, $fail) use ($existing) {
+                    $allowed = array_merge(Setting::taxRates(), $existing ? [(float) $existing->tax_rate] : []);
+                    if (! in_array((float) $value, $allowed, true)) {
+                        $fail(__('Thuế suất phải thuộc danh sách của công ty: :rates%.', ['rates' => implode('%, ', Setting::taxRates())]));
+                    }
+                }] : []),
             'notes' => ['nullable', 'string', 'max:5000'],
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'items' => ['required', 'array', 'min:1', 'max:100'],

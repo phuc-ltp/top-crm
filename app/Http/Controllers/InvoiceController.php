@@ -70,6 +70,7 @@ class InvoiceController extends SalesDocumentController
         $this->authorize('update', $invoice);
         abort_if($invoice->status === 'cancelled', 422, __('Hóa đơn đã bị hủy.'));
         abort_if($invoice->payments()->exists(), 422, __('Hóa đơn đã có thanh toán. Hãy xóa các khoản thanh toán trước khi hủy.'));
+        abort_if($invoice->creditNotes()->exists(), 422, __('Hóa đơn đã có phiếu giảm trừ nên không hủy được.'));
         $invoice->update(['status' => 'cancelled']);
         ActivityLogger::log('updated', $invoice, 'Hủy hóa đơn '.$invoice->number);
 

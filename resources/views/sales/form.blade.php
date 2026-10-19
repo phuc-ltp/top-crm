@@ -61,7 +61,15 @@
                     <div class="d-flex justify-content-between align-items-center mb-2 gap-2"><label for="discount_amount" class="text-muted">{{ __('Chiết khấu (₫)') }}</label>
                         <input type="number" name="discount_amount" id="discount_amount" class="form-control form-control-sm text-end" style="max-width:160px" min="0" step="1000" value="{{ old('discount_amount', (int) $doc->discount_amount) }}"></div>
                     <div class="d-flex justify-content-between align-items-center mb-2 gap-2"><label for="tax_rate" class="text-muted">{{ __('Thuế VAT (%)') }}</label>
+                        @php($rates = App\Models\Setting::taxRates())
+                        @if ($rates)
+                            @php($rates = array_values(array_unique(array_merge($rates, [(float) old('tax_rate', $doc->tax_rate)]))))
+                            <select name="tax_rate" id="tax_rate" class="form-select form-select-sm text-end" style="max-width:160px" required>
+                                @foreach ($rates as $rate)<option value="{{ $rate }}" @selected((float) old('tax_rate', $doc->tax_rate) === $rate)>{{ $rate }}%</option>@endforeach
+                            </select></div>
+                        @else
                         <input type="number" name="tax_rate" id="tax_rate" class="form-control form-control-sm text-end" style="max-width:160px" min="0" max="100" step="0.5" required value="{{ old('tax_rate', (float) $doc->tax_rate) }}"></div>
+                        @endif
                     <div class="d-flex justify-content-between mb-2"><span class="text-muted">{{ __('Tiền thuế') }}</span><strong id="sumTax">0 ₫</strong></div>
                     <hr>
                     <div class="d-flex justify-content-between fs-5"><span class="fw-bold">{{ __('Tổng cộng') }}</span><span class="fw-bold text-orange" id="sumTotal">0 ₫</span></div>

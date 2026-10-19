@@ -36,10 +36,18 @@ class SettingController extends Controller
             'date_format' => ['required', 'in:'.implode(',', array_keys(self::DATE_FORMATS))],
             'default_tax_rate' => ['required', 'numeric', 'min:0', 'max:100'],
             'quotation_discount_threshold' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'tax_rates' => ['nullable', 'string', 'max:100', 'regex:/^\s*\d{1,2}(\.\d{1,2})?(\s*,\s*\d{1,2}(\.\d{1,2})?)*\s*$/'],
             'company_logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:1024'],
             'remove_logo' => ['nullable', 'boolean'],
         ], ['brand_color.regex' => __('Màu thương hiệu phải có dạng #RRGGBB.')], ['company_name' => __('Tên công ty'), 'brand_color' => __('Màu thương hiệu')]);
 
+        // Thuế mặc định phải thuộc danh sách thuế suất (khi có danh sách)
+        if (! empty($data['tax_rates'])) {
+            $rates = array_map(fn ($v) => (float) trim($v), explode(',', $data['tax_rates']));
+            if (! in_array((float) $data['default_tax_rate'], $rates, true)) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['default_tax_rate' => __('Thuế VAT mặc định phải thuộc danh sách thuế suất.')]);
+            }
+        }
         $current = Setting::allCached();
         if ($request->hasFile('company_logo')) {
             $data['company_logo'] = $uploads->replacePublicImage($request->file('company_logo'), 'branding', $current['company_logo'] ?: null);

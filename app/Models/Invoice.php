@@ -33,11 +33,17 @@ class Invoice extends Model
 
     protected $fillable = [
         'number', 'customer_id', 'sales_order_id', 'issue_date', 'due_date', 'status', 'payment_status',
-        'subtotal', 'discount_amount', 'tax_rate', 'tax_amount', 'total', 'amount_paid', 'notes',
+        'subtotal', 'discount_amount', 'tax_rate', 'tax_amount', 'total', 'amount_paid', 'credited_amount', 'notes',
         'created_by', 'assigned_to', 'is_demo',
     ];
 
-    protected $casts = ['issue_date' => 'date', 'due_date' => 'date', 'amount_paid' => 'decimal:2'];
+    protected $casts = ['issue_date' => 'date', 'due_date' => 'date', 'amount_paid' => 'decimal:2', 'credited_amount' => 'decimal:2',
+        'due_reminder_sent_at' => 'datetime', 'overdue_notified_at' => 'datetime'];
+
+    public function creditNotes()
+    {
+        return $this->hasMany(CreditNote::class)->orderBy('id');
+    }
 
     public function items()
     {
@@ -56,7 +62,7 @@ class Invoice extends Model
 
     public function getBalanceAttribute(): float
     {
-        return (float) \App\Support\Decimal::round(\App\Support\Decimal::clamp(\App\Support\Decimal::sub($this->total, $this->amount_paid), 0));
+        return (float) \App\Services\PaymentService::due($this);   // tổng − giảm trừ − đã thu
     }
 
     /** Quá hạn: đã phát hành, chưa trả đủ và quá ngày đến hạn. */

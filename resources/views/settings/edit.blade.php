@@ -36,6 +36,8 @@
                 </div></div>
 
                 <div class="card mt-4"><div class="card-header"><span><i class="bi bi-file-earmark-text me-2 text-orange"></i>{{ __('Báo giá') }}</span></div><div class="card-body"><div class="row">
+                    <x-input name="tax_rates" :label="__('Các mức thuế VAT dùng trên chứng từ (%)')" :value="$s['tax_rates'] ?? ''" maxlength="100" placeholder="0, 5, 8, 10" col="col-md-6 mb-2"
+                             :help="__('Phân cách bằng dấu phẩy. Để trống: nhập tự do. Thuế mặc định ở trên phải thuộc danh sách.')" />
                     <x-input name="quotation_discount_threshold" type="number" :label="__('Ngưỡng chiết khấu cần duyệt (%)')" :value="$s['quotation_discount_threshold'] ?? ''" min="0" max="100" step="0.5" col="col-md-6 mb-2"
                              :help="__('Báo giá có tổng chiết khấu vượt ngưỡng do nhân viên lập phải được người có quyền duyệt báo giá chấp thuận trước khi gửi khách / tạo đơn hàng. Để trống: không cần duyệt.')" />
                 </div></div></div>

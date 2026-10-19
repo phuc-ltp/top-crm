@@ -87,7 +87,7 @@ class DashboardService
             'pipeline_value' => (float) (clone $openOpps)->sum('value'),
             'revenue' => $revenue,
             'revenue_change' => $prevRevenue > 0 ? round(($revenue - $prevRevenue) / $prevRevenue * 100, 1) : null,
-            'receivable' => (float) Invoice::visibleTo($u)->where('status', 'issued')->where('payment_status', '!=', 'paid')->sum(DB::raw('total - amount_paid')),
+            'receivable' => (float) Invoice::visibleTo($u)->where('status', 'issued')->where('payment_status', '!=', 'paid')->sum(DB::raw('total - amount_paid - credited_amount')),
             'tasks_open' => Task::visibleTo($u)->open()->count(),
             'tasks_late' => Task::visibleTo($u)->open()->where('due_date', '<', now())->count(),
         ];

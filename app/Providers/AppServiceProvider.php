@@ -50,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
             'warehouse' => \App\Models\Warehouse::class,
             'stock_document' => \App\Models\StockDocument::class,
             'quotation_template' => \App\Models\QuotationTemplate::class,
+            'credit_note' => \App\Models\CreditNote::class,
             'quotation' => \App\Models\Quotation::class,
             'sales_order' => \App\Models\SalesOrder::class,
             'invoice' => \App\Models\Invoice::class,
@@ -67,6 +68,8 @@ class AppServiceProvider extends ServiceProvider
         // Khu vực quản trị nền tảng (danh sách tổ chức...) — chỉ quản trị nền tảng
         Gate::define('platform', fn ($user) => $user->isPlatformAdmin());
         // Thùng rác: có quyền xóa ít nhất một module (chỉ thấy loại mình được xóa)
+        // Đối soát thanh toán: xem mọi hóa đơn + được sửa hóa đơn
+        Gate::define('payments-reconcile', fn ($user) => $user->can('invoices.view_all') && $user->can('invoices.update'));
         Gate::define('trash', fn ($user) => \App\Http\Controllers\TrashController::allowedTypes($user) !== []);
 
         // Quản trị nền tảng có toàn quyền trên mọi tổ chức
