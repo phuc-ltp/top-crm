@@ -230,6 +230,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/invoices/{invoice}/issue', [InvoiceController::class, 'issue'])->name('invoices.issue');
     Route::post('/invoices/{invoice}/cancel', [InvoiceController::class, 'cancel'])->name('invoices.cancel');
     Route::post('/invoices/{invoice}/payments', [PaymentController::class, 'store'])->name('payments.store');
+    Route::post('/invoices/{invoice}/refunds', [PaymentController::class, 'refund'])->name('payments.refund');
+    Route::post('/invoices/{invoice}/credit-notes', [PaymentController::class, 'credit'])->name('payments.credit');
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::post('/payments/reconcile', [PaymentController::class, 'reconcile'])->name('payments.reconcile');
     Route::delete('/payments/{payment}', [PaymentController::class, 'destroy'])->name('payments.destroy');
     Route::resource('invoices', InvoiceController::class);
 

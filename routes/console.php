@@ -95,8 +95,8 @@ Artisan::command('crm:purge-demo {--force}', function () {
 */
 Artisan::command('crm:sales-automation', function (\App\Services\SalesAutomationService $service) {
     $result = $service->run();
-    $this->info('Báo giá chuyển hết hạn: '.$result['expired_quotations']);
-})->purpose('Tác vụ bán hàng định kỳ (báo giá hết hạn)');
+    $this->info('Báo giá chuyển hết hạn: '.$result['expired_quotations'].' · Nhắc hóa đơn sắp đến hạn: '.$result['due_reminders'].' · Báo hóa đơn quá hạn: '.$result['overdue_invoices']);
+})->purpose('Tác vụ bán hàng định kỳ (báo giá hết hạn, nhắc thanh toán)');
 
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();

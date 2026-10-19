@@ -69,6 +69,8 @@ class Setting extends Model
         'inventory_allow_negative', 'notify_low_stock', 'inventory_track_orders',
         // Báo giá (bước 3.4)
         'quotation_discount_threshold',
+        // Hóa đơn (bước 3.5): danh sách thuế suất VAT, VD "0,5,8,10"
+        'tax_rates',
     ];
 
     private const CACHE_KEY = 'crm.settings';
@@ -117,6 +119,14 @@ class Setting extends Model
     }
 
     /** Lưu cài đặt: khóa của tổ chức ghi cho tổ chức đang làm việc (hoặc chỉ định), khóa chung ghi toàn hệ thống. */
+    /** Danh sách thuế suất VAT của tổ chức (rỗng = nhập tự do). */
+    public static function taxRates(): array
+    {
+        $raw = trim((string) self::get('tax_rates', ''));
+
+        return $raw === '' ? [] : array_values(array_unique(array_map(fn ($v) => (float) trim($v), explode(',', $raw))));
+    }
+
     public static function put(array $values, string $group = 'general', ?int $organizationId = null): void
     {
         $organizationId ??= self::currentOrganizationId();

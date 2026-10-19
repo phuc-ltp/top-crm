@@ -14,9 +14,14 @@ class Payment extends Model
         'cash' => 'Tiền mặt', 'bank_transfer' => 'Chuyển khoản', 'card' => 'Thẻ ngân hàng', 'other' => 'Khác',
     ];
 
-    protected $fillable = ['invoice_id', 'amount', 'payment_date', 'method', 'reference', 'notes', 'recorded_by', 'is_demo'];
+    protected $fillable = ['invoice_id', 'type', 'amount', 'payment_date', 'method', 'reference', 'notes', 'recorded_by', 'is_demo'];
 
-    protected $casts = ['amount' => 'decimal:2', 'payment_date' => 'date', 'is_demo' => 'boolean'];
+    protected $casts = ['amount' => 'decimal:2', 'payment_date' => 'date', 'reconciled_at' => 'datetime', 'is_demo' => 'boolean'];
+
+    public function reconciler()
+    {
+        return $this->belongsTo(User::class, 'reconciled_by');
+    }
 
     public function invoice()
     {

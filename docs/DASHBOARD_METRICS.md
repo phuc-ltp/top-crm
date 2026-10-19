@@ -28,10 +28,10 @@ Trang **Tổng quan** có khung "Chỉ số điều hành" gồm 20 chỉ số c
 | | Thắng / thua trong kỳ | Số cơ hội đóng Thắng / Thất bại trong kỳ, theo ngày đóng |
 | | Tỷ lệ thắng | Thắng ÷ (thắng + thất bại) trong kỳ |
 | | Giá trị deal trung bình | Tổng giá trị thắng ÷ số cơ hội thắng trong kỳ |
-| Tài chính | Doanh thu (đã thu) | Tiền khách đã thanh toán trong kỳ cho hóa đơn đã phát hành |
+| Tài chính | Doanh thu (đã thu) | Tiền khách đã thanh toán trong kỳ cho hóa đơn đã phát hành, trừ các khoản hoàn tiền |
 | | Tăng trưởng doanh thu | (Kỳ này − kỳ trước) ÷ kỳ trước |
 | | Hóa đơn chờ thanh toán *(hiện tại)* | Hóa đơn đã phát hành chưa thanh toán đủ, kèm số hóa đơn quá hạn |
-| | Công nợ phải thu *(hiện tại)* | Σ(tổng tiền − đã thanh toán) của các hóa đơn đó, kèm phần quá hạn |
+| | Công nợ phải thu *(hiện tại)* | Σ(tổng tiền − giảm trừ − đã thanh toán) của các hóa đơn đó, kèm phần quá hạn |
 | Đội ngũ & vận hành | Công việc quá hạn *(hiện tại)* | Việc chưa xong đã qua hạn |
 | | Hoàn thành đúng hạn | Việc có hạn trong kỳ hoàn thành đúng hoặc trước hạn ÷ việc có hạn trong kỳ (trừ việc hủy) |
 | | Ticket đang mở *(hiện tại)* | Ticket Mới mở, Đang xử lý hoặc Chờ phản hồi, kèm số ticket mới trong kỳ |

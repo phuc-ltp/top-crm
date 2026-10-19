@@ -35,6 +35,7 @@ class Menu
                     ['Báo giá', null, 'quotations.index', 'quotations.view', 'quotations.*'],
                     ['Đơn hàng', null, 'orders.index', 'orders.view', 'orders.*'],
                     ['Hóa đơn', null, 'invoices.index', 'invoices.view', 'invoices.*'],
+                    ['Đối soát thanh toán', null, 'payments.index', 'payments-reconcile', 'payments.index'],
                     ['Chỉ tiêu doanh số', null, 'targets.index', 'reports.view', 'targets.*'],
                     ['Mẫu báo giá', null, 'quotation-templates.index', 'quotations.approve', 'quotation-templates.*'],
                 ]],

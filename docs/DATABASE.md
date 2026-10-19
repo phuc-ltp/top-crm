@@ -136,6 +136,7 @@ erDiagram
 | `stock_movements` | Sổ kho bất biến: số lượng có dấu, `balance_after`, đơn giá. Tổng phát sinh = tồn kho. `products.average_cost` = giá vốn bình quân gia quyền (cập nhật khi nhập), `products.reorder_level` = mức tồn tối thiểu (cảnh báo). |
 | `stock_reservations` | Hàng đang giữ cho đơn hàng (bước 3.3), theo đơn × sản phẩm × kho; tổng nằm ở `stock_levels.reserved`. `sales_orders.warehouse_id` = kho xuất (trống = đơn không theo dõi kho, gồm mọi đơn tạo trước bước 3.3 hoặc khi tắt Cài đặt › Kho hàng › "Đơn hàng giữ hàng & xuất kho tự động"). `stock_documents.sales_order_id` = phiếu xuất giao hàng / phiếu nhập hàng trả lại (NT) của đơn. |
 | `quotation_templates` | Mẫu báo giá theo tổ chức (bước 3.4): dòng sản phẩm (JSON), thuế, điều khoản; tạo từ một báo giá. `quotations.approval_status` (pending / approved / rejected), `approved_by`, `approved_at`, `approval_note`: duyệt chiết khấu vượt ngưỡng `quotation_discount_threshold` (cài đặt tổ chức). |
+| `credit_notes` | Phiếu giảm trừ GT (bước 3.5), bất biến, giảm số còn phải thu: `invoices.credited_amount`. Hoàn tiền = dòng `payments` loại `refund` với số tiền âm (doanh thu theo dòng tiền tự trừ). `payments.reconciled_at/by` = đối soát. `invoices.due_reminder_sent_at`, `overdue_notified_at` = mốc đã nhắc. Còn phải thu = tổng − giảm trừ − đã thu. |
 | `suppliers` | Nhà cung cấp theo tổ chức (bước 3.1): mã tự sinh NCC00001, liên hệ, mã số thuế, trạng thái; xóa mềm (khôi phục ở Thùng rác). |
 | `sales_targets` | Chỉ tiêu doanh số theo nhân viên và kỳ. |
 

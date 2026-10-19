@@ -187,11 +187,11 @@ class ExecutiveMetrics
         $prevRevenue = $this->paid($this->prevFrom, $this->prevTo);
         $unpaid = fn () => Invoice::visibleTo($u)->where('status', 'issued')->where('payment_status', '!=', 'paid');
         $overdue = fn () => $unpaid()->whereNotNull('due_date')->where('due_date', '<', now()->toDateString());
-        $remaining = DB::raw('total - amount_paid');
+        $remaining = DB::raw('total - amount_paid - credited_amount');
 
         $m = [
             self::metric('revenue', 'Doanh thu (đã thu)', 'bi-currency-dollar', 'money', $revenue,
-                'Tổng tiền khách đã thanh toán trong kỳ (theo ngày thanh toán) cho các hóa đơn đã phát hành.',
+                'Tổng tiền khách đã thanh toán trong kỳ (theo ngày thanh toán) cho các hóa đơn đã phát hành, trừ các khoản hoàn tiền.',
                 ['change' => DashboardService::change($revenue, $prevRevenue), 'compare' => true, 'url' => route('invoices.index')]),
             self::metric('revenue_growth', 'Tăng trưởng doanh thu', 'bi-graph-up', 'percent', DashboardService::change($revenue, $prevRevenue),
                 '(Doanh thu kỳ này − doanh thu kỳ trước) ÷ doanh thu kỳ trước × 100%. Kỳ trước là khoảng liền trước có cùng số ngày.',
@@ -200,7 +200,7 @@ class ExecutiveMetrics
                 'Số hóa đơn đã phát hành nhưng chưa thanh toán đủ, tại thời điểm hiện tại.',
                 ['snapshot' => true, 'sub' => __('Quá hạn: :n', ['n' => $overdue()->count()]), 'url' => route('invoices.index')]),
             self::metric('receivable', 'Công nợ phải thu', 'bi-wallet2', 'money', (float) $unpaid()->sum($remaining),
-                'Σ (tổng tiền − đã thanh toán) của các hóa đơn đã phát hành chưa thanh toán đủ, tại thời điểm hiện tại.',
+                'Σ (tổng tiền − giảm trừ − đã thanh toán) của các hóa đơn đã phát hành chưa thanh toán đủ, tại thời điểm hiện tại.',
                 ['snapshot' => true, 'sub' => __('Quá hạn: :a', ['a' => money_short((float) $overdue()->sum($remaining))])]),
         ];
 
