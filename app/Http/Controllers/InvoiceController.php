@@ -40,6 +40,24 @@ class InvoiceController extends SalesDocumentController
         return $doc->status === 'draft';
     }
 
+    /** Tổng quan công nợ cho trang danh sách hóa đơn (theo phạm vi xem). */
+    protected function indexExtras(Request $request): array
+    {
+        $open = fn () => Invoice::visibleTo($request->user())->where('status', 'issued')->where('payment_status', '!=', 'paid');
+        $remaining = \Illuminate\Support\Facades\DB::raw('total - amount_paid - credited_amount');
+        $paidThisMonth = \App\Models\Payment::whereIn('invoice_id', Invoice::visibleTo($request->user())->where('status', 'issued')->select('id'))
+            ->whereBetween('payment_date', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])->sum('amount');
+
+        return ['invoiceSummary' => [
+            'receivable' => (float) $open()->sum($remaining), 'open_count' => $open()->count(),
+            'overdue' => (float) $open()->whereNotNull('due_date')->where('due_date', '<', today())->sum($remaining),
+            'overdue_count' => $open()->whereNotNull('due_date')->where('due_date', '<', today())->count(),
+            'soon' => (float) $open()->whereBetween('due_date', [today(), today()->addDays(7)])->sum($remaining),
+            'soon_count' => $open()->whereBetween('due_date', [today(), today()->addDays(7)])->count(),
+            'paid_month' => (float) $paidThisMonth,
+        ]];
+    }
+
     protected function showRelations(): array
     {
         return array_merge(parent::showRelations(), ['salesOrder', 'payments.recorder:id,name']);

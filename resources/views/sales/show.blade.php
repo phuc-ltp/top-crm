@@ -13,6 +13,9 @@
 
     <div class="row g-4">
         <div class="col-lg-8">
+            @if ($r === 'invoices')
+                @include('sales.invoice-document')
+            @else
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="d-flex flex-wrap justify-content-between gap-3 mb-4">
@@ -59,6 +62,7 @@
                     @if ($doc->notes)<hr><div class="small" style="white-space: pre-line">{{ $doc->notes }}</div>@endif
                 </div>
             </div>
+            @endif
 
             @if ($r === 'invoices')
                 @include('sales.payments')

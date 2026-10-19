@@ -80,7 +80,18 @@ abstract class SalesDocumentController extends Controller
             ->when($request->filled('customer_id'), fn ($q) => $q->where('customer_id', $request->customer_id))
             ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->assigned_to))
             ->when($request->filled('from'), fn ($q) => $q->whereDate($this->dateField, '>=', $request->from))
-            ->when($request->filled('to'), fn ($q) => $q->whereDate($this->dateField, '<=', $request->to));
+            ->when($request->filled('to'), fn ($q) => $q->whereDate($this->dateField, '<=', $request->to))
+            // Hóa đơn: lọc nhanh quá hạn / sắp đến hạn (7 ngày)
+            ->when($class === \App\Models\Invoice::class && $request->input('due') === 'overdue', fn ($q) => $q->where('status', 'issued')
+                ->where('payment_status', '!=', 'paid')->whereNotNull('due_date')->where('due_date', '<', today()))
+            ->when($class === \App\Models\Invoice::class && $request->input('due') === 'soon', fn ($q) => $q->where('status', 'issued')
+                ->where('payment_status', '!=', 'paid')->whereBetween('due_date', [today(), today()->addDays(7)]));
+    }
+
+    /** Thông tin thêm cho trang danh sách (lớp con). */
+    protected function indexExtras(Request $request): array
+    {
+        return [];
     }
 
     public function index(Request $request)
@@ -91,7 +102,7 @@ abstract class SalesDocumentController extends Controller
 
         $totals = (clone $this->filtered($request))->toBase()->selectRaw('COUNT(*) as cnt, COALESCE(SUM(total),0) as total')->first();
 
-        return view('sales.index', ['docs' => $docs, 'totals' => $totals, 'users' => Lookup::users(), 'cfg' => $this->config()]);
+        return view('sales.index', ['docs' => $docs, 'totals' => $totals, 'users' => Lookup::users(), 'cfg' => $this->config()] + $this->indexExtras($request));
     }
 
     public function create(Request $request)
