@@ -59,6 +59,10 @@ class OrganizationProvisioner
                         'probability' => $prob, 'color' => $color, 'is_won' => $won, 'is_lost' => $lost]);
                 }
             }
+            // Kho mặc định luôn phải tồn tại (phiếu kho cần ít nhất một kho)
+            if (! \App\Models\Warehouse::exists()) {
+                \App\Models\Warehouse::create(['code' => 'KHO-CHINH', 'name' => 'Kho chính', 'is_default' => true, 'is_active' => true]);
+            }
             if ($alreadyProvisioned) {
                 return;
             }

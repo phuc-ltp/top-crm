@@ -70,6 +70,10 @@ erDiagram
     suppliers ||--o{ products : ""
     price_lists ||--o{ price_list_items : ""
     price_lists ||--o{ customers : ""
+    warehouses ||--o{ stock_levels : ""
+    products ||--o{ stock_levels : ""
+    stock_documents ||--o{ stock_document_items : ""
+    stock_documents ||--o{ stock_movements : ""
     products |o--o{ quotation_items : ""
     products |o--o{ sales_order_items : ""
     products |o--o{ invoice_items : ""
@@ -126,6 +130,10 @@ erDiagram
 | `payments` | Thanh toán; nguồn duy nhất để tính doanh thu. |
 | `product_categories`, `products` | Danh mục và sản phẩm/dịch vụ. Từ bước 3.1: `type` (product / service — dịch vụ không theo dõi tồn kho), `purchase_price` (giá vốn, chỉ người sửa sản phẩm thấy), `supplier_id`. |
 | `price_lists`, `price_list_items` | Bảng giá theo nhóm khách hàng (bước 3.1b): giá riêng từng sản phẩm, bật/tắt; `customers.price_list_id` (SET NULL khi xóa bảng giá). Giá được điền sẵn khi lập chứng từ và dùng khi dòng để trống đơn giá. Biến thể sản phẩm: `products.parent_id` + `variant_name` (1 cấp). |
+| `warehouses` | Kho theo tổ chức (bước 3.2): mã, tên, kho mặc định, đang dùng. Kho có phát sinh không xóa được. |
+| `stock_levels` | Tồn kho theo kho × sản phẩm: `quantity` (tồn thực), `reserved` (đang giữ cho đơn — bước 3.3). Chỉ InventoryService thay đổi, trong giao dịch có khóa dòng. |
+| `stock_documents`, `stock_document_items` | Phiếu kho đã ghi sổ: nhập PN (nhà cung cấp, đơn giá nhập), xuất PX, điều chỉnh kiểm kê DC (`counted_quantity`, `quantity` = chênh lệch), chuyển kho CK. Bất biến — không sửa / xóa. |
+| `stock_movements` | Sổ kho bất biến: số lượng có dấu, `balance_after`, đơn giá. Tổng phát sinh = tồn kho. `products.average_cost` = giá vốn bình quân gia quyền (cập nhật khi nhập), `products.reorder_level` = mức tồn tối thiểu (cảnh báo). |
 | `suppliers` | Nhà cung cấp theo tổ chức (bước 3.1): mã tự sinh NCC00001, liên hệ, mã số thuế, trạng thái; xóa mềm (khôi phục ở Thùng rác). |
 | `sales_targets` | Chỉ tiêu doanh số theo nhân viên và kỳ. |
 

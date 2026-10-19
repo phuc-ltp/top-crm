@@ -47,6 +47,8 @@ class AppServiceProvider extends ServiceProvider
             'product' => \App\Models\Product::class,
             'supplier' => \App\Models\Supplier::class,
             'price_list' => \App\Models\PriceList::class,
+            'warehouse' => \App\Models\Warehouse::class,
+            'stock_document' => \App\Models\StockDocument::class,
             'quotation' => \App\Models\Quotation::class,
             'sales_order' => \App\Models\SalesOrder::class,
             'invoice' => \App\Models\Invoice::class,
