@@ -43,7 +43,7 @@ class StockDocumentController extends Controller
     public function create(Request $request)
     {
         $type = $request->input('type', 'receipt');
-        abort_unless(isset(StockDocument::TYPES[$type]), 404);
+        abort_unless(in_array($type, StockDocument::manualTypes(), true), 404);
         abort_unless($this->canCreate($request, $type), 403);
         $warehouses = Warehouse::active()->orderByDesc('is_default')->orderBy('name')->get(['id', 'name', 'is_default']);
 
@@ -62,12 +62,12 @@ class StockDocumentController extends Controller
     public function store(Request $request, InventoryService $inventory)
     {
         $type = (string) $request->input('type');
-        abort_unless(isset(StockDocument::TYPES[$type]), 422);
+        abort_unless(in_array($type, StockDocument::manualTypes(), true), 422);
         abort_unless($this->canCreate($request, $type), 403);
 
         $activeWarehouse = TenantRule::exists('warehouses')->where('is_active', true);
         $data = $request->validate([
-            'type' => ['required', Rule::in(array_keys(StockDocument::TYPES))],
+            'type' => ['required', Rule::in(StockDocument::manualTypes())],
             'warehouse_id' => ['required', $activeWarehouse],
             'to_warehouse_id' => [Rule::requiredIf($type === 'transfer'), 'nullable', 'different:warehouse_id', $activeWarehouse],
             'supplier_id' => ['nullable', Rule::prohibitedIf($type !== 'receipt'), TenantRule::exists('suppliers')->whereNull('deleted_at')],
@@ -102,7 +102,7 @@ class StockDocumentController extends Controller
     public function show(Request $request, StockDocument $stockDocument)
     {
         abort_unless($request->user()->can('inventory.view'), 403);
-        $stockDocument->load(['items.product', 'warehouse', 'toWarehouse', 'supplier', 'creator']);
+        $stockDocument->load(['items.product', 'warehouse', 'toWarehouse', 'supplier', 'creator', 'salesOrder']);
 
         return view('stock-documents.show', ['doc' => $stockDocument, 'canCost' => $request->user()->can('inventory.manage')]);
     }

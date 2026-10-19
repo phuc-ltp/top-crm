@@ -28,11 +28,26 @@ class SalesOrder extends Model
     ];
 
     protected $fillable = [
-        'number', 'customer_id', 'quotation_id', 'order_date', 'status', 'subtotal', 'discount_amount',
+        'number', 'customer_id', 'quotation_id', 'warehouse_id', 'order_date', 'status', 'subtotal', 'discount_amount',
         'tax_rate', 'tax_amount', 'total', 'notes', 'created_by', 'assigned_to', 'approved_by', 'approved_at', 'is_demo',
     ];
 
     protected $casts = ['order_date' => 'date', 'approved_at' => 'datetime'];
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(StockReservation::class);
+    }
+
+    public function stockDocuments()
+    {
+        return $this->hasMany(StockDocument::class);
+    }
 
     public function items()
     {

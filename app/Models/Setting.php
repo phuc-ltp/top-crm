@@ -66,7 +66,7 @@ class Setting extends Model
         'lead_form_enabled', 'lead_form_token', 'lead_form_assignee', 'lead_form_source', 'lead_form_thanks',
         'provisioned_at',
         // Kho hàng (bước 3.2)
-        'inventory_allow_negative', 'notify_low_stock',
+        'inventory_allow_negative', 'notify_low_stock', 'inventory_track_orders',
     ];
 
     private const CACHE_KEY = 'crm.settings';

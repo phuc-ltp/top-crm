@@ -3,7 +3,7 @@
 @section('content')
     <x-page-header :title="__('Phiếu kho')" :breadcrumbs="['Kho hàng' => route('inventory.index'), 'Phiếu kho' => null]"
                    :subtitle="__('Phiếu đã ghi sổ không sửa / xóa được. Sai sót được sửa bằng phiếu điều chỉnh.')">
-        @foreach (App\Models\StockDocument::TYPES as $k => [$label])
+        @foreach (array_intersect_key(App\Models\StockDocument::TYPES, array_flip(App\Models\StockDocument::manualTypes())) as $k => [$label])
             @if ($k === 'adjustment' ? auth()->user()->can('inventory.adjust') : auth()->user()->can('inventory.create'))
                 <a href="{{ route('stock-documents.create', ['type' => $k]) }}" class="btn {{ $k === 'receipt' ? 'btn-primary' : 'btn-light' }}"><i class="bi bi-plus-lg me-1"></i>{{ __($label) }}</a>
             @endif

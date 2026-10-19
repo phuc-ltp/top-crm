@@ -53,7 +53,8 @@ class SettingController extends Controller
         foreach (['notify_lead_assigned', 'notify_task_due', 'notify_deal_stage', 'notify_ticket_new', 'notify_low_stock'] as $key) {
             Setting::put([$key => $request->boolean($key) ? '1' : '0'], 'notifications');
         }
-        Setting::put(['inventory_allow_negative' => $request->boolean('inventory_allow_negative') ? '1' : '0'], 'inventory');
+        Setting::put(['inventory_allow_negative' => $request->boolean('inventory_allow_negative') ? '1' : '0',
+            'inventory_track_orders' => $request->boolean('inventory_track_orders') ? '1' : '0'], 'inventory');
         // Cài đặt bảo mật áp dụng toàn hệ thống → chỉ quản trị nền tảng được đổi
         if ($request->user()->isPlatformAdmin()) {
             $require = $request->boolean(\App\Http\Middleware\RequireTwoFactor::SETTING) ? '1' : '0';

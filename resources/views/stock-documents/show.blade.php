@@ -10,6 +10,7 @@
                 <dt>{{ __('Ngày chứng từ') }}</dt><dd>{{ vn_date($doc->document_date) }}</dd>
                 <dt>{{ $doc->type === 'transfer' ? __('Kho xuất') : __('Kho') }}</dt><dd>{{ $doc->warehouse?->name }}</dd>
                 @if ($doc->toWarehouse)<dt>{{ __('Kho nhận') }}</dt><dd>{{ $doc->toWarehouse->name }}</dd>@endif
+                @if ($doc->salesOrder)<dt>{{ __('labels.order') }}</dt><dd>@can('view', $doc->salesOrder)<a href="{{ route('orders.show', $doc->salesOrder) }}">{{ $doc->salesOrder->number }}</a>@else {{ $doc->salesOrder->number }} @endcan</dd>@endif
                 @if ($doc->supplier)<dt>{{ __('Nhà cung cấp') }}</dt><dd>@can('view', $doc->supplier)<a href="{{ route('suppliers.show', $doc->supplier) }}">{{ $doc->supplier->name }}</a>@else {{ $doc->supplier->name }} @endcan</dd>@endif
                 <dt>{{ __('Số tham chiếu') }}</dt><dd>{{ $doc->reference ?? '—' }}</dd>
                 <dt>{{ __('Ghi chú') }}</dt><dd style="white-space: pre-line">{{ $doc->notes ?: '—' }}</dd>

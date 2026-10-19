@@ -22,6 +22,7 @@ class StockMovement extends Model
         'adjustment_out' => ['Điều chỉnh giảm', 'danger'],
         'transfer_in' => ['Chuyển đến', 'primary'],
         'transfer_out' => ['Chuyển đi', 'secondary'],
+        'return' => ['Hàng trả lại', 'success'],
     ];
 
     protected $fillable = ['product_id', 'warehouse_id', 'stock_document_id', 'type', 'quantity', 'unit_cost', 'balance_after', 'created_by'];

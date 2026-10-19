@@ -91,11 +91,25 @@ class SalesDocumentService
         }
 
         return DB::transaction(function () use ($document, $attributes, $calc) {
+            // Lịch sử sửa dòng chứng từ (đơn hàng, báo giá, hóa đơn): ghi nhật ký khi dòng thay đổi
+            $before = $document->exists ? $this->itemSummary($document->items()->get()->toArray()) : null;
             $document->fill(array_merge($attributes, collect($calc)->except('items')->all()));
             $document->save();
 
             $document->items()->delete();
             $document->items()->createMany($calc['items']);
+            $after = $this->itemSummary($calc['items']);
+            if ($before !== null && $before !== $after) {
+                ActivityLogger::log('updated', $document, 'Sửa dòng '.$document->activityLabel(), ['old' => ['items' => implode('; ', $before)], 'new' => ['items' => implode('; ', $after)]]);
+            }
+
+            // Đơn hàng: giữ / giao / trả phần giữ theo trạng thái (lỗi không đủ hàng → hủy cả thao tác lưu)
+            if ($document instanceof SalesOrder) {
+                $actor = auth()->user() ?? User::find($document->created_by);
+                if ($actor) {
+                    app(OrderFulfillmentService::class)->sync($document->fresh(), $actor);
+                }
+            }
 
             if ($document instanceof Invoice) {
                 app(PaymentService::class)->refreshInvoice($document);
@@ -103,6 +117,13 @@ class SalesDocumentService
 
             return $document->load('items');
         });
+    }
+
+    /** Tóm tắt dòng để so sánh / ghi nhật ký: "SL × mô tả @ đơn giá (-x%)". */
+    private function itemSummary(array $items): array
+    {
+        return array_map(fn ($i) => rtrim(rtrim(number_format((float) $i['quantity'], 2, '.', ''), '0'), '.').' × '.$i['description']
+            .' @ '.number_format((float) $i['unit_price'], 0, ',', '.').((float) $i['discount_percent'] > 0 ? ' (-'.(float) $i['discount_percent'].'%)' : ''), $items);
     }
 
     public function convertQuotationToOrder(Quotation $quotation, User $user): SalesOrder
@@ -115,6 +136,7 @@ class SalesDocumentService
             $order = $this->save(new SalesOrder, [
                 'customer_id' => $quotation->customer_id,
                 'quotation_id' => $quotation->id,
+                'warehouse_id' => InventoryService::tracksOrders() ? \App\Models\Warehouse::default()?->id : null,
                 'order_date' => today(),
                 'status' => 'pending',
                 'discount_amount' => $quotation->discount_amount,
