@@ -64,6 +64,8 @@ class ProductController extends Controller
     {
         $this->authorize('view', $product);
         $product->load('category', 'supplier', 'parent', 'variants');
+        $stock = $product->type === 'product' && request()->user()->can('inventory.view')
+            ? $product->stockLevels()->with('warehouse:id,name')->get() : collect();
         // Lịch sử thay đổi (giá, giá vốn, trạng thái...) — chỉ người được sửa sản phẩm (có giá vốn)
         $history = request()->user()->can('update', $product)
             ? \App\Models\ActivityLog::with('user:id,name')->where('subject_type', $product->getMorphClass())->where('subject_id', $product->id)
@@ -73,7 +75,7 @@ class ProductController extends Controller
             ->whereHas('invoice', fn ($q) => $q->where('status', 'issued'))
             ->selectRaw('COALESCE(SUM(quantity),0) as qty, COALESCE(SUM(line_total),0) as revenue')->first();
 
-        return view('products.show', compact('product', 'sales', 'history'));
+        return view('products.show', compact('product', 'sales', 'history', 'stock'));
     }
 
     public function edit(Product $product)
@@ -138,6 +140,7 @@ class ProductController extends Controller
             'type' => ['sometimes', 'required', Rule::in(array_keys(Product::TYPES))],   // không gửi: tạo mới = sản phẩm, sửa = giữ nguyên
             'supplier_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('suppliers')->whereNull('deleted_at')],
             'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
+            'reorder_level' => ['nullable', 'numeric', 'min:0', 'max:999999999'],
             // Biến thể: 1 cấp — cha phải là sản phẩm gốc (không phải biến thể), không phải chính nó; sản phẩm đang có biến thể không làm biến thể được
             'parent_id' => ['nullable', 'integer', \App\Support\Tenancy\TenantRule::exists('products')->whereNull('parent_id')->whereNull('deleted_at'),
                 function ($attr, $value, $fail) use ($product) {

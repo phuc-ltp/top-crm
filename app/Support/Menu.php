@@ -42,6 +42,12 @@ class Menu
                     ['Nhà cung cấp', null, 'suppliers.index', 'suppliers.view', 'suppliers.*'],
                     ['Bảng giá', null, 'price-lists.index', 'products.update', 'price-lists.*'],
                 ]],
+                ['Kho hàng', 'bi-boxes', null, null, null, [
+                    ['Tồn kho', null, 'inventory.index', 'inventory.view', 'inventory.index'],
+                    ['Phiếu kho', null, 'stock-documents.index', 'inventory.view', 'stock-documents.*'],
+                    ['Sổ kho', null, 'inventory.movements', 'inventory.view', 'inventory.movements'],
+                    ['Danh mục kho', null, 'warehouses.index', 'inventory.manage', 'warehouses.*'],
+                ]],
             ],
             'Vận hành' => [
                 ['Công việc', 'bi-check2-square', null, null, null, [

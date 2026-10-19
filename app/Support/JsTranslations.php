@@ -13,6 +13,7 @@ class JsTranslations
         'Đã sao chép mã khôi phục.',
         'Đã sao chép khóa API.',
         'Tìm gần đây',
+        'giữ',
         'Xóa',
         'Xem tất cả kết quả cho “:q”',
         'Không sao chép được, hãy chép thủ công.',

@@ -25,6 +25,7 @@ class CrmNotification extends Notification
         'task_assigned' => 'notify_task_due',
         'deal_stage' => 'notify_deal_stage',
         'ticket_new' => 'notify_ticket_new',
+        'low_stock' => 'notify_low_stock',
     ];
 
     public function __construct(

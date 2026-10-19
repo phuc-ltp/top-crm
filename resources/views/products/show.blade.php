@@ -38,6 +38,27 @@
                     <dt>{{ __('Mô tả') }}</dt><dd style="white-space: pre-line">{{ $product->description ?: '—' }}</dd>
                 </dl>
             </div></div>
+            @can('inventory.view')
+                @if ($product->type === 'product')
+                    @php($Inv = App\Services\InventoryService::class)
+                    <div class="card mt-4">
+                        <div class="card-header"><span>{{ __('Tồn kho') }}</span><a href="{{ route('inventory.movements', ['product' => $product->id]) }}" class="card-link-sm">{{ __('Sổ kho') }}</a></div>
+                        @if ($stock->isEmpty())
+                            <div class="card-body small text-muted">{{ __('Chưa có phát sinh kho.') }}</div>
+                        @else
+                            <div class="table-responsive"><table class="table table-sm mb-0 align-middle">
+                                <thead><tr><th>{{ __('Kho') }}</th><th class="text-end">{{ __('Tồn thực') }}</th><th class="text-end">{{ __('Đang giữ') }}</th><th class="text-end">{{ __('Có thể dùng') }}</th></tr></thead>
+                                <tbody>
+                                @foreach ($stock as $l)
+                                    <tr><td>{{ $l->warehouse?->name }}</td><td class="text-end">{{ $Inv::qty($l->quantity) }}</td><td class="text-end text-muted">{{ $Inv::qty($l->reserved) }}</td><td class="text-end fw-semibold">{{ $Inv::qty($l->available) }}</td></tr>
+                                @endforeach
+                                </tbody>
+                            </table></div>
+                        @endif
+                        @can('inventory.manage')<div class="card-body small text-muted pt-2">{{ __('Giá vốn bình quân') }}: {{ $product->average_cost !== null ? money($product->average_cost) : '—' }}</div>@endcan
+                    </div>
+                @endif
+            @endcan
             @if ($product->variants->isNotEmpty())
                 <div class="card mt-4">
                     <div class="card-header">{{ __('Biến thể') }} <span class="badge badge-soft-secondary ms-1">{{ $product->variants->count() }}</span></div>

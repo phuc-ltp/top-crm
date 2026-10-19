@@ -201,6 +201,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/price-lists/for-customer', [\App\Http\Controllers\PriceListController::class, 'forCustomer'])->name('price-lists.for-customer');
     Route::resource('price-lists', \App\Http\Controllers\PriceListController::class)->except(['show']);
     Route::get('/suppliers/export', [\App\Http\Controllers\SupplierController::class, 'export'])->name('suppliers.export');
+
+    // Kho hàng (bước 3.2)
+    Route::get('/inventory', [\App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/movements', [\App\Http\Controllers\InventoryController::class, 'movements'])->name('inventory.movements');
+    Route::resource('stock-documents', \App\Http\Controllers\StockDocumentController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('warehouses', \App\Http\Controllers\WarehouseController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('suppliers', \App\Http\Controllers\SupplierController::class);
 
     // Bán hàng

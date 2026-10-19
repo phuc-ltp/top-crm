@@ -23,6 +23,8 @@
                 <x-input name="purchase_price" type="number" :label="__('Giá vốn (₫)')" :value="$product->purchase_price !== null ? (int) $product->purchase_price : null" min="0" step="1"
                          col="col-md-4 mb-3" :help="__('Chỉ người được sửa sản phẩm mới thấy.')" />
                 <x-input name="unit" :label="__('Đơn vị tính')" :value="$product->unit" required maxlength="30" col="col-md-4 mb-3" />
+                <x-input name="reorder_level" type="number" :label="__('Mức tồn tối thiểu')" :value="$product->reorder_level !== null ? (float) $product->reorder_level : null" min="0" step="0.001" col="col-md-4 mb-3"
+                         :help="__('Có thể dùng ≤ mức này → cảnh báo tồn thấp. Để trống: không cảnh báo.')" />
                 <x-textarea name="description" :label="__('Mô tả')" :value="$product->description" rows="5" maxlength="5000" col="col-12 mb-0" />
             </div></div></div></div>
             <div class="col-lg-4">

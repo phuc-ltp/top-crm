@@ -24,10 +24,15 @@ class Product extends Model
     ];
 
     protected $fillable = [
-        'parent_id', 'sku', 'type', 'name', 'variant_name', 'product_category_id', 'supplier_id', 'description', 'price', 'purchase_price', 'unit', 'status', 'image', 'is_demo',
+        'parent_id', 'sku', 'type', 'name', 'variant_name', 'product_category_id', 'supplier_id', 'description', 'price', 'purchase_price', 'reorder_level', 'unit', 'status', 'image', 'is_demo',
     ];
 
-    protected $casts = ['price' => 'decimal:2', 'purchase_price' => 'decimal:2', 'is_demo' => 'boolean'];
+    protected $casts = ['price' => 'decimal:2', 'purchase_price' => 'decimal:2', 'average_cost' => 'decimal:2', 'reorder_level' => 'decimal:3', 'is_demo' => 'boolean'];
+
+    public function stockLevels()
+    {
+        return $this->hasMany(StockLevel::class);
+    }
 
     /** Sản phẩm cha (khi đây là một biến thể). */
     public function parent()

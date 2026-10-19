@@ -26,13 +26,21 @@
                 </div></div></div>
 
                 <div class="card"><div class="card-header">{{ __('Cấu hình thông báo nội bộ') }}</div><div class="card-body">
-                    @foreach (['notify_lead_assigned' => __('Khi được phân công lead / khách hàng'), 'notify_task_due' => __('Công việc được giao, sắp đến hạn, quá hạn'), 'notify_deal_stage' => __('Cơ hội thay đổi giai đoạn'), 'notify_ticket_new' => __('Ticket hỗ trợ mới')] as $key => $label)
+                    @foreach (['notify_lead_assigned' => __('Khi được phân công lead / khách hàng'), 'notify_task_due' => __('Công việc được giao, sắp đến hạn, quá hạn'), 'notify_deal_stage' => __('Cơ hội thay đổi giai đoạn'), 'notify_ticket_new' => __('Ticket hỗ trợ mới'), 'notify_low_stock' => __('Tồn kho xuống dưới mức tối thiểu (gửi người quản lý kho)')] as $key => $label)
                         <div class="form-check form-switch mb-2">
                             <input class="form-check-input" type="checkbox" role="switch" name="{{ $key }}" value="1" id="{{ $key }}" @checked(($s[$key] ?? '1') === '1')>
                             <label class="form-check-label" for="{{ $key }}">{{ $label }}</label>
                         </div>
                     @endforeach
                     <div class="small text-muted mt-2">{{ __('Thông báo hiển thị trong chuông thông báo. Hệ thống không gửi email hàng loạt.') }}</div>
+                </div></div>
+
+                <div class="card mt-4"><div class="card-header"><span><i class="bi bi-boxes me-2 text-orange"></i>{{ __('Kho hàng') }}</span></div><div class="card-body">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" role="switch" name="inventory_allow_negative" value="1" id="inventory_allow_negative" @checked(($s['inventory_allow_negative'] ?? '0') === '1')>
+                        <label class="form-check-label" for="inventory_allow_negative">{{ __('Cho phép xuất kho khi không đủ tồn (tồn kho âm)') }}</label>
+                    </div>
+                    <div class="small text-muted">{{ __('Mặc định tắt: phiếu xuất / chuyển vượt số có thể dùng sẽ bị từ chối.') }}</div>
                 </div></div>
 
                 @can('platform')
