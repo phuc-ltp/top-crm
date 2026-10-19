@@ -134,6 +134,7 @@ erDiagram
 | `stock_levels` | Tồn kho theo kho × sản phẩm: `quantity` (tồn thực), `reserved` (đang giữ cho đơn — bước 3.3). Chỉ InventoryService thay đổi, trong giao dịch có khóa dòng. |
 | `stock_documents`, `stock_document_items` | Phiếu kho đã ghi sổ: nhập PN (nhà cung cấp, đơn giá nhập), xuất PX, điều chỉnh kiểm kê DC (`counted_quantity`, `quantity` = chênh lệch), chuyển kho CK. Bất biến — không sửa / xóa. |
 | `stock_movements` | Sổ kho bất biến: số lượng có dấu, `balance_after`, đơn giá. Tổng phát sinh = tồn kho. `products.average_cost` = giá vốn bình quân gia quyền (cập nhật khi nhập), `products.reorder_level` = mức tồn tối thiểu (cảnh báo). |
+| `stock_reservations` | Hàng đang giữ cho đơn hàng (bước 3.3), theo đơn × sản phẩm × kho; tổng nằm ở `stock_levels.reserved`. `sales_orders.warehouse_id` = kho xuất (trống = đơn không theo dõi kho, gồm mọi đơn tạo trước bước 3.3 hoặc khi tắt Cài đặt › Kho hàng › "Đơn hàng giữ hàng & xuất kho tự động"). `stock_documents.sales_order_id` = phiếu xuất giao hàng / phiếu nhập hàng trả lại (NT) của đơn. |
 | `suppliers` | Nhà cung cấp theo tổ chức (bước 3.1): mã tự sinh NCC00001, liên hệ, mã số thuế, trạng thái; xóa mềm (khôi phục ở Thùng rác). |
 | `sales_targets` | Chỉ tiêu doanh số theo nhân viên và kỳ. |
 

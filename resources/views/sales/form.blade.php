@@ -15,7 +15,11 @@
                 <x-select name="status" :label="__('Trạng thái')" :options="App\Models\Quotation::STATUSES" :value="$doc->status" required col="col-md-4 mb-3" />
                 <x-select name="opportunity_id" :label="__('Cơ hội liên quan')" :options="$opportunities" :value="$doc->opportunity_id" :placeholder="__('— Không —')" col="col-md-4 mb-3" />
             @elseif ($r === 'orders')
-                <x-select name="status" :label="__('Trạng thái')" :options="auth()->user()->can('orders.approve') || $doc->approved_at ? App\Models\SalesOrder::STATUSES : collect(App\Models\SalesOrder::STATUSES)->except('confirmed')->all()" :value="$doc->status" required col="col-md-3 mb-3" />
+                <x-select name="status" :label="__('Trạng thái')" :options="auth()->user()->can('orders.approve') || $doc->approved_at ? App\Models\SalesOrder::STATUSES : collect(App\Models\SalesOrder::STATUSES)->except(['confirmed', 'processing', 'completed'])->all()" :value="$doc->status" required col="col-md-3 mb-3" />
+                @if ($doc->exists ? $doc->warehouse_id : ($tracksOrders ?? false))
+                    <x-select name="warehouse_id" :label="__('Kho xuất hàng')" :options="$warehouses" :value="$doc->warehouse_id" :placeholder="__('— Không theo dõi kho —')" col="col-md-4 mb-3"
+                              :help="__('Duyệt đơn → giữ hàng; hoàn thành → tự lập phiếu xuất kho; hủy → trả phần giữ.')" />
+                @endif
             @else
                 <x-input name="due_date" type="date" :label="__('Hạn thanh toán')" :value="optional($doc->due_date)->format('Y-m-d')" col="col-md-3 mb-3" />
             @endif

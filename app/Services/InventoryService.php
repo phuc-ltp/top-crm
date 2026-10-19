@@ -25,6 +25,12 @@ use Illuminate\Validation\ValidationException;
  */
 class InventoryService
 {
+    /** Đơn hàng mới tự gắn kho mặc định (giữ hàng khi duyệt, xuất kho khi hoàn thành). Mặc định tắt. */
+    public static function tracksOrders(): bool
+    {
+        return Setting::get('inventory_track_orders', '0') === '1';
+    }
+
     public static function allowsNegative(): bool
     {
         return Setting::get('inventory_allow_negative', '0') === '1';
@@ -54,6 +60,8 @@ class InventoryService
                 }
                 match ($type) {
                     'receipt' => $this->receive($document, $product, $line, $actor),
+                    // Hàng trả lại nhập theo giá vốn bình quân hiện tại (không làm đổi giá vốn)
+                    'return' => $this->receive($document, $product, ['unit_cost' => $product->average_cost ?? $product->purchase_price ?? 0] + $line, $actor, 'return'),
                     'issue' => $this->move($document, $product, $document->warehouse_id, Decimal::mul($line['quantity'], -1), 'issue', $actor, $line),
                     'adjustment' => $this->adjust($document, $product, $line, $actor),
                     'transfer' => $this->transfer($document, $product, $line, $actor),
@@ -72,7 +80,7 @@ class InventoryService
         return $document->load('items.product', 'warehouse', 'toWarehouse', 'supplier');
     }
 
-    private function receive(StockDocument $doc, Product $product, array $line, User $actor): void
+    private function receive(StockDocument $doc, Product $product, array $line, User $actor, string $movementType = 'receipt'): void
     {
         $qty = Decimal::of($line['quantity']);
         $cost = Decimal::round($line['unit_cost'] ?? ($product->average_cost ?? $product->purchase_price ?? 0));
@@ -87,7 +95,7 @@ class InventoryService
             : $cost;
         $product->saveQuietly();
 
-        $this->move($doc, $product, $doc->warehouse_id, $qty, 'receipt', $actor, $line + ['unit_cost' => $cost]);
+        $this->move($doc, $product, $doc->warehouse_id, $qty, $movementType, $actor, ['unit_cost' => $cost] + $line);
     }
 
     private function adjust(StockDocument $doc, Product $product, array $line, User $actor): void

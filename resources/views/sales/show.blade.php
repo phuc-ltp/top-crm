@@ -61,6 +61,9 @@
             @if ($r === 'invoices')
                 @include('sales.payments')
             @endif
+            @if ($r === 'orders' && ($doc->warehouse_id || $doc->stockDocuments->isNotEmpty()))
+                @include('sales.fulfilment')
+            @endif
         </div>
         <div class="col-lg-4">
             <div class="card"><div class="card-body">

@@ -40,7 +40,12 @@
                         <input class="form-check-input" type="checkbox" role="switch" name="inventory_allow_negative" value="1" id="inventory_allow_negative" @checked(($s['inventory_allow_negative'] ?? '0') === '1')>
                         <label class="form-check-label" for="inventory_allow_negative">{{ __('Cho phép xuất kho khi không đủ tồn (tồn kho âm)') }}</label>
                     </div>
-                    <div class="small text-muted">{{ __('Mặc định tắt: phiếu xuất / chuyển vượt số có thể dùng sẽ bị từ chối.') }}</div>
+                    <div class="small text-muted mb-3">{{ __('Mặc định tắt: phiếu xuất / chuyển vượt số có thể dùng sẽ bị từ chối.') }}</div>
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" role="switch" name="inventory_track_orders" value="1" id="inventory_track_orders" @checked(($s['inventory_track_orders'] ?? '0') === '1')>
+                        <label class="form-check-label" for="inventory_track_orders">{{ __('Đơn hàng giữ hàng & xuất kho tự động') }}</label>
+                    </div>
+                    <div class="small text-muted">{{ __('Bật khi đã nhập tồn kho: đơn hàng mới gắn kho mặc định — duyệt đơn giữ hàng (thiếu hàng thì không duyệt được), hoàn thành tự lập phiếu xuất kho, hủy trả phần giữ. Đơn hàng đã có không bị ảnh hưởng.') }}</div>
                 </div></div>
 
                 @can('platform')

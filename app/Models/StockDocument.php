@@ -19,9 +19,17 @@ class StockDocument extends Model
         'issue' => ['Phiếu xuất kho', 'warning', 'PX'],
         'adjustment' => ['Phiếu điều chỉnh (kiểm kê)', 'info', 'DC'],
         'transfer' => ['Phiếu chuyển kho', 'primary', 'CK'],
+        // Chỉ lập từ đơn hàng (trả hàng sau khi giao)
+        'return' => ['Phiếu nhập hàng trả lại', 'success', 'NT'],
     ];
 
-    protected $fillable = ['number', 'type', 'warehouse_id', 'to_warehouse_id', 'supplier_id', 'document_date', 'reference', 'notes', 'created_by', 'is_demo'];
+    /** Loại phiếu lập trực tiếp ở trang Phiếu kho (phiếu trả hàng chỉ lập từ đơn hàng). */
+    public static function manualTypes(): array
+    {
+        return array_values(array_diff(array_keys(self::TYPES), ['return']));
+    }
+
+    protected $fillable = ['number', 'type', 'warehouse_id', 'to_warehouse_id', 'supplier_id', 'sales_order_id', 'document_date', 'reference', 'notes', 'created_by', 'is_demo'];
 
     protected $casts = ['document_date' => 'date', 'is_demo' => 'boolean'];
 
@@ -73,5 +81,10 @@ class StockDocument extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class)->withTrashed();
     }
 }

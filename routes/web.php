@@ -219,6 +219,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/pdf', [SalesOrderController::class, 'pdf'])->name('orders.pdf');
     Route::post('/orders/{order}/approve', [SalesOrderController::class, 'approve'])->name('orders.approve');
     Route::post('/orders/{order}/invoice', [SalesOrderController::class, 'createInvoice'])->name('orders.invoice');
+    Route::post('/orders/{order}/return', [SalesOrderController::class, 'returnGoods'])->name('orders.return');
     Route::resource('orders', SalesOrderController::class)->parameters(['orders' => 'order']);
 
     Route::get('/invoices/export', [InvoiceController::class, 'export'])->name('invoices.export');
