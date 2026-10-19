@@ -106,8 +106,21 @@ abstract class SalesDocumentController extends Controller
             'assigned_to' => $request->user()->id,
         ]);
 
-        return view('sales.form', $this->formData($request) + ['doc' => $doc, 'items' => [['quantity' => 1]]]);
+        // Điền sẵn (VD: từ mẫu báo giá)
+        $prefill = $this->prefill($request);
+        $doc->fill($prefill['attributes'] ?? []);
+
+        return view('sales.form', $this->formData($request) + ['doc' => $doc, 'items' => $prefill['items'] ?? [['quantity' => 1]]]);
     }
+
+    /** Dữ liệu điền sẵn khi tạo mới: ['attributes' => [...], 'items' => [...]]. */
+    protected function prefill(Request $request): array
+    {
+        return [];
+    }
+
+    /** Sau khi lưu (tạo / sửa) — lớp con xử lý thêm (VD: duyệt báo giá). */
+    protected function afterSave(Model $doc, Request $request): void {}
 
     public function store(Request $request)
     {
@@ -117,6 +130,7 @@ abstract class SalesDocumentController extends Controller
         $attributes['created_by'] = $request->user()->id;
 
         $doc = $this->documents->save(new $class, $attributes, $items);
+        $this->afterSave($doc, $request);
 
         return redirect()->route($this->route.'.show', $doc)->with('success', __('Đã tạo :doc :number.', ['doc' => $this->docName(), 'number' => $doc->number]));
     }
@@ -156,6 +170,7 @@ abstract class SalesDocumentController extends Controller
         [$attributes, $items] = $this->validated($request, $doc);
 
         $this->documents->save($doc, $attributes, $items);
+        $this->afterSave($doc, $request);
 
         return redirect()->route($this->route.'.show', $doc)->with('success', __('Đã cập nhật :doc.', ['doc' => $this->docName()]));
     }

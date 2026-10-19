@@ -35,6 +35,7 @@ class SettingController extends Controller
             'currency' => ['required', 'in:'.implode(',', array_keys(self::CURRENCIES))],
             'date_format' => ['required', 'in:'.implode(',', array_keys(self::DATE_FORMATS))],
             'default_tax_rate' => ['required', 'numeric', 'min:0', 'max:100'],
+            'quotation_discount_threshold' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'company_logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:1024'],
             'remove_logo' => ['nullable', 'boolean'],
         ], ['brand_color.regex' => __('Màu thương hiệu phải có dạng #RRGGBB.')], ['company_name' => __('Tên công ty'), 'brand_color' => __('Màu thương hiệu')]);

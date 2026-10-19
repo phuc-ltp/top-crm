@@ -90,6 +90,14 @@ Artisan::command('crm:purge-demo {--force}', function () {
 | Nhắc việc sắp đến hạn / đánh dấu quá hạn. Chạy mỗi 15 phút qua scheduler,
 | hoặc thủ công: php artisan crm:task-reminders
 */
+/*
+| Tác vụ bán hàng định kỳ: báo giá quá hạn → hết hạn. Chạy mỗi giờ qua scheduler, hoặc: php artisan crm:sales-automation
+*/
+Artisan::command('crm:sales-automation', function (\App\Services\SalesAutomationService $service) {
+    $result = $service->run();
+    $this->info('Báo giá chuyển hết hạn: '.$result['expired_quotations']);
+})->purpose('Tác vụ bán hàng định kỳ (báo giá hết hạn)');
+
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
     $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']} · Nhắc hoạt động: {$result['activities']}");
@@ -161,5 +169,6 @@ Artisan::command('crm:health', function () {
 })->purpose('Kiểm tra tình trạng hệ thống OrangeCRM');
 
 Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlapping();
+Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
 // Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
 Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

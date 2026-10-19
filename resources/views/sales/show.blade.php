@@ -24,6 +24,7 @@
                         </div>
                         <div class="text-md-end">
                             <div>{!! badge($cfg['statuses'], $doc->status) !!}
+                                @if ($r === 'quotations' && $doc->approval_status) {!! badge(App\Models\Quotation::APPROVAL_STATUSES, $doc->approval_status) !!} @endif
                                 @if ($r === 'invoices') {!! badge(App\Models\Invoice::PAYMENT_STATUSES, $doc->payment_status) !!} @if ($doc->is_overdue)<span class="badge badge-soft-danger">{{ __('Quá hạn') }}</span>@endif @endif</div>
                             <div class="small text-muted mt-2">{{ __('Ngày:') }} <strong>{{ vn_date($doc->{$cfg['dateField']}) }}</strong></div>
                             @if ($r === 'quotations')<div class="small text-muted">{{ __('Hiệu lực đến:') }} <strong>{{ vn_date($doc->valid_until) }}</strong></div>@endif
@@ -60,6 +61,9 @@
 
             @if ($r === 'invoices')
                 @include('sales.payments')
+            @endif
+            @if ($r === 'quotations')
+                @include('sales.quotation-approval')
             @endif
             @if ($r === 'orders' && ($doc->warehouse_id || $doc->stockDocuments->isNotEmpty()))
                 @include('sales.fulfilment')

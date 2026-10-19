@@ -10,6 +10,13 @@
         <div class="card mb-4"><div class="card-header">{{ __('Thông tin chung') }}</div><div class="card-body"><div class="row">
             <x-select name="customer_id" :label="__('labels.customer')" :options="$customers" :value="$doc->customer_id" required :placeholder="__('— Chọn khách hàng —')" col="col-md-6 mb-3" />
             <x-input :name="$cfg['dateField']" type="date" :label="$r === 'orders' ? __('Ngày đặt hàng') : __('Ngày lập')" :value="optional($doc->{$cfg['dateField']})->format('Y-m-d')" required col="col-md-3 mb-3" />
+            @if ($r === 'quotations' && ! $doc->exists && ! empty($templates))
+                <div class="col-md-3 mb-3"><label class="form-label" for="templatePick">{{ __('Dùng mẫu báo giá') }}</label>
+                    <select id="templatePick" class="form-select" onchange="if (this.value) window.location = '{{ route('quotations.create') }}?template=' + this.value">
+                        <option value="">{{ __('— Không dùng mẫu —') }}</option>
+                        @foreach ($templates as $tid => $tname)<option value="{{ $tid }}" @selected(request('template') == $tid)>{{ $tname }}</option>@endforeach
+                    </select></div>
+            @endif
             @if ($r === 'quotations')
                 <x-input name="valid_until" type="date" :label="__('Hiệu lực đến')" :value="optional($doc->valid_until)->format('Y-m-d')" col="col-md-3 mb-3" />
                 <x-select name="status" :label="__('Trạng thái')" :options="App\Models\Quotation::STATUSES" :value="$doc->status" required col="col-md-4 mb-3" />

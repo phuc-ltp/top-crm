@@ -67,6 +67,8 @@ class Setting extends Model
         'provisioned_at',
         // Kho hàng (bước 3.2)
         'inventory_allow_negative', 'notify_low_stock', 'inventory_track_orders',
+        // Báo giá (bước 3.4)
+        'quotation_discount_threshold',
     ];
 
     private const CACHE_KEY = 'crm.settings';
