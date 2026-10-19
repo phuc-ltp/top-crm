@@ -71,6 +71,8 @@ class Setting extends Model
         'quotation_discount_threshold',
         // Hóa đơn (bước 3.5): danh sách thuế suất VAT, VD "0,5,8,10"
         'tax_rates',
+        // Thông tin trên chứng từ (hóa đơn / PDF)
+        'company_tax_code', 'bank_name', 'bank_account_number', 'bank_account_name', 'invoice_terms',
     ];
 
     private const CACHE_KEY = 'crm.settings';

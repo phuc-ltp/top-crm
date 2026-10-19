@@ -542,6 +542,18 @@ pre { color: var(--crm-text); }
 
 .kpi-card { padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 6px; transition: transform .15s ease, box-shadow .15s ease; }
 .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--crm-shadow-lg); }
+/* Hóa đơn (trình bày như chứng từ) */
+.invoice-paper { border-top: 4px solid var(--crm-primary); }
+.invoice-head { border-bottom: 1px dashed var(--crm-border); }
+.invoice-logo { width: 56px; height: 56px; object-fit: contain; border-radius: 10px; background: var(--crm-surface); }
+.invoice-title { font-size: 1.6rem; font-weight: 800; letter-spacing: .08em; color: var(--crm-text); line-height: 1.1; }
+.invoice-items thead th { background: var(--crm-primary-soft); color: var(--crm-primary-text); font-size: .74rem; text-transform: uppercase; letter-spacing: .03em; border: 0; }
+.invoice-bank { border: 1px solid var(--crm-border); border-radius: var(--crm-radius-sm); padding: 10px 12px; background: var(--crm-surface); }
+.invoice-steps { display: flex; gap: 6px; flex-wrap: wrap; }
+.invoice-step { flex: 1 1 140px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 999px; background: var(--crm-neutral-soft); color: var(--crm-text-muted); font-size: .8rem; font-weight: 600; }
+.invoice-step .dot { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--crm-surface); flex-shrink: 0; }
+.invoice-step.done { background: var(--crm-success-soft); color: var(--crm-success-text); }
+.invoice-step.current { background: var(--crm-primary-soft); color: var(--crm-primary-text); box-shadow: inset 0 0 0 1px var(--crm-primary); }
 /* Chỉ số điều hành (bước 2.7) */
 .metric-group { border: 1px solid var(--crm-border); border-radius: var(--crm-radius-sm); padding: 10px 12px; background: var(--crm-surface); }
 .metric-group-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: var(--crm-text-muted); padding-bottom: 6px; border-bottom: 1px solid var(--crm-border); }

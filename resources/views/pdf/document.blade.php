@@ -29,6 +29,7 @@
             <div class="company">{{ $settings['company_name'] }}</div>
             @if ($settings['company_address'])<div class="muted">{{ $settings['company_address'] }}</div>@endif
             <div class="muted">{{ $settings['company_phone'] }} @if ($settings['company_email']) · {{ $settings['company_email'] }} @endif</div>
+            @if ($settings['company_tax_code'] ?? null)<div class="muted">{{ __('MST') }}: {{ $settings['company_tax_code'] }}</div>@endif
         </td>
         <td>
             <div class="title">{{ $cfg['doc'] }}</div>
@@ -73,7 +74,14 @@
     </table>
 </td></tr></table>
 
+@if ($cfg['route'] === 'invoices' && ($settings['bank_account_number'] ?? null) && (float) $doc->balance > 0)
+    <div class="box" style="margin-top:16px"><strong>{{ __('Thông tin chuyển khoản') }}</strong><br>
+        {{ __('Ngân hàng') }}: {{ $settings['bank_name'] }} · {{ __('Số tài khoản') }}: <strong>{{ $settings['bank_account_number'] }}</strong> · {{ __('Chủ tài khoản') }}: {{ $settings['bank_account_name'] }}<br>
+        {{ __('Nội dung chuyển khoản') }}: <strong>{{ $doc->number }}</strong></div>
+@endif
 @if ($doc->notes)<div style="margin-top:16px"><strong>{{ __('Ghi chú / điều khoản:') }}</strong><br>{!! nl2br(e($doc->notes)) !!}</div>@endif
+@if ($cfg['route'] === 'invoices' && ($settings['invoice_terms'] ?? null))<div style="margin-top:10px" class="muted">{!! nl2br(e($settings['invoice_terms'])) !!}</div>@endif
+@if ($cfg['route'] === 'invoices')<div style="margin-top:10px; font-size:9px" class="muted">{{ __('Hóa đơn trong CRM là chứng từ nội bộ để theo dõi công nợ — không phải hóa đơn điện tử hợp lệ theo quy định thuế Việt Nam.') }}</div>@endif
 
 <table class="sign"><tr>
     <td><strong>{{ __('labels.customer') }}</strong><br><span class="muted">{{ __('(Ký, ghi rõ họ tên)') }}</span></td>
