@@ -68,6 +68,8 @@ erDiagram
     invoices ||--o{ payments : ""
     product_categories ||--o{ products : ""
     suppliers ||--o{ products : ""
+    price_lists ||--o{ price_list_items : ""
+    price_lists ||--o{ customers : ""
     products |o--o{ quotation_items : ""
     products |o--o{ sales_order_items : ""
     products |o--o{ invoice_items : ""
@@ -123,6 +125,7 @@ erDiagram
 | `invoices`, `invoice_items` | Hóa đơn (nháp → phát hành), `amount_paid`, `payment_status`. |
 | `payments` | Thanh toán; nguồn duy nhất để tính doanh thu. |
 | `product_categories`, `products` | Danh mục và sản phẩm/dịch vụ. Từ bước 3.1: `type` (product / service — dịch vụ không theo dõi tồn kho), `purchase_price` (giá vốn, chỉ người sửa sản phẩm thấy), `supplier_id`. |
+| `price_lists`, `price_list_items` | Bảng giá theo nhóm khách hàng (bước 3.1b): giá riêng từng sản phẩm, bật/tắt; `customers.price_list_id` (SET NULL khi xóa bảng giá). Giá được điền sẵn khi lập chứng từ và dùng khi dòng để trống đơn giá. Biến thể sản phẩm: `products.parent_id` + `variant_name` (1 cấp). |
 | `suppliers` | Nhà cung cấp theo tổ chức (bước 3.1): mã tự sinh NCC00001, liên hệ, mã số thuế, trạng thái; xóa mềm (khôi phục ở Thùng rác). |
 | `sales_targets` | Chỉ tiêu doanh số theo nhân viên và kỳ. |
 

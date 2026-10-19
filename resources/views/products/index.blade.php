@@ -34,7 +34,7 @@
                     <tr>
                         <td style="width:56px">@if ($p->image_url)<img src="{{ $p->image_url }}" alt="" class="rounded" style="width:40px;height:40px;object-fit:cover">@else<span class="avatar tone-orange" style="border-radius:8px"><i class="bi bi-box"></i></span>@endif</td>
                         <td class="small text-muted">{{ $p->sku }}</td>
-                        <td><a href="{{ route('products.show', $p) }}" class="row-link">{{ $p->name }}</a>@if ($p->type === 'service') <span class="badge badge-soft-info">{{ __('Dịch vụ') }}</span>@endif</td>
+                        <td><a href="{{ route('products.show', $p) }}" class="row-link">{{ $p->name }}</a>@if ($p->variant_name)<div class="small text-muted"><i class="bi bi-diagram-2"></i> {{ $p->variant_name }}</div>@endif @if ($p->type === 'service') <span class="badge badge-soft-info">{{ __('Dịch vụ') }}</span>@endif</td>
                         <td class="small">{{ $p->category?->name ?? '—' }}</td>
                         <td class="text-end fw-semibold">{{ money($p->price) }}<div class="small text-muted fw-normal">/ {{ $p->unit }}</div></td>
                         <td>{!! badge(App\Models\Product::STATUSES, $p->status) !!}</td>

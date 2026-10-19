@@ -24,6 +24,7 @@ class CustomerRequest extends FormRequest
             'company' => ['nullable', 'string', 'max:255'],
             'type' => ['required', Rule::in(array_keys(Customer::TYPES))],
             'lead_source_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('lead_sources')],
+            'price_list_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('price_lists')],
             'status' => ['required', Rule::in(array_keys(Customer::STATUSES))],
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'notes' => ['nullable', 'string', 'max:5000'],

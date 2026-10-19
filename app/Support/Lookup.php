@@ -64,6 +64,6 @@ class Lookup
 
     public static function products()
     {
-        return Product::active()->orderBy('name')->get(['id', 'sku', 'name', 'price', 'unit']);
+        return Product::active()->orderBy('name')->orderBy('variant_name')->get(['id', 'sku', 'name', 'variant_name', 'price', 'unit']);
     }
 }

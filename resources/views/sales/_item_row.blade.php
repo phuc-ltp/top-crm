@@ -3,7 +3,7 @@
         <select name="items[{{ $index }}][product_id]" class="form-select" data-field="product_id" aria-label="{{ __('Sản phẩm') }}">
             <option value="">{{ __('— Tự nhập —') }}</option>
             @foreach ($products as $p)
-                <option value="{{ $p->id }}" data-price="{{ (int) $p->price }}" data-name="{{ $p->name }}" @selected(($item['product_id'] ?? null) == $p->id)>{{ $p->sku }} — {{ $p->name }}</option>
+                <option value="{{ $p->id }}" data-price="{{ (int) $p->price }}" data-name="{{ $p->display_name }}" @selected(($item['product_id'] ?? null) == $p->id)>{{ $p->sku }} — {{ $p->display_name }}</option>
             @endforeach
         </select>
     </td>

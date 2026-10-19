@@ -40,6 +40,7 @@ class Menu
                 ['Sản phẩm & Dịch vụ', 'bi-box-seam-fill', null, null, null, [
                     ['Danh sách sản phẩm', null, 'products.index', 'products.view', 'products.*'],
                     ['Nhà cung cấp', null, 'suppliers.index', 'suppliers.view', 'suppliers.*'],
+                    ['Bảng giá', null, 'price-lists.index', 'products.update', 'price-lists.*'],
                 ]],
             ],
             'Vận hành' => [

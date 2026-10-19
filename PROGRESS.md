@@ -89,7 +89,7 @@
 
 ## PHASE 3 — Vận hành bán hàng (bắt đầu 16/10/2026, kế hoạch: docs/PHASE3_PLAN.md)
 - [x] 3.1a Tiền chính xác & nhà cung cấp (16/10): App\Support\Decimal (bcmath, làm tròn nửa lên) cho tính tiền chứng từ & thanh toán — tính lại 29/29 chứng từ cũ (demo + thật, chỉ đọc) không lệch; bảng suppliers + CRUD/tìm/lọc/sắp xếp/xuất/thùng rác/tìm kiếm toàn cục, quyền suppliers.* (migration gán theo vai trò ở mọi tổ chức); sản phẩm: loại sản phẩm/dịch vụ, giá vốn (chỉ người sửa sản phẩm thấy) + lợi nhuận gộp, nhà cung cấp; menu Sản phẩm & Dịch vụ › Nhà cung cấp. SupplierCatalogTest 5 + DecimalTest 5.
-- [ ] 3.1b Biến thể, bảng giá, lịch sử sản phẩm
+- [x] 3.1b Biến thể, bảng giá, lịch sử sản phẩm (19/10): biến thể = sản phẩm con 1 cấp (parent_id + variant_name, SKU/giá riêng, nút "Thêm biến thể" điền sẵn từ sản phẩm cha, chặn biến thể lồng / tự làm cha), tên "Sản phẩm — Biến thể" trong chọn sản phẩm chứng từ; bảng giá theo nhóm khách hàng (price_lists + items, gắn vào khách hàng, bật/tắt; JS điền giá theo khách hàng đang chọn; máy chủ dùng giá bảng giá khi dòng để trống đơn giá — vẫn cho chỉnh giá như cũ); lịch sử thay đổi sản phẩm (chỉ người sửa sản phẩm thấy vì có giá vốn). VariantPriceListTest 4.
 - [ ] 3.2 Kho hàng
 - [ ] 3.3 Đơn hàng ↔ kho
 - [ ] 3.4 Báo giá: mẫu, duyệt, hết hạn

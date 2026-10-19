@@ -27,7 +27,7 @@
         <div class="card mb-4">
             <div class="card-header"><span>{{ __('Sản phẩm / dịch vụ') }}</span><button type="button" class="btn btn-soft-primary btn-sm" data-add-row><i class="bi bi-plus"></i> {{ __('Thêm dòng') }}</button></div>
             <div class="table-responsive">
-                <table class="table line-items" data-line-items>
+                <table class="table line-items" data-line-items data-prices-url="{{ route('price-lists.for-customer') }}">
                     <thead><tr><th style="min-width:220px">{{ __('Sản phẩm') }}</th><th style="min-width:200px">{{ __('Mô tả') }}</th><th style="width:100px">{{ __('SL') }}</th><th style="width:150px">{{ __('Đơn giá') }}</th><th style="width:90px">{{ __('% giảm') }}</th><th class="text-end" style="width:140px">{{ __('Thành tiền') }}</th><th style="width:44px"></th></tr></thead>
                     <tbody>
                     @foreach (old('items', $items) as $i => $item)

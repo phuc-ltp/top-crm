@@ -198,6 +198,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/import', [\App\Http\Controllers\ImportController::class, 'store'])->defaults('module', 'products')->name('products.import.store');
     Route::get('/products/import/template', [\App\Http\Controllers\ImportController::class, 'template'])->defaults('module', 'products')->name('products.import.template');
     Route::resource('products', ProductController::class);
+    Route::get('/price-lists/for-customer', [\App\Http\Controllers\PriceListController::class, 'forCustomer'])->name('price-lists.for-customer');
+    Route::resource('price-lists', \App\Http\Controllers\PriceListController::class)->except(['show']);
     Route::get('/suppliers/export', [\App\Http\Controllers\SupplierController::class, 'export'])->name('suppliers.export');
     Route::resource('suppliers', \App\Http\Controllers\SupplierController::class);
 

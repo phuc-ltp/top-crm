@@ -24,10 +24,27 @@ class Product extends Model
     ];
 
     protected $fillable = [
-        'sku', 'type', 'name', 'product_category_id', 'supplier_id', 'description', 'price', 'purchase_price', 'unit', 'status', 'image', 'is_demo',
+        'parent_id', 'sku', 'type', 'name', 'variant_name', 'product_category_id', 'supplier_id', 'description', 'price', 'purchase_price', 'unit', 'status', 'image', 'is_demo',
     ];
 
     protected $casts = ['price' => 'decimal:2', 'purchase_price' => 'decimal:2', 'is_demo' => 'boolean'];
+
+    /** Sản phẩm cha (khi đây là một biến thể). */
+    public function parent()
+    {
+        return $this->belongsTo(Product::class, 'parent_id')->withTrashed();
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(Product::class, 'parent_id');
+    }
+
+    /** Tên hiển thị: "Tên — Biến thể" (biến thể) hoặc tên sản phẩm. */
+    public function getDisplayNameAttribute(): string
+    {
+        return $this->variant_name ? $this->name.' — '.$this->variant_name : $this->name;
+    }
 
     public function supplier()
     {

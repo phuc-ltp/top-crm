@@ -39,7 +39,13 @@ class ProductController extends Controller
     {
         $this->authorize('create', Product::class);
 
-        return view('products.form', ['product' => new Product(['status' => 'active', 'unit' => 'cái', 'type' => 'product']), 'categories' => Lookup::categories(), 'suppliers' => $this->supplierOptions()]);
+        $product = new Product(['status' => 'active', 'unit' => 'cái', 'type' => 'product']);
+        // "Thêm biến thể" từ trang sản phẩm cha: điền sẵn thông tin của cha
+        if ($parent = Product::whereNull('parent_id')->find(request()->integer('parent'))) {
+            $product->fill($parent->only(['name', 'type', 'product_category_id', 'supplier_id', 'price', 'purchase_price', 'unit', 'description']) + ['parent_id' => $parent->id]);
+        }
+
+        return view('products.form', ['product' => $product, 'categories' => Lookup::categories(), 'suppliers' => $this->supplierOptions(), 'parents' => $this->parentOptions()]);
     }
 
     public function store(Request $request, UploadService $uploads)
@@ -57,19 +63,25 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $this->authorize('view', $product);
-        $product->load('category', 'supplier');
+        $product->load('category', 'supplier', 'parent', 'variants');
+        // Lịch sử thay đổi (giá, giá vốn, trạng thái...) — chỉ người được sửa sản phẩm (có giá vốn)
+        $history = request()->user()->can('update', $product)
+            ? \App\Models\ActivityLog::with('user:id,name')->where('subject_type', $product->getMorphClass())->where('subject_id', $product->id)
+                ->latest('created_at')->limit(30)->get()
+            : collect();
         $sales = \App\Models\InvoiceItem::where('product_id', $product->id)
             ->whereHas('invoice', fn ($q) => $q->where('status', 'issued'))
             ->selectRaw('COALESCE(SUM(quantity),0) as qty, COALESCE(SUM(line_total),0) as revenue')->first();
 
-        return view('products.show', compact('product', 'sales'));
+        return view('products.show', compact('product', 'sales', 'history'));
     }
 
     public function edit(Product $product)
     {
         $this->authorize('update', $product);
 
-        return view('products.form', ['product' => $product, 'categories' => Lookup::categories(), 'suppliers' => $this->supplierOptions($product->supplier_id)]);
+        return view('products.form', ['product' => $product, 'categories' => Lookup::categories(), 'suppliers' => $this->supplierOptions($product->supplier_id),
+            'parents' => $product->variants()->exists() ? [] : $this->parentOptions($product)]);
     }
 
     public function update(Request $request, Product $product, UploadService $uploads)
@@ -105,6 +117,13 @@ class ProductController extends Controller
         return $exporter->download('san_pham', ['ID', 'SKU', __('Tên sản phẩm'), __('Danh mục'), __('Giá'), __('Đơn vị'), __('Trạng thái'), __('Ngày tạo')], $rows, $request->input('format', 'xlsx'));
     }
 
+    /** Sản phẩm gốc có thể làm cha (không phải biến thể, không phải chính nó). */
+    private function parentOptions(?Product $except = null): array
+    {
+        return Product::whereNull('parent_id')->when($except, fn ($q) => $q->whereKeyNot($except->id))
+            ->orderBy('name')->get(['id', 'sku', 'name'])->mapWithKeys(fn ($p) => [$p->id => $p->sku.' — '.$p->name])->all();
+    }
+
     /** Nhà cung cấp đang hợp tác (+ nhà cung cấp hiện tại của sản phẩm dù đã ngừng). */
     private function supplierOptions(?int $current = null): array
     {
@@ -119,6 +138,16 @@ class ProductController extends Controller
             'type' => ['sometimes', 'required', Rule::in(array_keys(Product::TYPES))],   // không gửi: tạo mới = sản phẩm, sửa = giữ nguyên
             'supplier_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('suppliers')->whereNull('deleted_at')],
             'purchase_price' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
+            // Biến thể: 1 cấp — cha phải là sản phẩm gốc (không phải biến thể), không phải chính nó; sản phẩm đang có biến thể không làm biến thể được
+            'parent_id' => ['nullable', 'integer', \App\Support\Tenancy\TenantRule::exists('products')->whereNull('parent_id')->whereNull('deleted_at'),
+                function ($attr, $value, $fail) use ($product) {
+                    if ($product && (int) $value === $product->id) {
+                        $fail(__('Sản phẩm không thể là biến thể của chính nó.'));
+                    } elseif ($product && $value && $product->variants()->exists()) {
+                        $fail(__('Sản phẩm đang có biến thể nên không thể trở thành biến thể của sản phẩm khác.'));
+                    }
+                }],
+            'variant_name' => ['nullable', 'required_with:parent_id', 'string', 'max:100'],
             'name' => ['required', 'string', 'max:255'],
             'product_category_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('product_categories')],
             'description' => ['nullable', 'string', 'max:5000'],
