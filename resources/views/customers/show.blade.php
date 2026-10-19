@@ -38,6 +38,7 @@
                         <dt>{{ __('Liên lạc qua') }}</dt><dd>{{ $customer->preferred_channel ? __(App\Models\Customer::CHANNELS[$customer->preferred_channel] ?? $customer->preferred_channel) : '—' }}</dd>
                         <dt>{{ __('Marketing') }}</dt><dd>@if ($customer->marketing_consent)<span class="badge badge-soft-success">{{ __('Đã đồng ý') }}</span><div class="small-xs text-muted">{{ $customer->marketing_consent_source }}@if ($customer->marketing_consent_at) · {{ vn_date($customer->marketing_consent_at) }}@endif</div>@else<span class="badge badge-soft-secondary">{{ __('Chưa đồng ý') }}</span>@endif</dd>
                         <dt>{{ __('Nguồn') }}</dt><dd>{{ $customer->source?->label ?? "—" }}</dd>
+                        <dt>{{ __('Bảng giá') }}</dt><dd>{{ $customer->priceList?->name ?? __('Giá chuẩn') }}</dd>
                         <dt>{{ __('Phụ trách') }}</dt><dd>{{ $customer->assignee?->name ?? __('Chưa phân công') }}</dd>
                         <dt>{{ __('Thẻ') }}</dt><dd>@forelse ($customer->tags as $tag)<span class="tag-chip me-1" style="background: {{ $tag->color }}">{{ $tag->name }}</span>@empty — @endforelse</dd>
                         <dt>{{ __('Người tạo') }}</dt><dd>{{ $customer->creator?->name ?? '—' }}</dd>

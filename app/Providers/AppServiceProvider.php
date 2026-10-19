@@ -46,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
             'task' => \App\Models\Task::class,
             'product' => \App\Models\Product::class,
             'supplier' => \App\Models\Supplier::class,
+            'price_list' => \App\Models\PriceList::class,
             'quotation' => \App\Models\Quotation::class,
             'sales_order' => \App\Models\SalesOrder::class,
             'invoice' => \App\Models\Invoice::class,

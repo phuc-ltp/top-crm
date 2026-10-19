@@ -322,6 +322,7 @@ class CustomerController extends Controller
     private function formData(): array
     {
         return ['users' => Lookup::users(), 'sources' => Lookup::sources(), 'tags' => Lookup::tags(),
+            'priceLists' => \App\Models\PriceList::orderBy('name')->get(['id', 'name', 'is_active'])->mapWithKeys(fn ($l) => [$l->id => $l->name.($l->is_active ? '' : ' ('.__('đang tắt').')')])->all(),
             'customFields' => \App\Models\CustomFieldDefinition::for('customer')->active()->get()];
     }
 

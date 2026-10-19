@@ -459,6 +459,16 @@ function initLineItems() {
     const template = $('#lineItemTemplate');
     const fmt = new Intl.NumberFormat('vi-VN');
     let index = $$('tr', tbody).length;
+    // Giá theo bảng giá của khách hàng đang chọn (tải khi đổi khách hàng)
+    let listPrices = {};
+    const customer = table.closest('form')?.querySelector('[name="customer_id"]');
+    const loadPrices = async () => {
+        listPrices = {};
+        if (!customer?.value || !table.dataset.pricesUrl) return;
+        try { listPrices = (await api(`${table.dataset.pricesUrl}?customer_id=${encodeURIComponent(customer.value)}`)).prices || {}; } catch (e) { /* giữ giá chuẩn */ }
+    };
+    customer?.addEventListener('change', loadPrices);
+    loadPrices();
 
     const recalc = () => {
         let subtotal = 0;
@@ -481,7 +491,7 @@ function initLineItems() {
         $('[data-field="product_id"]', tr)?.addEventListener('change', (e) => {
             const opt = e.target.selectedOptions[0];
             if (opt?.dataset.price) {
-                $('[data-field="unit_price"]', tr).value = opt.dataset.price;
+                $('[data-field="unit_price"]', tr).value = listPrices[opt.value] !== undefined ? Math.round(Number(listPrices[opt.value])) : opt.dataset.price;
                 const desc = $('[data-field="description"]', tr);
                 if (!desc.value) desc.value = opt.dataset.name;
             }

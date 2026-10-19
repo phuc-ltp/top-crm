@@ -37,7 +37,7 @@ Riêng Phase 3:
 - **Bảng giá:** giá riêng theo nhóm khách hàng, gắn vào khách hàng. Áp dụng ở máy chủ khi thêm sản phẩm vào chứng từ.
 - **Nghiệm thu:**
   - tổng tiền chứng từ cũ tính lại không đổi;
-  - giá theo bảng giá được áp ở máy chủ (trình duyệt gửi giá khác cũng không có tác dụng nếu người dùng không có quyền sửa giá);
+  - giá theo bảng giá được điền sẵn trong form và được máy chủ dùng khi dòng để trống đơn giá. Nhân viên vẫn chỉnh được giá từng dòng như hiện nay; kiểm soát chiết khấu thuộc bước 3.4 (duyệt báo giá vượt ngưỡng);
   - nhà cung cấp và bảng giá của tổ chức A không thấy ở tổ chức B.
 
 ## 3.2 Kho hàng

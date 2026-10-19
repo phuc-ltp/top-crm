@@ -21,10 +21,12 @@ class SalesDocumentService
     /**
      * @param  array<int, array{product_id?:int|null, description?:string, quantity:float|string, unit_price?:float|string|null, discount_percent?:float|string|null}>  $items
      */
-    public function calculate(array $items, float $discountAmount = 0, float $taxRate = 0): array
+    public function calculate(array $items, float $discountAmount = 0, float $taxRate = 0, ?int $customerId = null): array
     {
         $productIds = collect($items)->pluck('product_id')->filter()->unique();
         $products = $productIds->isEmpty() ? collect() : Product::withTrashed()->whereIn('id', $productIds)->get()->keyBy('id');
+        // Bảng giá của khách hàng (đang hoạt động): dùng khi dòng để trống đơn giá
+        $listPrices = $customerId ? (\App\Models\Customer::find($customerId)?->priceList?->priceMap() ?? []) : [];
 
         // Tính bằng số thập phân chính xác (bcmath); làm tròn 2 chữ số ở từng bước giống quy tắc cũ
         $lines = [];
@@ -38,7 +40,7 @@ class SalesDocumentService
             }
             $unitPrice = isset($item['unit_price']) && $item['unit_price'] !== '' && $item['unit_price'] !== null
                 ? Decimal::round(Decimal::clamp(self::number($item['unit_price']), 0))
-                : Decimal::round($product?->price ?? 0);
+                : Decimal::round($product ? ($listPrices[$product->id] ?? $product->price) : 0);
             $discount = Decimal::round(Decimal::clamp(self::number($item['discount_percent'] ?? 0), 0, 100));
             $lineTotal = Decimal::round(Decimal::div(Decimal::mul(Decimal::mul($quantity, $unitPrice), Decimal::sub(100, $discount)), 100));
 
@@ -82,7 +84,7 @@ class SalesDocumentService
     /** Lưu chứng từ + chi tiết trong một transaction. */
     public function save(Model $document, array $attributes, array $items): Model
     {
-        $calc = $this->calculate($items, (float) ($attributes['discount_amount'] ?? 0), (float) ($attributes['tax_rate'] ?? 0));
+        $calc = $this->calculate($items, (float) ($attributes['discount_amount'] ?? 0), (float) ($attributes['tax_rate'] ?? 0), isset($attributes['customer_id']) ? (int) $attributes['customer_id'] : null);
 
         if (empty($calc['items'])) {
             throw ValidationException::withMessages(['items' => __('Chứng từ phải có ít nhất một dòng sản phẩm hợp lệ.')]);

@@ -10,6 +10,12 @@
                 <x-input name="name" :label="__('Tên sản phẩm')" :value="$product->name" required maxlength="255" col="col-md-8 mb-3" />
                 <x-select name="product_category_id" :label="__('Danh mục')" :options="$categories" :value="$product->product_category_id" :placeholder="__('— Chọn danh mục —')" col="col-md-6 mb-3" />
                 <x-select name="status" :label="__('Trạng thái')" :options="App\Models\Product::STATUSES" :value="$product->status" required col="col-md-6 mb-3" />
+                @if (! empty($parents))
+                    <x-select name="parent_id" :label="__('Biến thể của sản phẩm')" :options="$parents" :value="$product->parent_id" :placeholder="__('— Không (sản phẩm gốc) —')" col="col-md-6 mb-3"
+                              :help="__('Biến thể (màu, kích cỡ...) có SKU, giá và tồn kho riêng.')" />
+                    <x-input name="variant_name" :label="__('Tên biến thể')" :value="$product->variant_name" maxlength="100" placeholder="VD: Đỏ / XL" col="col-md-6 mb-3"
+                             :help="__('Bắt buộc khi chọn sản phẩm gốc.')" />
+                @endif
                 <x-select name="type" :label="__('Loại')" :options="App\Models\Product::TYPES" :value="$product->type" required col="col-md-6 mb-3"
                           :help="__('Dịch vụ không theo dõi tồn kho.')" />
                 <x-select name="supplier_id" :label="__('Nhà cung cấp')" :options="$suppliers" :value="$product->supplier_id" :placeholder="__('— Không có —')" col="col-md-6 mb-3" />

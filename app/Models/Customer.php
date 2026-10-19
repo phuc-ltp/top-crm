@@ -56,7 +56,7 @@ class Customer extends Model
     ];
 
     protected $fillable = [
-        'code', 'name', 'phone', 'email', 'address', 'country', 'company', 'type', 'lead_source_id', 'status',
+        'code', 'name', 'phone', 'email', 'address', 'country', 'company', 'type', 'lead_source_id', 'price_list_id', 'status',
         'segment', 'lifecycle_stage', 'preferred_channel', 'marketing_consent', 'marketing_consent_source', 'custom_fields',
         'assigned_to', 'created_by', 'updated_by', 'notes', 'is_demo',
     ];
@@ -91,6 +91,11 @@ class Customer extends Model
     public function source()
     {
         return $this->belongsTo(LeadSource::class, 'lead_source_id');
+    }
+
+    public function priceList()
+    {
+        return $this->belongsTo(PriceList::class);
     }
 
     public function assignee()

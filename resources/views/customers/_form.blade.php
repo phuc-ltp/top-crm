@@ -26,6 +26,10 @@
                     <x-input name="email" type="email" label="Email" :value="$customer->email" maxlength="255" col="col-md-6 mb-3" data-dup-check />
                     <x-input name="company" :label="__('Công ty')" :value="$customer->company" maxlength="255" col="col-md-6 mb-3" />
                     <x-select name="lead_source_id" :label="__('Nguồn khách hàng')" :options="$sources" :value="$customer->lead_source_id" :placeholder="__('— Chọn nguồn —')" col="col-md-6 mb-3" />
+                    @if (! empty($priceLists))
+                        <x-select name="price_list_id" :label="__('Bảng giá')" :options="$priceLists" :value="$customer->price_list_id" :placeholder="__('— Giá chuẩn —')" col="col-md-6 mb-3"
+                                  :help="__('Giá theo bảng giá được điền sẵn khi lập báo giá / đơn hàng / hóa đơn cho khách này.')" />
+                    @endif
                     <x-input name="address" :label="__('Địa chỉ')" :value="$customer->address" maxlength="500" col="col-12 mb-3" />
                     <x-textarea name="notes" :label="__('Ghi chú')" :value="$customer->notes" rows="4" maxlength="5000" col="col-12 mb-0" />
                 </div>
