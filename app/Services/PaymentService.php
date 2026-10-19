@@ -39,6 +39,7 @@ class PaymentService
                 'is_demo' => $invoice->is_demo,
             ]);
             $this->refreshInvoice($invoice);
+            $this->notifyPayment($invoice->fresh(), $amount, $user);
 
             return $payment;
         });
@@ -98,6 +99,18 @@ class PaymentService
             $payment->delete();
             $this->refreshInvoice($invoice);
         });
+    }
+
+    private function notifyPayment(Invoice $invoice, string $amount, User $actor): void
+    {
+        $paid = $invoice->payment_status === 'paid';
+        $recipients = User::whereIn('id', array_filter([$invoice->assigned_to, $invoice->created_by]))->get()->filter(fn ($u) => $u->id !== $actor->id);
+        foreach ($recipients as $u) {
+            \App\Notifications\CrmNotification::send($u, $paid ? 'invoice_paid' : 'payment_received', $paid
+                ? __('Hóa đơn :number đã được thanh toán đủ (khoản cuối :amount, ghi nhận bởi :by).', ['number' => $invoice->number, 'amount' => money($amount), 'by' => $actor->name])
+                : __('Hóa đơn :number nhận thanh toán :amount (còn phải thu :due).', ['number' => $invoice->number, 'amount' => money($amount), 'due' => money(self::due($invoice))]),
+                route('invoices.show', $invoice), $paid ? 'bi-patch-check' : 'bi-cash-coin');
+        }
     }
 
     /** Còn phải thu = tổng − giảm trừ − đã thu (không âm). */

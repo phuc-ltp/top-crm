@@ -128,8 +128,13 @@ Route::middleware('auth')->group(function () {
     // Thông báo
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/feed', [NotificationController::class, 'feed'])->name('notifications.feed');
-    Route::get('/notifications/{id}/open', [NotificationController::class, 'open'])->name('notifications.open');
+    Route::get('/notifications/preferences', [NotificationController::class, 'preferences'])->name('notifications.preferences');
+    Route::put('/notifications/preferences', [NotificationController::class, 'updatePreferences'])->name('notifications.preferences.update');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::delete('/notifications/read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
+    Route::get('/notifications/{id}/open', [NotificationController::class, 'open'])->name('notifications.open');
+    Route::post('/notifications/{id}/toggle', [NotificationController::class, 'toggle'])->name('notifications.toggle');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 
     // Lịch sử tương tác / ghi chú
     Route::post('/interactions/{type}/{id}', [InteractionController::class, 'store'])->name('interactions.store')
