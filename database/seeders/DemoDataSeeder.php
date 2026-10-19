@@ -267,6 +267,7 @@ class DemoDataSeeder extends Seeder
         }
 
         $this->phase2Extras($customers, $sales);
+        $this->phase3Extras($users['Sales Manager']);
 
         $this->command?->info('Đã tạo dữ liệu DEMO (is_demo = 1).');
     }
@@ -275,6 +276,39 @@ class DemoDataSeeder extends Seeder
      * Bổ sung cho tính năng Phase 2 (chạy SAU cùng để không đổi dữ liệu ngẫu nhiên đã sinh ở trên):
      * phân khúc / vòng đời khách hàng, ngày lead đủ điều kiện, lý do thất bại, lịch hẹn sắp tới.
      */
+    /**
+     * Bổ sung cho Phase 3 (chạy sau cùng): dịch vụ không theo dõi tồn kho, giá vốn, nhà cung cấp,
+     * tồn kho ban đầu bằng phiếu nhập kho (ghi sổ qua InventoryService, đánh dấu demo).
+     */
+    private function phase3Extras(User $actor): void
+    {
+        // Mã SV- / TR- / SP- là dịch vụ (triển khai, đào tạo, gói hỗ trợ, lưu trữ)
+        Product::where('is_demo', true)->where(fn ($q) => $q->where('sku', 'like', 'SV-%')->orWhere('sku', 'like', 'TR-%')->orWhere('sku', 'like', 'SP-%'))
+            ->update(['type' => 'service']);
+
+        $suppliers = collect([
+            ['Công ty Phân phối Thiết bị Sao Việt (demo)', 'Anh Quang', '0283456789', 'saoviet@demo.orangecrm.local', '0312000001'],
+            ['Công ty Phần mềm Bản quyền An Tâm (demo)', 'Chị Mai', '0249876543', 'antam@demo.orangecrm.local', '0101000002'],
+        ])->map(fn ($s) => \App\Models\Supplier::create(['name' => $s[0], 'contact_name' => $s[1], 'phone' => $s[2], 'email' => $s[3],
+            'tax_code' => $s[4], 'status' => 'active', 'created_by' => $actor->id, 'is_demo' => true]));
+
+        $stocked = Product::where('is_demo', true)->where('type', 'product')->get();
+        foreach ($stocked as $p) {
+            $p->forceFill([
+                'purchase_price' => round((float) $p->price * 0.65, -3),
+                'supplier_id' => str_starts_with($p->sku, 'HW-') ? $suppliers[0]->id : $suppliers[1]->id,
+                'reorder_level' => str_starts_with($p->sku, 'HW-') ? 3 : null,
+            ])->saveQuietly();
+        }
+        $warehouse = \App\Models\Warehouse::default();
+        if ($warehouse && $stocked->isNotEmpty()) {
+            app(\App\Services\InventoryService::class)->post([
+                'type' => 'receipt', 'warehouse_id' => $warehouse->id, 'supplier_id' => $suppliers[0]->id,
+                'document_date' => today()->subDays(20)->toDateString(), 'reference' => 'DEMO-NK-01', 'notes' => 'Tồn kho ban đầu (demo)', 'is_demo' => true,
+            ], $stocked->map(fn ($p) => ['product_id' => $p->id, 'quantity' => str_starts_with($p->sku, 'HW-') ? 8 : 50, 'unit_cost' => $p->purchase_price])->values()->all(), $actor);
+        }
+    }
+
     private function phase2Extras($customers, $sales): void
     {
         $segments = array_keys(Customer::SEGMENTS);

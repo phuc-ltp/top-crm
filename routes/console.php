@@ -58,8 +58,21 @@ Artisan::command('crm:purge-demo {--force}', function () {
     }
 
     DB::transaction(function () {
+        // Kho (Phase 3): sổ kho / dòng phiếu của phiếu demo, giữ hàng của đơn demo, tồn kho của sản phẩm demo
+        $demoDocs = DB::table('stock_documents')->where('is_demo', true)->pluck('id');
+        DB::table('stock_movements')->whereIn('stock_document_id', $demoDocs)->delete();
+        DB::table('stock_document_items')->whereIn('stock_document_id', $demoDocs)->delete();
+        DB::table('stock_reservations')->whereIn('sales_order_id', DB::table('sales_orders')->where('is_demo', true)->select('id'))->delete();
+        $this->line('  - stock_documents: '.DB::table('stock_documents')->whereIn('id', $demoDocs)->delete().' bản ghi');
+        $demoProducts = DB::table('products')->where('is_demo', true)->pluck('id');
+        if (DB::table('stock_movements')->whereIn('product_id', $demoProducts)->doesntExist()) {
+            DB::table('stock_levels')->whereIn('product_id', $demoProducts)->delete();
+        }
+        DB::table('price_list_items')->whereIn('product_id', $demoProducts)->delete();
+        DB::table('credit_notes')->where('is_demo', true)->delete();
+
         $tables = ['payments', 'invoices', 'sales_orders', 'quotations', 'support_tickets', 'tasks', 'opportunities',
-            'leads', 'contacts', 'campaigns', 'customers', 'products'];
+            'leads', 'contacts', 'campaigns', 'customers', 'products', 'suppliers'];
         foreach ($tables as $table) {
             $count = DB::table($table)->where('is_demo', true)->delete();
             $this->line("  - $table: $count bản ghi");

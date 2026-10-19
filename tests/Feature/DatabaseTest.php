@@ -103,6 +103,12 @@ class DatabaseTest extends TestCase
         $this->assertSame(0, \App\Models\Lead::where('status', 'lost')->whereNull('lost_reason_id')->count());
         $this->assertSame(0, Opportunity::whereHas('stage', fn ($q) => $q->where('is_lost', true))->whereNull('lost_reason_id')->count());
         $this->assertSame(8, \App\Models\Interaction::where('status', 'planned')->count());
+        // Phase 3: dịch vụ không có tồn kho; sản phẩm có tồn = sổ kho
+        $this->assertSame(0, Product::where('type', 'service')->where('sku', 'like', 'HW-%')->count());
+        $this->assertTrue(Product::where('sku', 'SV-IMPL')->where('type', 'service')->exists());
+        $this->assertSame(2, \App\Models\Supplier::where('is_demo', true)->count());
+        $this->assertEquals((float) \App\Models\StockMovement::sum('quantity'), (float) \App\Models\StockLevel::sum('quantity'));
+        $this->assertGreaterThan(0, (float) \App\Models\StockLevel::sum('quantity'));
 
         $this->seed(DemoDataSeeder::class); // chạy lại không nhân đôi
         $this->assertSame(30, Customer::count());
@@ -132,6 +138,10 @@ class DatabaseTest extends TestCase
         $this->assertSame(0, \App\Models\Interaction::where('content', 'Ghi chú trên lead demo')->count(), 'Hoạt động của lead demo phải được dọn');
         $this->assertSame(1, \App\Models\Interaction::where('content', 'Ghi chú thật')->count(), 'Không được xóa hoạt động của dữ liệu thật');
         $this->assertSame(0, \App\Models\Interaction::where('subject', 'like', '%(demo)')->count());
+        $this->assertSame(0, \App\Models\StockDocument::count());
+        $this->assertSame(0, \App\Models\StockMovement::count());
+        $this->assertSame(0, \App\Models\StockLevel::count());
+        $this->assertSame(0, \App\Models\Supplier::withTrashed()->count());
         $this->assertNull(cache()->get('crm.has_demo.'.$orgId));
         $this->assertTrue(Customer::whereKey($real->id)->exists());
         $this->assertSame(0, \App\Models\User::withTrashed()->where('is_demo', true)->count());

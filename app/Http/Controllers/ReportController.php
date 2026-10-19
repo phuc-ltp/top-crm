@@ -17,7 +17,7 @@ class ReportController extends Controller
     {
         abort_unless($request->user()->can('reports.view'), 403);
 
-        return view('reports.index', ['types' => ReportService::TYPES]);
+        return view('reports.index', ['types' => ReportService::allowedTypes($request->user())]);
     }
 
     private function build(Request $request, string $type): array
@@ -38,7 +38,7 @@ class ReportController extends Controller
     {
         $report = $this->build($request, $type);
 
-        return view('reports.show', ['report' => $report, 'users' => Lookup::users(false), 'types' => ReportService::TYPES]);
+        return view('reports.show', ['report' => $report, 'users' => Lookup::users(false), 'types' => ReportService::allowedTypes($request->user())]);
     }
 
     public function export(Request $request, string $type, string $format, ExportService $exporter)

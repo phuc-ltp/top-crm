@@ -30,13 +30,30 @@ class ReportService
         'campaigns' => ['Hiệu quả chiến dịch', 'bi-megaphone'],
         'tasks' => ['Năng suất công việc', 'bi-check2-square'],
         'tickets' => ['Báo cáo hỗ trợ khách hàng', 'bi-headset'],
+        // Phase 3
+        'products' => ['Bán hàng theo sản phẩm', 'bi-box-seam'],
+        'inventory' => ['Nhập – xuất – tồn kho', 'bi-boxes'],
+        'receivables' => ['Công nợ phải thu (tuổi nợ)', 'bi-wallet2'],
     ];
+
+    /** Quyền module cần thêm (ngoài reports.view) cho từng báo cáo. */
+    public static function permissionFor(string $type): ?string
+    {
+        return ['products' => 'invoices.view', 'inventory' => 'inventory.view', 'receivables' => 'invoices.view'][$type] ?? null;
+    }
+
+    /** Báo cáo người dùng được xem. */
+    public static function allowedTypes(User $user): array
+    {
+        return array_filter(self::TYPES, fn ($k) => ($p = self::permissionFor($k)) === null || $user->can($p), ARRAY_FILTER_USE_KEY);
+    }
 
     public function __construct(private User $viewer, private Carbon $from, private Carbon $to, private ?int $userId = null, private ?string $status = null) {}
 
     public function build(string $type): array
     {
         abort_unless(isset(self::TYPES[$type]), 404);
+        abort_unless(isset(self::allowedTypes($this->viewer)[$type]), 403);
 
         return ['title' => __(self::TYPES[$type][0]), 'type' => $type] + $this->{$type}();
     }
@@ -123,6 +140,125 @@ class ReportService
                 [__('Công nợ hiện tại'), money(Invoice::visibleTo($this->viewer)->where('status', 'issued')->when($this->userId, fn ($q) => $q->where('assigned_to', $this->userId))->get()->sum('balance')), 'bi-wallet2'],
             ],
             'chart' => ['type' => 'line', 'money' => true, 'label' => __('Doanh thu theo tháng'), 'labels' => $byMonth->keys()->all(), 'values' => $byMonth->map(fn ($g) => (float) $g->sum('amount'))->values()->all()],
+        ];
+    }
+
+    /** Bán hàng theo sản phẩm: dòng hóa đơn đã phát hành có ngày lập trong kỳ. Lãi gộp chỉ cho người sửa sản phẩm. */
+    private function products(): array
+    {
+        $invoiceIds = Invoice::visibleTo($this->viewer)->where('status', 'issued')
+            ->when($this->userId, fn ($q) => $q->where('assigned_to', $this->userId))
+            ->whereBetween('issue_date', [$this->from->toDateString(), $this->to->toDateString()])->select('id');
+        $lines = \App\Models\InvoiceItem::whereIn('invoice_id', $invoiceIds)->whereNotNull('product_id')
+            ->selectRaw('product_id, SUM(quantity) as qty, SUM(line_total) as revenue, COUNT(DISTINCT invoice_id) as invoices')
+            ->groupBy('product_id')->orderByDesc('revenue')->get();
+        $products = \App\Models\Product::withTrashed()->whereIn('id', $lines->pluck('product_id'))->get()->keyBy('id');
+        $cost = $this->viewer->can('products.update');
+
+        $rows = $lines->map(function ($l) use ($products, $cost) {
+            $p = $products[$l->product_id] ?? null;
+            $unitCost = (float) ($p?->average_cost ?? $p?->purchase_price ?? 0);
+            $row = [$p?->sku, $p?->display_name ?? '—', (float) $l->qty, (int) $l->invoices, (float) $l->revenue];
+            if ($cost) {
+                $row[] = round((float) $l->qty * $unitCost, 2);
+                $row[] = round((float) $l->revenue - (float) $l->qty * $unitCost, 2);
+            }
+
+            return $row;
+        })->values();
+
+        return [
+            'definition' => __('Theo dòng hóa đơn đã phát hành có ngày lập trong kỳ (trước thuế, sau chiết khấu dòng). Giá vốn = giá vốn bình quân hiện tại (hoặc giá vốn nhập tay); lãi gộp = doanh số − SL × giá vốn.'),
+            'statuses' => [],
+            'headings' => array_merge([__('SKU'), __('Sản phẩm'), __('SL bán'), __('Số hóa đơn'), __('Doanh số')], $cost ? [__('Giá vốn'), __('Lãi gộp')] : []),
+            'money_cols' => $cost ? [4, 5, 6] : [4],
+            'rows' => $rows->all(),
+            'summary' => array_values(array_filter([
+                [__('Doanh số'), money($rows->sum(4)), 'bi-cash-stack'],
+                [__('Số sản phẩm bán ra'), $rows->count(), 'bi-box-seam'],
+                $cost ? [__('Lãi gộp'), money($rows->sum(6)), 'bi-graph-up'] : null,
+            ])),
+            'chart' => ['type' => 'bar', 'money' => true, 'horizontal' => true, 'label' => __('Top sản phẩm theo doanh số'),
+                'labels' => $rows->take(10)->pluck(1)->all(), 'values' => $rows->take(10)->pluck(4)->all()],
+        ];
+    }
+
+    /** Nhập – xuất – tồn theo sản phẩm trong kỳ (từ sổ kho). Giá trị tồn cuối chỉ cho inventory.manage. */
+    private function inventory(): array
+    {
+        $from = $this->from->copy()->startOfDay();
+        $to = $this->to->copy()->endOfDay();
+        $mv = fn () => \App\Models\StockMovement::query();
+        $opening = $mv()->where('created_at', '<', $from)->selectRaw('product_id, SUM(quantity) as q')->groupBy('product_id')->pluck('q', 'product_id');
+        $in = $mv()->whereBetween('created_at', [$from, $to])->where('quantity', '>', 0)->whereNotIn('type', ['transfer_in'])
+            ->selectRaw('product_id, SUM(quantity) as q')->groupBy('product_id')->pluck('q', 'product_id');
+        $out = $mv()->whereBetween('created_at', [$from, $to])->where('quantity', '<', 0)->whereNotIn('type', ['transfer_out'])
+            ->selectRaw('product_id, SUM(quantity) as q')->groupBy('product_id')->pluck('q', 'product_id');
+        $ids = collect([$opening, $in, $out])->flatMap(fn ($c) => $c->keys())->unique();
+        $products = \App\Models\Product::withTrashed()->whereIn('id', $ids)->orderBy('name')->get();
+        $value = $this->viewer->can('inventory.manage');
+
+        $rows = $products->map(function ($p) use ($opening, $in, $out, $value) {
+            $o = (float) ($opening[$p->id] ?? 0);
+            $i = (float) ($in[$p->id] ?? 0);
+            $x = abs((float) ($out[$p->id] ?? 0));
+            $row = [$p->sku, $p->display_name, $p->unit, $o, $i, $x, round($o + $i - $x, 3)];
+            if ($value) {
+                $row[] = round(($o + $i - $x) * (float) ($p->average_cost ?? 0), 2);
+            }
+
+            return $row;
+        })->values();
+
+        return [
+            'definition' => __('Từ sổ kho, mọi kho cộng lại. Nhập = phát sinh tăng (nhập, hàng trả lại, điều chỉnh tăng); xuất = phát sinh giảm (xuất, điều chỉnh giảm); chuyển kho nội bộ không tính. Tồn cuối = tồn đầu + nhập − xuất.'),
+            'statuses' => [],
+            'headings' => array_merge([__('SKU'), __('Sản phẩm'), __('ĐVT'), __('Tồn đầu kỳ'), __('Nhập trong kỳ'), __('Xuất trong kỳ'), __('Tồn cuối kỳ')], $value ? [__('Giá trị tồn cuối')] : []),
+            'money_cols' => $value ? [7] : [],
+            'rows' => $rows->all(),
+            'summary' => array_values(array_filter([
+                [__('Số sản phẩm có phát sinh'), $rows->count(), 'bi-boxes'],
+                [__('Tổng nhập trong kỳ'), \App\Services\InventoryService::qty($rows->sum(4)), 'bi-box-arrow-in-down'],
+                [__('Tổng xuất trong kỳ'), \App\Services\InventoryService::qty($rows->sum(5)), 'bi-box-arrow-up'],
+                $value ? [__('Giá trị tồn cuối'), money($rows->sum(7)), 'bi-cash-stack'] : null,
+            ])),
+            'chart' => ['type' => 'bar', 'label' => __('Nhập / xuất theo sản phẩm (SL xuất)'), 'labels' => $rows->take(10)->pluck(1)->all(), 'values' => $rows->take(10)->pluck(5)->all()],
+        ];
+    }
+
+    /** Công nợ phải thu theo tuổi nợ (tại thời điểm xem, không phụ thuộc kỳ). */
+    private function receivables(): array
+    {
+        $buckets = ['current' => __('Chưa đến hạn'), 'd30' => __('Quá hạn 1–30 ngày'), 'd60' => __('Quá hạn 31–60 ngày'), 'd90' => __('Quá hạn 61–90 ngày'), 'over' => __('Quá hạn trên 90 ngày')];
+        $invoices = Invoice::visibleTo($this->viewer)->with('customer:id,name')->where('status', 'issued')->where('payment_status', '!=', 'paid')
+            ->when($this->userId, fn ($q) => $q->where('assigned_to', $this->userId))->orderBy('due_date')->get()
+            ->filter(fn ($i) => $i->balance > 0);
+        $bucketOf = function ($inv) {
+            $days = $inv->due_date ? (int) $inv->due_date->diffInDays(today(), false) : 0;
+
+            return match (true) { $days <= 0 => 'current', $days <= 30 => 'd30', $days <= 60 => 'd60', $days <= 90 => 'd90', default => 'over' };
+        };
+        $rows = $invoices->map(function ($inv) use ($bucketOf, $buckets) {
+            $days = $inv->due_date ? max(0, (int) $inv->due_date->diffInDays(today(), false)) : 0;
+
+            return [$inv->number, $inv->customer?->name, vn_date($inv->issue_date), $inv->due_date ? vn_date($inv->due_date) : '—', $days, $buckets[$bucketOf($inv)], (float) $inv->total, $inv->balance];
+        })->values();
+        $byBucket = collect($buckets)->map(fn ($label, $key) => $invoices->filter(fn ($i) => $bucketOf($i) === $key)->sum('balance'));
+        $byBucket = $byBucket->map(fn ($v) => (float) $v);
+
+        return [
+            'definition' => __('Hóa đơn đã phát hành còn phải thu (tổng − giảm trừ − đã thu) tại thời điểm xem; tuổi nợ tính từ hạn thanh toán. Không phụ thuộc khoảng ngày.'),
+            'statuses' => [],
+            'headings' => [__('Số hóa đơn'), __('Khách hàng'), __('Ngày lập'), __('Hạn thanh toán'), __('Số ngày quá hạn'), __('Nhóm tuổi nợ'), __('Tổng hóa đơn'), __('Còn phải thu')],
+            'money_cols' => [6, 7],
+            'rows' => $rows->all(),
+            'summary' => [
+                [__('Tổng công nợ'), money($byBucket->sum()), 'bi-wallet2'],
+                [__('Chưa đến hạn'), money($byBucket['current']), 'bi-calendar-check'],
+                [__('Đã quá hạn'), money($byBucket->except('current')->sum()), 'bi-exclamation-triangle'],
+                [__('Số hóa đơn còn nợ'), $rows->count(), 'bi-receipt'],
+            ],
+            'chart' => ['type' => 'bar', 'money' => true, 'label' => __('Công nợ theo tuổi nợ'), 'labels' => array_values($buckets), 'values' => $byBucket->values()->all()],
         ];
     }
 
