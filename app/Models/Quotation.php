@@ -19,6 +19,17 @@ class Quotation extends Model
 
     protected string $codeColumn = 'number';
 
+    public const APPROVAL_STATUSES = [
+        'pending' => ['Chờ duyệt chiết khấu', 'warning'],
+        'approved' => ['Đã duyệt chiết khấu', 'success'],
+        'rejected' => ['Từ chối duyệt', 'danger'],
+    ];
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
     public const STATUSES = [
         'draft' => ['Nháp', 'secondary'],
         'sent' => ['Đã gửi', 'primary'],
@@ -30,6 +41,7 @@ class Quotation extends Model
     protected $fillable = [
         'number', 'customer_id', 'opportunity_id', 'issue_date', 'valid_until', 'status', 'subtotal',
         'discount_amount', 'tax_rate', 'tax_amount', 'total', 'notes', 'created_by', 'assigned_to', 'is_demo',
+        'approval_status', 'approved_by', 'approved_at', 'approval_note',
     ];
 
     protected $casts = ['issue_date' => 'date', 'valid_until' => 'date'];

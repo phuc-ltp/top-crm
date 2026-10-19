@@ -212,6 +212,9 @@ Route::middleware('auth')->group(function () {
     // Bán hàng
     Route::get('/quotations/{quotation}/pdf', [QuotationController::class, 'pdf'])->name('quotations.pdf');
     Route::post('/quotations/{quotation}/convert', [QuotationController::class, 'convert'])->name('quotations.convert');
+    Route::post('/quotations/{quotation}/approve', [QuotationController::class, 'approve'])->name('quotations.approve');
+    Route::post('/quotations/{quotation}/reject', [QuotationController::class, 'reject'])->name('quotations.reject');
+    Route::resource('quotation-templates', \App\Http\Controllers\QuotationTemplateController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/quotations/export', [QuotationController::class, 'export'])->name('quotations.export');
     Route::resource('quotations', QuotationController::class);
 

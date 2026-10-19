@@ -35,6 +35,11 @@
                     <div class="small text-muted mt-2">{{ __('Thông báo hiển thị trong chuông thông báo. Hệ thống không gửi email hàng loạt.') }}</div>
                 </div></div>
 
+                <div class="card mt-4"><div class="card-header"><span><i class="bi bi-file-earmark-text me-2 text-orange"></i>{{ __('Báo giá') }}</span></div><div class="card-body"><div class="row">
+                    <x-input name="quotation_discount_threshold" type="number" :label="__('Ngưỡng chiết khấu cần duyệt (%)')" :value="$s['quotation_discount_threshold'] ?? ''" min="0" max="100" step="0.5" col="col-md-6 mb-2"
+                             :help="__('Báo giá có tổng chiết khấu vượt ngưỡng do nhân viên lập phải được người có quyền duyệt báo giá chấp thuận trước khi gửi khách / tạo đơn hàng. Để trống: không cần duyệt.')" />
+                </div></div></div>
+
                 <div class="card mt-4"><div class="card-header"><span><i class="bi bi-boxes me-2 text-orange"></i>{{ __('Kho hàng') }}</span></div><div class="card-body">
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input" type="checkbox" role="switch" name="inventory_allow_negative" value="1" id="inventory_allow_negative" @checked(($s['inventory_allow_negative'] ?? '0') === '1')>
