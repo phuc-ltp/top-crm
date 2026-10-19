@@ -126,7 +126,66 @@ Bản ghi bị xóa không mất hẳn, mà được chuyển vào *Hệ thống
 
 Bấm **Khôi phục** để đưa bản ghi trở lại. Việc khôi phục được ghi vào nhật ký hoạt động. Hệ thống không có chức năng xóa vĩnh viễn.
 
-## 13. Đổi mật khẩu và hồ sơ
+## 13. Kho hàng, nhà cung cấp, bảng giá (Phase 3)
+
+**Nhà cung cấp** (*Sản phẩm & Dịch vụ › Nhà cung cấp*): thêm nhà cung cấp, rồi gắn vào sản phẩm.
+
+**Sản phẩm:**
+- Chọn loại *Sản phẩm* (có tồn kho) hoặc *Dịch vụ* (không theo dõi tồn kho).
+- Nhập giá vốn (chỉ người được sửa sản phẩm thấy) và mức tồn tối thiểu để nhận cảnh báo tồn thấp.
+- Muốn có màu / size, bấm **Thêm biến thể** trên trang sản phẩm.
+
+**Bảng giá** (*Sản phẩm & Dịch vụ › Bảng giá*): tạo bảng giá (VD: Đại lý) rồi gắn vào khách hàng ở trang sửa khách hàng. Khi lập báo giá / đơn / hóa đơn cho khách đó, giá được điền sẵn.
+
+**Kho hàng** (*Kho hàng*):
+- **Tồn kho:** xem tồn thực, đang giữ, có thể dùng.
+- **Phiếu kho:**
+  - **Nhập kho:** từ nhà cung cấp, có đơn giá nhập.
+  - **Xuất kho.**
+  - **Kiểm kê:** nhập số đếm thực tế, hệ thống tự tính chênh lệch.
+  - **Chuyển kho.**
+  - Phiếu ghi sổ ngay và **không sửa / xóa được**; có sai sót thì lập phiếu kiểm kê để điều chỉnh.
+- **Sổ kho:** xem mọi phát sinh.
+- **Không xuất quá tồn.** Muốn cho phép tồn âm thì bật trong *Cài đặt › Kho hàng*.
+
+**Đơn hàng giữ hàng & xuất kho tự động** (bật trong *Cài đặt › Kho hàng* khi đã nhập tồn kho):
+- Duyệt đơn: giữ hàng. Thiếu hàng thì không duyệt được.
+- Đơn chuyển "Hoàn thành": tự lập phiếu xuất kho.
+- Hủy đơn: trả phần đang giữ.
+- Khách trả hàng: mở đơn và dùng mục **Trả hàng (nhập lại kho)**.
+
+## 14. Báo giá: duyệt chiết khấu và mẫu
+
+**Duyệt chiết khấu:**
+- Trong *Cài đặt › Báo giá*, đặt **ngưỡng chiết khấu cần duyệt (%)**.
+- Báo giá có tổng chiết khấu vượt ngưỡng do nhân viên lập sẽ "Chờ duyệt": giữ ở Nháp, chưa tạo đơn hàng được.
+- Quản lý nhận thông báo, rồi bấm **Duyệt** hoặc **Từ chối** (ghi lý do) trên trang báo giá.
+
+**Mẫu báo giá:** trên một báo giá chuẩn, quản lý bấm **Lưu làm mẫu**. Khi lập báo giá mới, chọn mẫu ở ô **Dùng mẫu báo giá**.
+
+**Hết hạn:** báo giá quá ngày hiệu lực tự chuyển "Hết hạn".
+
+## 15. Hóa đơn: thanh toán, hoàn tiền, giảm trừ, đối soát
+
+Trên hóa đơn đã phát hành:
+- **Ghi nhận thanh toán.**
+- Mục **Hoàn tiền / phiếu giảm trừ:**
+  - hoàn tiền (bắt buộc ghi lý do) làm giảm số đã thu và doanh thu;
+  - phiếu giảm trừ làm giảm số còn phải thu.
+
+**Còn phải thu** = tổng − giảm trừ − đã thu.
+
+**Đối soát thanh toán** (*Bán hàng › Đối soát thanh toán*, dành cho kế toán):
+- Tích các khoản đã khớp sao kê ngân hàng rồi bấm **Đánh dấu đã đối soát**.
+- Khoản đã đối soát không xóa được.
+
+**Thuế suất:** trong *Cài đặt › Báo giá*, nhập các mức VAT được dùng (VD: `0, 5, 8, 10`). Ô thuế trên chứng từ sẽ thành danh sách chọn.
+
+> Hóa đơn trong CRM là **chứng từ nội bộ** để theo dõi công nợ, không phải hóa đơn điện tử hợp lệ theo quy định thuế.
+
+**Tác vụ tự động** (nhắc việc, báo giá hết hạn, nhắc hóa đơn sắp đến hạn / quá hạn, cảnh báo tồn thấp) chỉ chạy khi đã mở **`START_CRM.bat`**. Hãy chạy file này mỗi lần bật máy, kể cả khi dùng qua XAMPP.
+
+## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
 
@@ -137,6 +196,6 @@ Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số
 
 **Giao diện:** nút mặt trăng/mặt trời trên thanh trên cùng để đổi sáng/tối (lưu theo tài khoản); ô **Tìm chức năng...** ở menu trái để tìm nhanh trang cần mở; chọn ngôn ngữ Việt/Anh ở góc trên phải. Thuộc nhiều tổ chức thì chuyển ở ô **Không gian làm việc** góc dưới menu trái.
 
-## 14. Tắt hệ thống
+## 17. Tắt hệ thống
 
 Bấm đúp **`STOP_CRM.bat`**. Dữ liệu đã lưu trong MySQL nên không bị mất.

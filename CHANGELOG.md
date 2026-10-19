@@ -2,6 +2,57 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [3.0.0] — Phase 3 Vận hành bán hàng — 19/10/2026
+
+### Thêm mới
+- **3.1 Tiền chính xác & danh mục sản phẩm**
+  - Mọi phép tính tiền (chứng từ, thanh toán, giá vốn) dùng số thập phân chính xác (bcmath). Đã tính lại các chứng từ cũ, không lệch.
+  - Sản phẩm có thêm loại *sản phẩm / dịch vụ*, giá vốn (chỉ người sửa sản phẩm thấy) và lợi nhuận gộp.
+  - **Nhà cung cấp**: danh sách, tìm, lọc, xuất, thùng rác, tìm kiếm toàn cục.
+  - **Biến thể sản phẩm** (sản phẩm con một cấp, có SKU và giá riêng).
+  - **Bảng giá theo nhóm khách hàng**: giá được điền sẵn khi lập chứng từ.
+  - Lịch sử thay đổi sản phẩm.
+- **3.2 Kho hàng**
+  - Nhiều kho; mỗi tổ chức có sẵn "Kho chính".
+  - Phiếu nhập, xuất, kiểm kê, chuyển kho; ghi sổ ngay và không sửa / xóa được.
+  - Sổ kho bất biến.
+  - Giá vốn bình quân gia quyền.
+  - Chặn tồn âm (cài đặt cho phép bật).
+  - Cảnh báo tồn thấp.
+  - Quyền `inventory.*`; giá vốn và giá trị tồn chỉ người quản lý kho thấy.
+  - Đã thử thật 3 tiến trình xuất cùng lúc: đúng 1 thành công, tồn khớp sổ kho.
+- **3.3 Đơn hàng ↔ kho** (bật trong *Cài đặt › Kho hàng*, mặc định tắt)
+  - Duyệt đơn: giữ hàng.
+  - Hoàn thành: tự lập phiếu xuất kho.
+  - Hủy: trả phần đang giữ.
+  - Trả hàng sau khi giao: phiếu nhập hàng trả lại.
+  - Lịch sử sửa dòng chứng từ.
+- **3.4 Báo giá**
+  - Duyệt chiết khấu vượt ngưỡng của tổ chức: chờ duyệt thì giữ ở Nháp và chưa tạo đơn được.
+  - Mẫu báo giá.
+  - Báo giá quá hạn hiệu lực tự chuyển "Hết hạn".
+- **3.5 Hóa đơn & thanh toán**
+  - Phiếu giảm trừ (credit note).
+  - Hoàn tiền (khoản thanh toán âm, doanh thu tự trừ).
+  - Còn phải thu = tổng − giảm trừ − đã thu.
+  - Trang **Đối soát thanh toán**.
+  - Nhắc hóa đơn sắp đến hạn / quá hạn.
+  - Danh sách thuế suất VAT theo tổ chức.
+  - Nhật ký tài chính trên hóa đơn.
+- **3.6 Báo cáo & hoàn thiện**
+  - 3 báo cáo mới: *Bán hàng theo sản phẩm* (lãi gộp chỉ cho người xem giá vốn), *Nhập – xuất – tồn kho*, *Công nợ phải thu theo tuổi nợ*.
+  - Dữ liệu demo cho kho và nhà cung cấp.
+  - Lệnh xóa demo dọn cả dữ liệu kho.
+
+### Thay đổi
+- Ô thuế VAT trên chứng từ thành danh sách chọn khi tổ chức cấu hình thuế suất.
+- Chỉ số "Doanh thu" trên Tổng quan trừ các khoản hoàn tiền; "Công nợ" trừ giảm trừ.
+- `START_CRM.bat` luôn bật bộ chạy tác vụ định kỳ (nhắc việc, báo giá hết hạn, nhắc thanh toán, cảnh báo tồn thấp), kể cả khi dùng qua Apache.
+
+### Sửa lỗi / bảo mật
+- **Lỗ hổng cũ:** nhân viên không có quyền duyệt từng đặt được đơn chưa duyệt sang "Đang xử lý / Hoàn thành". Nay bị chặn.
+- **Hóa đơn là chứng từ nội bộ:** trên hóa đơn ghi rõ đây không phải hóa đơn điện tử hợp lệ theo quy định thuế Việt Nam.
+- **Sự cố 16/10 (đã khắc phục):** nạp nhầm file SQL mẫu vào database thật. Đã có `scripts/verify-sql.ps1` để không lặp lại.
 ## [2.0.0] — Phase 2 CRM Core — 16/10/2026
 
 ### Thêm mới

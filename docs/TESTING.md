@@ -14,7 +14,7 @@ php artisan test --filter=two_factor               # theo tên
 - **Không chạy hai bộ test cùng lúc** (dùng chung database test).
 - Giao diện phải được build (`npm run build`) trước khi chạy test trang.
 
-## 2. Phạm vi bao phủ (271 test)
+## 2. Phạm vi bao phủ (310 test)
 
 | Tệp | Số test | Nội dung chính |
 |---|---:|---|
@@ -46,6 +46,14 @@ php artisan test --filter=two_factor               # theo tên
 | ExecutiveMetricsTest | 7 | *(Phase 2)* 20 chỉ số điều hành trên dữ liệu mẫu cố định, phạm vi quyền, trạng thái trống, bộ lọc kỳ |
 | TrashTest | 5 | *(Phase 2)* Thùng rác: khôi phục theo quyền xóa, phạm vi xem, tổ chức; nhật ký "Khôi phục" |
 | ImportExportTest | 6 | *(Phase 2)* Nhập lead / người liên hệ / sản phẩm (kiểm tra từng dòng, trùng, quyền, tổ chức), xuất công việc |
+| Unit/DecimalTest | 5 | *(Phase 3)* Số thập phân chính xác: không sai số, làm tròn nửa lên, chặn đầu vào sai, chia cho 0 |
+| SupplierCatalogTest | 5 | *(Phase 3)* Nhà cung cấp (quyền, cách ly), loại sản phẩm, giá vốn chỉ người sửa thấy, tính tiền chính xác |
+| VariantPriceListTest | 4 | *(Phase 3)* Biến thể 1 cấp, bảng giá theo khách hàng (máy chủ dùng khi để trống giá), lịch sử sản phẩm |
+| InventoryTest | 7 | *(Phase 3)* Phiếu kho, giá vốn bình quân, chặn tồn âm & hoàn tác, kiểm kê, chuyển kho, sổ kho khớp tồn, bất biến, quyền, tồn thấp, cách ly |
+| OrderFulfillmentTest | 5 | *(Phase 3)* Giữ hàng khi duyệt, sửa dòng, xuất kho khi hoàn thành, hủy trả giữ, trả hàng, chặn trạng thái khi chưa duyệt |
+| QuotationWorkflowTest | 5 | *(Phase 3)* Duyệt chiết khấu vượt ngưỡng, từ chối có lý do, tự duyệt, mẫu báo giá, tự hết hạn |
+| BillingTest | 5 | *(Phase 3)* Thanh toán / hoàn tiền / giảm trừ chính xác, đối soát, nhắc thanh toán 1 lần, thuế suất cấu hình, cách ly |
+| Phase3ReportsTest | 3 | *(Phase 3)* Bán hàng theo sản phẩm (giá vốn theo quyền), nhập–xuất–tồn, công nợ theo tuổi nợ |
 
 ## 3. Kiểm thử ngoài PHPUnit (thực hiện mỗi bước Phase 1 và 2)
 | Hạng mục | Cách làm |
@@ -62,9 +70,10 @@ php artisan test --filter=two_factor               # theo tên
 - Không đánh dấu hoàn thành khi chưa chạy toàn bộ `php artisan test`.
 
 ## 5. Kết quả gần nhất
-| Hạng mục | Kết quả (16/10/2026, hết Phase 2 — v2.0.0) |
+| Hạng mục | Kết quả (19/10/2026, hết Phase 3 — v3.0.0) |
 |---|---|
-| PHPUnit | **271/271 đạt** (7.891 kiểm tra), 408 giây |
+| PHPUnit | **310/310 đạt** (9.191 kiểm tra), 634 giây |
+| Thử đồng thời kho (3 tiến trình cùng xuất, database xem thử) | Đạt — đúng 1 phiếu thành công, tồn = sổ kho (3 vòng) |
 | `composer audit` / `npm audit` | 0 lỗ hổng |
-| `scripts/verify-sql.ps1` (nạp bản sao vào database tạm, 2 lần) | Đạt — 57 bảng, không thiếu migration, không có quản trị / dữ liệu thật |
+| `scripts/verify-sql.ps1` (nạp bản sao vào database tạm, 2 lần) | Đạt — 68 bảng, không thiếu migration, không có quản trị / dữ liệu thật |
 | Môi trường | Windows 11 · XAMPP · PHP 8.2.12 · MariaDB 10.11.19 · Laravel 12.69.3 · Node 24 |

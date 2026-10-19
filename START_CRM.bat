@@ -74,7 +74,7 @@ set "SERVE_URL=http://127.0.0.1:%PORT%"
 "%PHP%" -r "exit(@fsockopen('127.0.0.1',%PORT%)?0:1);"
 if errorlevel 1 (
     echo  [..]  Đang khởi động máy chủ Laravel tại %SERVE_URL% ...
-    powershell -NoProfile -Command "$p1 = Start-Process -FilePath '%PHP%' -ArgumentList 'artisan','serve','--host=127.0.0.1','--port=%PORT%' -WorkingDirectory '%~dp0.' -WindowStyle Minimized -PassThru; $p2 = Start-Process -FilePath '%PHP%' -ArgumentList 'artisan','schedule:work' -WorkingDirectory '%~dp0.' -WindowStyle Minimized -PassThru; Set-Content -Path '%PIDFILE%' -Value @($p1.Id, $p2.Id)"
+    powershell -NoProfile -Command "$p1 = Start-Process -FilePath '%PHP%' -ArgumentList 'artisan','serve','--host=127.0.0.1','--port=%PORT%' -WorkingDirectory '%~dp0.' -WindowStyle Minimized -PassThru; Set-Content -Path '%PIDFILE%' -Value @($p1.Id)"
     for /l %%i in (1,1,15) do (
         curl.exe -s -o nul -f %SERVE_URL%/up && goto :serve_ready
         timeout /t 1 /nobreak >nul
@@ -86,6 +86,11 @@ if errorlevel 1 (
     echo  [OK]  Máy chủ Laravel đã chạy sẵn.
 )
 :serve_ready
+
+rem ---------- 5b. Tác vụ định kỳ (nhắc việc, báo giá hết hạn, nhắc thanh toán) ----------
+rem Luôn bật nếu chưa chạy — kể cả khi dùng qua Apache hoặc máy chủ Laravel đã chạy sẵn
+powershell -NoProfile -Command "$running = Get-CimInstance Win32_Process -Filter \"Name='php.exe'\" | Where-Object { $_.CommandLine -like '*artisan*schedule:work*' }; if (-not $running) { $p = Start-Process -FilePath '%PHP%' -ArgumentList 'artisan','schedule:work' -WorkingDirectory '%~dp0.' -WindowStyle Minimized -PassThru; Add-Content -Path '%PIDFILE%' -Value $p.Id }"
+echo  [OK]  Tác vụ định kỳ đang chạy ^(nhắc việc, báo giá hết hạn, nhắc thanh toán^)
 
 rem ---------- 6. Trình giám sát MySQL (tự khởi động lại nếu MySQL bị sập) ----------
 if defined XAMPP (
