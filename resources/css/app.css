@@ -313,6 +313,7 @@ body.crm-app { background: var(--crm-bg); min-height: 100vh; }
 
 .avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; flex-shrink: 0; display: inline-grid; place-items: center; background: var(--crm-primary-soft); color: var(--crm-primary-text); font-weight: 700; font-size: .8rem; }
 .avatar-sm { width: 32px; height: 32px; font-size: .7rem; }
+.avatar-xs { width: 22px; height: 22px; font-size: .65rem; display: inline-grid; place-items: center; }
 .avatar-lg { width: 84px; height: 84px; font-size: 1.6rem; }
 
 .crm-content { padding: 18px 22px 22px; flex: 1; min-width: 0; }
@@ -542,6 +543,7 @@ pre { color: var(--crm-text); }
 
 .kpi-card { padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 6px; transition: transform .15s ease, box-shadow .15s ease; }
 .kpi-card:hover { transform: translateY(-2px); box-shadow: var(--crm-shadow-lg); }
+.notif-day { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--crm-text-muted); padding: 12px 16px 4px; }
 /* Hóa đơn (trình bày như chứng từ) */
 .invoice-paper { border-top: 4px solid var(--crm-primary); }
 .invoice-head { border-bottom: 1px dashed var(--crm-border); }

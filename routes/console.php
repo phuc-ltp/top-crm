@@ -111,6 +111,15 @@ Artisan::command('crm:sales-automation', function (\App\Services\SalesAutomation
     $this->info('Báo giá chuyển hết hạn: '.$result['expired_quotations'].' · Nhắc hóa đơn sắp đến hạn: '.$result['due_reminders'].' · Báo hóa đơn quá hạn: '.$result['overdue_invoices']);
 })->purpose('Tác vụ bán hàng định kỳ (báo giá hết hạn, nhắc thanh toán)');
 
+/*
+| Dọn thông báo cũ: đã đọc quá 90 ngày, chưa đọc quá 180 ngày (giữ bảng thông báo gọn nhẹ).
+*/
+Artisan::command('crm:prune-notifications', function () {
+    $read = DB::table('notifications')->whereNotNull('read_at')->where('created_at', '<', now()->subDays(90))->delete();
+    $unread = DB::table('notifications')->whereNull('read_at')->where('created_at', '<', now()->subDays(180))->delete();
+    $this->info("Đã xóa $read thông báo đã đọc và $unread thông báo chưa đọc quá hạn lưu.");
+})->purpose('Dọn thông báo cũ');
+
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
     $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']} · Nhắc hoạt động: {$result['activities']}");
@@ -183,5 +192,6 @@ Artisan::command('crm:health', function () {
 
 Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
+Schedule::command('crm:prune-notifications')->dailyAt('02:30');
 // Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
 Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

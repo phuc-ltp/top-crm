@@ -176,7 +176,8 @@
                         <a href="#" class="small" id="notifMarkAll" data-url="{{ route('notifications.read-all') }}">{{ __('Đánh dấu tất cả đã đọc') }}</a>
                     </div>
                     <div id="notifList" class="p-2" style="max-height: 380px; overflow-y: auto;"></div>
-                    <a href="{{ route('notifications.index') }}" class="d-block text-center py-2 border-top small fw-semibold">{{ __('Xem tất cả') }}</a>
+                    <div class="d-flex border-top"><a href="{{ route('notifications.index') }}" class="flex-grow-1 text-center py-2 small fw-semibold">{{ __('Xem tất cả') }}</a>
+                        <a href="{{ route('notifications.preferences') }}" class="text-center py-2 px-3 small text-muted border-start" title="{{ __('Tùy chọn nhận') }}" aria-label="{{ __('Tùy chọn nhận') }}"><i class="bi bi-sliders"></i></a></div>
                 </div>
             </div>
             @can('tasks.view')

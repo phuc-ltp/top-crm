@@ -234,11 +234,32 @@ function initNotifications() {
             const data = await api(dropdown.dataset.url);
             if (!data.items.length) { list.innerHTML = '<div class="empty-state py-4"><div class="empty-icon"><i class="bi bi-bell"></i></div><div class="small">' + t('Chưa có thông báo nào') + '</div></div>'; return; }
             list.innerHTML = data.items.map((n) => `<a class="notif-item ${n.read ? '' : 'unread'}" href="${escapeHtml(n.open_url)}">
-                <span class="avatar avatar-sm tone-orange"><i class="bi ${escapeHtml(n.icon)}"></i></span>
+                <span class="avatar avatar-sm tone-${escapeHtml(n.tone || 'orange')}"><i class="bi ${escapeHtml(n.icon)}"></i></span>
                 <span class="min-w-0"><span class="d-block small fw-semibold text-truncate-2">${escapeHtml(n.message)}</span><span class="small-xs text-muted">${escapeHtml(n.time)}</span></span></a>`).join('');
         } catch (e) { list.innerHTML = `<div class="p-3 text-danger small">${escapeHtml(e.message)}</div>`; }
     };
     dropdown.addEventListener('show.bs.dropdown', load);
+
+    // Tự cập nhật số chưa đọc mỗi 60 giây (dừng khi tab ẩn); có thông báo mới → báo nhỏ
+    let lastSeen = null;
+    const setBadge = (n) => {
+        let b = $('#notifBadge');
+        if (n > 0) {
+            if (!b) { b = document.createElement('span'); b.id = 'notifBadge'; b.className = 'dot'; $('[data-bs-toggle="dropdown"]', dropdown)?.appendChild(b); }
+            b.textContent = n > 99 ? '99+' : n;
+        } else b?.remove();
+    };
+    const poll = async () => {
+        if (document.hidden) return;
+        try {
+            const data = await api(dropdown.dataset.url);
+            setBadge(data.unread);
+            if (data.latest && lastSeen !== null && data.latest.id !== lastSeen) toast('info', data.latest.message);
+            lastSeen = data.latest ? data.latest.id : '';
+        } catch (e) { /* mất kết nối tạm thời — thử lại lần sau */ }
+    };
+    poll();
+    setInterval(poll, 60000);
     $('#notifMarkAll')?.addEventListener('click', async (e) => {
         e.preventDefault();
         try { await api(e.currentTarget.dataset.url, { method: 'POST' }); badge?.remove(); load(); } catch (err) { toast('error', err.message); }
