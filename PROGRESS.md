@@ -98,6 +98,6 @@
 
 - [x] Sau Phase 3 — Nâng cấp giao diện hóa đơn (19/10): danh sách có thẻ công nợ (còn phải thu, quá hạn, đến hạn 7 ngày, đã thu tháng này) + lọc nhanh quá hạn/sắp đến hạn + tiến độ thanh toán, số ngày quá hạn; trang hóa đơn trình bày như chứng từ (logo, MST, bên mua, chuyển khoản, điều khoản, các bước trạng thái, tiến độ); PDF thêm MST/chuyển khoản/điều khoản/ghi chú chứng từ nội bộ; cài đặt tổ chức mới: MST, ngân hàng, số tài khoản, chủ tài khoản, điều khoản. InvoiceUiTest 3. Sản phẩm demo dịch vụ (5) trong DB thật đã chuyển loại dịch vụ (user đồng ý, có sao lưu 1657).
 - [x] Nâng cấp thông báo (19/10): 7 nhóm (bán hàng, khách hàng, công việc, kho, hỗ trợ, bảo mật, khác), trang thông báo mới (lọc nhóm, chia theo ngày, đọc/chưa đọc, xóa, xóa đã đọc), chuông tự cập nhật 60 giây + báo nhỏ khi có mới, tùy chọn từng người (trong ứng dụng / email; bảo mật luôn bật; email chỉ gửi khi đã cấu hình SMTP), thông báo có thanh toán / hóa đơn đã thu đủ, crm:prune-notifications (02:30 hằng ngày: đã đọc >90 ngày, chưa đọc >180 ngày). users.notification_preferences. NotificationCenterTest 4 test.
-- [ ] TIẾP THEO: Phase 4 Team Operations (viết docs/PHASE4_PLAN.md trước).
+- [ ] Phase 4 Team Operations — kế hoạch: docs/PHASE4_PLAN.md (4.1 dự án & công việc nâng cao → 4.2 nhân viên & nhóm → 4.3 SLA ticket → 4.4 lịch hẹn → 4.5 tài liệu → 4.6 hoàn thiện). TIẾP THEO: 4.1.
 
 **PHASE 3 HOÀN TẤT (19/10/2026) — v3.0.0.** Tiếp theo theo lộ trình Master Prompt: Phase 4 — Team Operations (dự án, công việc, nhóm, nhân viên, ticket, lịch, tài liệu).
