@@ -208,6 +208,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::get('/projects/export', [ProjectController::class, 'export'])->name('projects.export');
     Route::resource('projects', ProjectController::class);
+    Route::get('/documents/{document}/download/{version?}', [\App\Http\Controllers\DocumentController::class, 'download'])->name('documents.download');
+    Route::get('/documents/{document}/preview/{version?}', [\App\Http\Controllers\DocumentController::class, 'preview'])->name('documents.preview');
+    Route::post('/documents/{document}/versions', [\App\Http\Controllers\DocumentController::class, 'addVersion'])->name('documents.versions.store')->middleware('throttle:30,1');
+    Route::post('/documents', [\App\Http\Controllers\DocumentController::class, 'store'])->name('documents.store')->middleware('throttle:30,1');
+    Route::resource('documents', \App\Http\Controllers\DocumentController::class)->except(['store']);
 
     // Sản phẩm
     Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');

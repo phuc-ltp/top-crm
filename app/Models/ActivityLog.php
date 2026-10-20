@@ -28,6 +28,7 @@ class ActivityLog extends Model
         'converted' => ['Chuyển đổi', 'orange'],
         'stage_changed' => ['Đổi giai đoạn', 'orange'],
         'exported' => ['Xuất dữ liệu', 'secondary'],
+        'downloaded' => ['Tải tài liệu', 'info'],
         'imported' => ['Nhập dữ liệu', 'secondary'],
         'payment' => ['Thanh toán', 'success'],
         'assigned' => ['Phân công', 'primary'],

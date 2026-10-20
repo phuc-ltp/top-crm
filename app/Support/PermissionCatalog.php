@@ -28,6 +28,7 @@ class PermissionCatalog
         'users' => ['label' => 'Người dùng & vai trò', 'actions' => ['view', 'create', 'update', 'delete', 'manage']],
         'employees' => ['label' => 'Hồ sơ nhân viên', 'actions' => ['view', 'view_sensitive', 'update', 'export']],
         'teams' => ['label' => 'Nhóm & chi nhánh', 'actions' => ['view', 'manage']],
+        'documents' => ['label' => 'Tài liệu', 'actions' => ['view', 'create', 'manage']],
         'activity_logs' => ['label' => 'Nhật ký hoạt động', 'actions' => ['view']],
         'settings' => ['label' => 'Cài đặt hệ thống', 'actions' => ['manage']],
         'api' => ['label' => 'Kết nối API', 'actions' => ['use']],
@@ -176,7 +177,8 @@ class PermissionCatalog
 
         // Mọi vai trò còn lại đều xem được danh bạ nhân viên và nhóm (thông tin công việc, không gồm thông tin nhạy cảm)
         if ($permissions && ! in_array($role, ['Organization Owner', 'Organization Administrator'], true)) {
-            $permissions = array_merge($permissions, ['employees.view', 'teams.view']);
+            $permissions = array_merge($permissions, ['employees.view', 'teams.view'],
+                $role === 'Read-only Auditor' ? ['documents.view'] : ['documents.view', 'documents.create']);
         }
 
         return $permissions;

@@ -7,6 +7,9 @@ return [
     // Tệp đính kèm cho phép tải lên (công việc)
     'attachment_mimes' => 'pdf,doc,docx,xls,xlsx,csv,txt,png,jpg,jpeg,gif,webp,zip',
     'attachment_max_kb' => 10240,
+    // Thư viện tài liệu (bước 4.5): loại tệp kiểm tra theo nội dung; dung lượng tối đa mỗi tệp (KB)
+    'document_mimes' => 'pdf,doc,docx,xls,xlsx,ppt,pptx,csv,txt,png,jpg,jpeg,gif,webp,zip',
+    'document_max_kb' => 20480,
 
     'per_page' => 15,
 

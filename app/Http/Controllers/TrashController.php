@@ -41,6 +41,7 @@ class TrashController extends Controller
             'products' => ['class' => Product::class, 'label' => 'Sản phẩm', 'icon' => 'bi-box-seam', 'module' => 'products', 'show' => 'products.show'],
             'suppliers' => ['class' => \App\Models\Supplier::class, 'label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'module' => 'suppliers', 'show' => 'suppliers.show'],
             'projects' => ['class' => \App\Models\Project::class, 'label' => 'Dự án', 'icon' => 'bi-kanban', 'module' => 'projects', 'show' => 'projects.show'],
+            'documents' => ['class' => \App\Models\Document::class, 'label' => 'Tài liệu', 'icon' => 'bi-folder2-open', 'module' => 'documents', 'permission' => 'documents.manage', 'show' => 'documents.show'],
             'tasks' => ['class' => Task::class, 'label' => 'Công việc', 'icon' => 'bi-check2-square', 'module' => 'tasks', 'show' => 'tasks.show'],
             'tickets' => ['class' => SupportTicket::class, 'label' => 'Ticket hỗ trợ', 'icon' => 'bi-headset', 'module' => 'tickets', 'show' => 'tickets.show'],
             'campaigns' => ['class' => Campaign::class, 'label' => 'Chiến dịch', 'icon' => 'bi-megaphone', 'module' => 'campaigns', 'show' => 'campaigns.show'],
@@ -50,7 +51,7 @@ class TrashController extends Controller
     /** Loại người dùng được xem trong thùng rác (có quyền xóa module đó). */
     public static function allowedTypes(User $user): array
     {
-        return array_keys(array_filter(self::types(), fn ($t) => $user->can($t['module'].'.delete')));
+        return array_keys(array_filter(self::types(), fn ($t) => $user->can($t['permission'] ?? $t['module'].'.delete')));
     }
 
     private function query(string $type, User $user): Builder
