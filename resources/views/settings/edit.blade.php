@@ -48,6 +48,20 @@
                              :help="__('Báo giá có tổng chiết khấu vượt ngưỡng do nhân viên lập phải được người có quyền duyệt báo giá chấp thuận trước khi gửi khách / tạo đơn hàng. Để trống: không cần duyệt.')" />
                 </div></div></div>
 
+                @php($slaPolicy = App\Services\SlaService::policy())
+                <div class="card mt-4"><div class="card-header"><span><i class="bi bi-stopwatch me-2 text-orange"></i>{{ __('SLA hỗ trợ khách hàng') }}</span></div><div class="card-body">
+                    <div class="table-responsive"><table class="table table-sm align-middle mb-2">
+                        <thead><tr><th>{{ __('Mức ưu tiên') }}</th><th>{{ __('Phản hồi đầu (giờ)') }}</th><th>{{ __('Xử lý xong (giờ)') }}</th></tr></thead>
+                        <tbody>
+                        @foreach (App\Models\SupportTicket::PRIORITIES as $p => [$pLabel])
+                            <tr><td>{!! badge(App\Models\SupportTicket::PRIORITIES, $p) !!}</td>
+                                <td><input type="number" name="sla[{{ $p }}][response]" value="{{ old("sla.$p.response", $slaPolicy[$p][0]) }}" min="1" max="720" class="form-control form-control-sm @error("sla.$p.response") is-invalid @enderror" required aria-label="{{ __('Phản hồi đầu (giờ)') }}: {{ __($pLabel) }}"></td>
+                                <td><input type="number" name="sla[{{ $p }}][resolve]" value="{{ old("sla.$p.resolve", $slaPolicy[$p][1]) }}" min="1" max="2160" class="form-control form-control-sm @error("sla.$p.resolve") is-invalid @enderror" required aria-label="{{ __('Xử lý xong (giờ)') }}: {{ __($pLabel) }}"></td></tr>
+                        @endforeach
+                        </tbody></table></div>
+                    <div class="form-text">{{ __('Áp dụng cho ticket tạo mới (và ticket đổi mức ưu tiên). Tính theo giờ đồng hồ; thời gian ở trạng thái "Chờ phản hồi" không bị tính. Ticket sắp trễ được nhắc người phụ trách, quá hạn được báo quản lý.') }}</div>
+                </div></div>
+
                 <div class="card mt-4"><div class="card-header"><span><i class="bi bi-boxes me-2 text-orange"></i>{{ __('Kho hàng') }}</span></div><div class="card-body">
                     <div class="form-check form-switch mb-2">
                         <input class="form-check-input" type="checkbox" role="switch" name="inventory_allow_negative" value="1" id="inventory_allow_negative" @checked(($s['inventory_allow_negative'] ?? '0') === '1')>

@@ -202,6 +202,15 @@ Trên hóa đơn đã phát hành:
 - **Nhóm:** tạo nhóm, chọn trưởng nhóm và thành viên; trang nhóm hiện KPI cả nhóm và từng người.
 - **Chi nhánh:** thêm / sửa / ngừng hoạt động; không xóa được chi nhánh còn nhân viên.
 
+## 16c. SLA hỗ trợ khách hàng (Phase 4)
+
+- **Hạn SLA** tự đặt khi tạo ticket, theo mức ưu tiên: hạn phản hồi đầu và hạn xử lý xong. Chỉnh số giờ ở **Cài đặt › SLA hỗ trợ khách hàng**.
+- **Phản hồi đầu** chỉ tính phản hồi gửi khách; ghi chú nội bộ không tính.
+- Khi chuyển ticket sang **Chờ phản hồi** (chờ khách), đồng hồ SLA tạm dừng; tiếp tục xử lý thì hạn được dời đúng bằng thời gian đã chờ.
+- **Leo thang tự động** (mỗi 10 phút): còn dưới 1 giờ thì nhắc người phụ trách; quá hạn thì báo quản lý trực tiếp và quản lý CSKH. Mỗi mức chỉ báo một lần.
+- Danh sách ticket có thẻ **Vi phạm SLA** và cột SLA; trang chi tiết có bảng SLA, **lịch sử trạng thái**, **đánh giá hài lòng** (1–5 sao, nhập sau khi đã giải quyết).
+- **Phân tích hỗ trợ:** tỉ lệ đạt SLA, thời gian phản hồi / xử lý trung bình, CSAT, theo danh mục và nhân viên. **Danh mục ticket** quản lý ở menu Hỗ trợ khách hàng.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

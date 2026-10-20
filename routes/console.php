@@ -122,6 +122,14 @@ Artisan::command('crm:prune-notifications', function () {
     $this->info("Đã xóa $read thông báo đã đọc và $unread thông báo chưa đọc quá hạn lưu.");
 })->purpose('Dọn thông báo cũ');
 
+/*
+| SLA ticket: cảnh báo sắp trễ (≤ 1 giờ) và leo thang ticket quá hạn. Chạy mỗi 10 phút, hoặc: php artisan crm:ticket-sla
+*/
+Artisan::command('crm:ticket-sla', function (\App\Services\SlaService $service) {
+    $r = $service->runEscalations();
+    $this->info('Cảnh báo sắp trễ: '.$r['warned'].' · Leo thang: '.$r['escalated']);
+})->purpose('Cảnh báo và leo thang ticket vi phạm SLA');
+
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
     $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']} · Nhắc hoạt động: {$result['activities']}");
@@ -262,5 +270,6 @@ Artisan::command('crm:production-check', function () {
 Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
 Schedule::command('crm:prune-notifications')->dailyAt('02:30');
+Schedule::command('crm:ticket-sla')->everyTenMinutes()->withoutOverlapping();
 // Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
 Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

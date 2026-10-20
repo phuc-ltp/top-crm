@@ -73,6 +73,9 @@ class Setting extends Model
         'tax_rates',
         // Thông tin trên chứng từ (hóa đơn / PDF)
         'company_tax_code', 'bank_name', 'bank_account_number', 'bank_account_name', 'invoice_terms',
+        // SLA ticket (bước 4.3): giờ phản hồi đầu / giờ xử lý theo mức ưu tiên (trống = mặc định SlaService::DEFAULTS)
+        'sla_response_urgent', 'sla_resolve_urgent', 'sla_response_high', 'sla_resolve_high',
+        'sla_response_medium', 'sla_resolve_medium', 'sla_response_low', 'sla_resolve_low',
     ];
 
     private const CACHE_KEY = 'crm.settings';

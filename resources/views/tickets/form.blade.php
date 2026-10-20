@@ -18,7 +18,8 @@
             </div></div></div></div>
             <div class="col-lg-4">
                 <div class="card mb-4"><div class="card-body">
-                    <x-select name="priority" :label="__('Mức ưu tiên')" :options="App\Models\SupportTicket::PRIORITIES" :value="$ticket->priority" required />
+                    <x-select name="priority" :label="__('Mức ưu tiên')" :options="App\Models\SupportTicket::PRIORITIES" :value="$ticket->priority" required :help="__('Quyết định hạn SLA (Cài đặt › SLA hỗ trợ khách hàng).')" />
+                    @if ($categories)<x-select name="category_id" :label="__('Danh mục')" :options="$categories" :value="$ticket->category_id" :placeholder="__('— Chưa phân loại —')" :translate="false" />@endif
                     <x-select name="status" :label="__('Trạng thái')" :options="App\Models\SupportTicket::STATUSES" :value="$ticket->status" required />
                     @can('tickets.assign')<x-select name="assigned_to" :label="__('Nhân viên xử lý')" :options="$users" :value="$ticket->assigned_to" :placeholder="__('— Chưa giao —')" />@endcan
                 </div></div>

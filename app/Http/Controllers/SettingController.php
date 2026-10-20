@@ -44,6 +44,9 @@ class SettingController extends Controller
             'tax_rates' => ['nullable', 'string', 'max:100', 'regex:/^\s*\d{1,2}(\.\d{1,2})?(\s*,\s*\d{1,2}(\.\d{1,2})?)*\s*$/'],
             'company_logo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:1024'],
             'remove_logo' => ['nullable', 'boolean'],
+            'sla' => ['nullable', 'array'],
+            'sla.*.response' => ['required', 'integer', 'min:1', 'max:720'],
+            'sla.*.resolve' => ['required', 'integer', 'min:1', 'max:2160', 'gte:sla.*.response'],
         ], ['brand_color.regex' => __('Màu thương hiệu phải có dạng #RRGGBB.')], ['company_name' => __('Tên công ty'), 'brand_color' => __('Màu thương hiệu')]);
 
         // Thuế mặc định phải thuộc danh sách thuế suất (khi có danh sách)
@@ -63,6 +66,13 @@ class SettingController extends Controller
             unset($data['company_logo']);
         }
         unset($data['remove_logo']);
+        foreach (array_keys(\App\Services\SlaService::DEFAULTS) as $priority) {
+            if (isset($data['sla'][$priority])) {
+                $data["sla_response_$priority"] = (int) $data['sla'][$priority]['response'];
+                $data["sla_resolve_$priority"] = (int) $data['sla'][$priority]['resolve'];
+            }
+        }
+        unset($data['sla']);
 
         foreach (['notify_lead_assigned', 'notify_task_due', 'notify_deal_stage', 'notify_ticket_new', 'notify_low_stock'] as $key) {
             Setting::put([$key => $request->boolean($key) ? '1' : '0'], 'notifications');

@@ -265,6 +265,9 @@ Route::middleware('auth')->group(function () {
     // Hỗ trợ
     Route::get('/tickets/export', [SupportTicketController::class, 'export'])->name('tickets.export');
     Route::post('/tickets/{ticket}/replies', [SupportTicketController::class, 'reply'])->name('tickets.reply');
+    Route::post('/tickets/{ticket}/satisfaction', [SupportTicketController::class, 'satisfaction'])->name('tickets.satisfaction');
+    Route::get('/tickets/analytics', [SupportTicketController::class, 'analytics'])->name('tickets.analytics');
+    Route::resource('ticket-categories', \App\Http\Controllers\TicketCategoryController::class)->only(['index', 'store', 'update', 'destroy'])->parameters(['ticket-categories' => 'category']);
     Route::resource('tickets', SupportTicketController::class);
 
     // Báo cáo

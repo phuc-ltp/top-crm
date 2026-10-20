@@ -44,6 +44,8 @@ class JsTranslations
         'phụ trách:',
         'Sửa phòng ban',
         'Thêm phòng ban',
+        'Sửa danh mục',
+        'Thêm danh mục',
         'Sửa chi nhánh',
         'Thêm chi nhánh',
         'Nội dung mục checklist',
