@@ -211,6 +211,14 @@ Trên hóa đơn đã phát hành:
 - Danh sách ticket có thẻ **Vi phạm SLA** và cột SLA; trang chi tiết có bảng SLA, **lịch sử trạng thái**, **đánh giá hài lòng** (1–5 sao, nhập sau khi đã giải quyết).
 - **Phân tích hỗ trợ:** tỉ lệ đạt SLA, thời gian phản hồi / xử lý trung bình, CSAT, theo danh mục và nhân viên. **Danh mục ticket** quản lý ở menu Hỗ trợ khách hàng.
 
+## 16d. Lịch chung và lịch hẹn (Phase 4)
+
+- **Lên lịch** ở trang khách hàng / lead / cơ hội (mục Hoạt động › Lên lịch): chọn giờ bắt đầu, giờ kết thúc, địa điểm hoặc link họp, người phụ trách và **người tham dự** nội bộ.
+- Người tham dự được mời (thông báo), được nhắc trước giờ hẹn và thấy lịch hẹn trên lịch của mình.
+- **Cảnh báo trùng lịch:** khi người phụ trách hoặc người tham dự đã có lịch khác trùng giờ, hệ thống báo ngay sau khi lưu (vẫn cho lưu).
+- **Lịch chung** (Công việc › Lịch chung): xem theo tháng hoặc tuần, gồm lịch hẹn và hạn công việc. Quản lý xem được lịch của nhân viên.
+- Nút **.ics** tải tệp lịch để thêm vào Google Calendar hoặc Outlook.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
