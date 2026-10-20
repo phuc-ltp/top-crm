@@ -104,6 +104,7 @@
 - [x] 4.2 Nhân viên & nhóm (20/10): branches, teams, team_members, employee_profiles (7 trường nhạy cảm mã hóa, $hidden), EmployeeController (danh bạ, hồ sơ, sửa, sơ đồ tổ chức, xuất có/không cột nhạy cảm), TeamController, BranchController, EmployeeKpiService (doanh thu đã thu như trang Chỉ tiêu, cơ hội thắng theo closed_at, việc đúng hạn, ticket resolved_at). Quyền employees.view/view_sensitive/update/export, teams.view/manage (103 quyền). EmployeeTeamTest 7 test.
 - [x] Dữ liệu thật (20/10): đã xóa toàn bộ dữ liệu demo khỏi orangecrm_db (sao lưu trước: orangecrm_db_20261020_1006.sql.zip), chỉ còn tài khoản phuphuc, 2 tổ chức, vai trò, cấu hình.
 - [x] Sẵn sàng production (20/10): SecurityHeaders (CSP + HSTS ở production), URL::forceScheme khi APP_URL https, TRUSTED_PROXIES, crm:production-check, .env.production.example, scripts/deploy.sh + backup.sh + nginx-topcrm.conf, docs/GO_LIVE.md. Đã thử chế độ production + CSP trên trình duyệt thật: không lỗi JS. ProductionReadinessTest 3 test.
-- TIẾP THEO: 4.3 SLA ticket; 4.4 lịch hẹn; 4.5 tài liệu. Go-live theo docs/GO_LIVE.md khi có VPS + tên miền.
+- [x] 4.3 SLA ticket (20/10): ticket_categories, ticket_status_histories, cột SLA trên support_tickets; SlaService (policy theo tổ chức sla_response_*/sla_resolve_*, tạm dừng/dời hạn khi waiting, state none/pending/paused/met/breached, leo thang 2 mức), hook ở model SupportTicket, crm:ticket-sla mỗi 10 phút, TicketCategoryController, analytics, CSAT. TicketSlaTest 6 test.
+- TIẾP THEO: 4.4 lịch hẹn; 4.5 tài liệu. Go-live theo docs/GO_LIVE.md khi có VPS + tên miền.
 
 **PHASE 3 HOÀN TẤT (19/10/2026) — v3.0.0.** Tiếp theo theo lộ trình Master Prompt: Phase 4 — Team Operations (dự án, công việc, nhóm, nhân viên, ticket, lịch, tài liệu).
