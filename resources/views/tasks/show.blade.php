@@ -16,6 +16,68 @@
                 <div style="white-space: pre-line">{{ $task->description ?: __('Không có mô tả.') }}</div>
             </div></div>
 
+            @if ($task->dependencies->where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->isNotEmpty())
+                <div class="alert alert-warning small"><i class="bi bi-lock me-1"></i>{{ __('Việc này đang chờ :count việc khác hoàn thành nên chưa thể đánh dấu hoàn thành.', ['count' => $task->dependencies->whereNotIn('status', ['completed', 'cancelled'])->count()]) }}</div>
+            @endif
+
+            @unless ($task->parent_id)
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>{{ __('Việc con (:done/:count)', ['done' => $task->subtasks->where('status', 'completed')->count(), 'count' => $task->subtasks->count()]) }}</span>
+                        @can('create', App\Models\Task::class)<a href="{{ route('tasks.create', ['parent_id' => $task->id]) }}" class="btn btn-soft-primary btn-sm"><i class="bi bi-plus"></i> {{ __('Thêm việc con') }}</a>@endcan
+                    </div>
+                    <div class="card-body">
+                        @forelse ($task->subtasks as $s)
+                            <div class="d-flex align-items-center gap-2 py-2 border-bottom">
+                                {!! badge(App\Models\Task::STATUSES, $s->status) !!}
+                                <a href="{{ route('tasks.show', $s) }}" class="flex-grow-1 small {{ $s->status === 'completed' ? 'text-decoration-line-through text-muted' : '' }}">{{ $s->title }}</a>
+                                <span class="small {{ $s->is_late ? 'text-danger' : 'text-muted' }}">{{ vn_date($s->due_date) }}</span>
+                                @if ($s->assignee)<x-avatar :user="$s->assignee" size="sm" />@endif
+                            </div>
+                        @empty
+                            <div class="small text-muted">{{ __('Chưa có việc con. Chia việc lớn thành các việc nhỏ để dễ giao và theo dõi.') }}</div>
+                        @endforelse
+                    </div>
+                </div>
+            @endunless
+
+            <div class="card mb-4">
+                <div class="card-header">{{ __('Phụ thuộc') }}</div>
+                <div class="card-body">
+                    <div class="small fw-semibold mb-1">{{ __('Cần xong trước') }}</div>
+                    @forelse ($task->dependencies as $d)
+                        <div class="d-flex align-items-center gap-2 py-1 border-bottom">
+                            <i class="bi {{ in_array($d->status, ['completed', 'cancelled'], true) ? 'bi-unlock text-success' : 'bi-lock text-warning' }}"></i>
+                            <a href="{{ route('tasks.show', $d) }}" class="flex-grow-1 small">{{ $d->title }}</a>
+                            {!! badge(App\Models\Task::STATUSES, $d->status) !!}
+                            @can('update', $task)
+                                <form method="POST" action="{{ route('tasks.dependencies.destroy', [$task, $d->id]) }}">@csrf @method('DELETE')<button class="btn btn-link btn-sm text-muted p-0" title="{{ __('Bỏ phụ thuộc') }}" aria-label="{{ __('Bỏ phụ thuộc') }}"><i class="bi bi-x-lg"></i></button></form>
+                            @endcan
+                        </div>
+                    @empty
+                        <div class="small text-muted mb-2">{{ __('Không phụ thuộc việc nào.') }}</div>
+                    @endforelse
+                    @can('update', $task)
+                        @if ($dependencyOptions)
+                            <form method="POST" action="{{ route('tasks.dependencies.store', $task) }}" class="d-flex gap-2 mt-2">@csrf
+                                <select name="depends_on_id" class="form-select form-select-sm @error('depends_on_id') is-invalid @enderror" required aria-label="{{ __('Việc phải xong trước') }}">
+                                    <option value="">{{ __('— Chọn việc phải xong trước —') }}</option>
+                                    @foreach ($dependencyOptions as $id => $title)<option value="{{ $id }}">{{ $title }}</option>@endforeach
+                                </select>
+                                <button class="btn btn-soft-primary btn-sm text-nowrap"><i class="bi bi-plus"></i> {{ __('Thêm') }}</button>
+                            </form>
+                            @error('depends_on_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        @endif
+                    @endcan
+                    @if ($task->dependents->isNotEmpty())
+                        <div class="small fw-semibold mt-3 mb-1">{{ __('Đang chờ việc này') }}</div>
+                        @foreach ($task->dependents as $d)
+                            <div class="d-flex align-items-center gap-2 py-1"><i class="bi bi-hourglass text-muted"></i><a href="{{ route('tasks.show', $d) }}" class="flex-grow-1 small">{{ $d->title }}</a>{!! badge(App\Models\Task::STATUSES, $d->status) !!}</div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+
             <div class="card mb-4">
                 <div class="card-header"><span>Checklist ({{ $task->checklist->where('is_done', true)->count() }}/{{ $task->checklist->count() }})</span></div>
                 <div class="card-body">
@@ -89,7 +151,11 @@
         <div class="col-lg-4">
             <div class="card mb-4"><div class="card-body">
                 <dl class="detail-list">
+                    @if ($task->project)<dt>{{ __('Dự án') }}</dt><dd><a href="{{ route('projects.show', $task->project_id) }}">{{ $task->project->name }}</a></dd>@endif
+                    @if ($task->parent)<dt>{{ __('Việc cha') }}</dt><dd><a href="{{ route('tasks.show', $task->parent) }}">{{ $task->parent->title }}</a></dd>@endif
+                    @if ($task->start_date)<dt>{{ __('Ngày bắt đầu') }}</dt><dd>{{ vn_date($task->start_date) }}</dd>@endif
                     <dt>{{ __('Hạn chót') }}</dt><dd class="{{ $task->is_late ? 'text-danger' : '' }}">{{ vn_date($task->due_date, true) }}</dd>
+                    @if ($task->estimated_hours !== null)<dt>{{ __('Giờ ước tính') }}</dt><dd>{{ rtrim(rtrim(number_format((float) $task->estimated_hours, 2, ',', '.'), '0'), ',') }} {{ __('giờ') }}</dd>@endif
                     <dt>Giao cho</dt><dd>{{ $task->assignee?->name ?? '—' }}</dd>
                     <dt>{{ __('Người tạo') }}</dt><dd>{{ $task->creator?->name ?? '—' }}</dd>
                     <dt>{{ __('Liên quan') }}</dt><dd>@include('tasks._related')</dd>
@@ -98,6 +164,7 @@
                 </dl>
                 @can('update', $task)
                     <hr>
+                    @error('status')<div class="alert alert-danger small py-2">{{ $message }}</div>@enderror
                     <form method="POST" action="{{ route('tasks.status', $task) }}" class="d-flex gap-2">@csrf @method('PATCH')
                         <select name="status" class="form-select form-select-sm" aria-label="{{ __('Trạng thái') }}">
                             @foreach (App\Models\Task::STATUSES as $k => $s)<option value="{{ $k }}" @selected($task->status === $k)>{{ __($s[0]) }}</option>@endforeach

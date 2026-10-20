@@ -2,6 +2,7 @@
 @section('title', __('Công việc'))
 @section('content')
     <x-page-header :title="__('Công việc')" :breadcrumbs="['Công việc' => null]" :subtitle="__('Giao việc, theo dõi hạn chót và tiến độ')">
+        <a href="{{ route('tasks.board', request()->query()) }}" class="btn btn-light"><i class="bi bi-kanban me-1"></i>{{ __('Kanban') }}</a>
         <a href="{{ route('tasks.calendar') }}" class="btn btn-light"><i class="bi bi-calendar3 me-1"></i>{{ __('Lịch công việc') }}</a>
         <a href="{{ route('tasks.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>
         @can('create', App\Models\Task::class)<a href="{{ route('tasks.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Tạo công việc') }}</a>@endcan
@@ -24,6 +25,11 @@
             <select name="priority" class="form-select"><option value="">{{ __('Mọi mức ưu tiên') }}</option>
                 @foreach (App\Models\Task::PRIORITIES as $k => $s)<option value="{{ $k }}" @selected(request('priority') === $k)>{{ __($s[0]) }}</option>@endforeach
             </select>
+            @if ($projects)
+                <select name="project_id" class="form-select" aria-label="{{ __('Dự án') }}"><option value="">{{ __('Mọi dự án') }}</option><option value="none" @selected(request('project_id') === 'none')>{{ __('Không thuộc dự án') }}</option>
+                    @foreach ($projects as $id => $name)<option value="{{ $id }}" @selected(request('project_id') == $id)>{{ $name }}</option>@endforeach
+                </select>
+            @endif
             <select name="due" class="form-select"><option value="">{{ __('Mọi thời hạn') }}</option>
                 <option value="today" @selected(request('due') === 'today')>{{ __('Hôm nay') }}</option><option value="week" @selected(request('due') === 'week')>{{ __('Tuần này') }}</option><option value="late" @selected(request('due') === 'late')>{{ __('Trễ hạn') }}</option>
             </select>
@@ -44,7 +50,8 @@
                 <tbody>
                 @foreach ($tasks as $t)
                     <tr>
-                        <td><a href="{{ route('tasks.show', $t) }}" class="row-link">{{ $t->title }}</a></td>
+                        <td>@if ($t->parent_id)<i class="bi bi-arrow-return-right text-muted me-1" title="{{ __('Việc con') }}"></i>@endif<a href="{{ route('tasks.show', $t) }}" class="row-link">{{ $t->title }}</a>
+                            @if ($t->project || $t->subtasks_count)<div class="small text-muted">@if ($t->project)<i class="bi bi-kanban me-1"></i>{{ $t->project->name }}@endif @if ($t->subtasks_count)<span class="ms-1"><i class="bi bi-diagram-2"></i> {{ __(':count việc con', ['count' => $t->subtasks_count]) }}</span>@endif</div>@endif</td>
                         <td class="small">@include('tasks._related', ['task' => $t])</td>
                         <td>{!! badge(App\Models\Task::PRIORITIES, $t->priority) !!}</td>
                         <td class="small {{ $t->is_late ? 'text-danger fw-semibold' : '' }}">{{ vn_date($t->due_date, true) }}@if ($t->is_late)<div class="small-xs">{{ __('Trễ :time', ['time' => $t->due_date->diffForHumans(null, true)]) }}</div>@endif</td>

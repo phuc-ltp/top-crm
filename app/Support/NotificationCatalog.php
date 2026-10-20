@@ -28,6 +28,7 @@ class NotificationCatalog
         'task_due' => ['work', 'Công việc / lịch hẹn sắp đến hạn'],
         'task_overdue' => ['work', 'Công việc quá hạn'],
         'task_comment' => ['work', 'Bình luận mới trong công việc'],
+        'project_member' => ['work', 'Được thêm vào dự án'],
         'order_approved' => ['sales', 'Đơn hàng được duyệt'],
         'quotation_approval' => ['sales', 'Duyệt báo giá (chờ duyệt, kết quả duyệt)'],
         'quotation_expired' => ['sales', 'Báo giá hết hạn'],

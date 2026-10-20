@@ -9,6 +9,13 @@
                 <div class="card mb-4"><div class="card-header">{{ __('Nội dung công việc') }}</div><div class="card-body">
                     <x-input name="title" :label="__('Tiêu đề')" :value="$task->title" required maxlength="255" />
                     <x-textarea name="description" :label="__('Mô tả chi tiết')" :value="$task->description" rows="5" maxlength="10000" />
+                    @if ($parent)
+                        <input type="hidden" name="parent_id" value="{{ $parent->id }}">
+                        <div class="mb-3 small"><span class="text-muted">{{ __('Việc con của') }}:</span> <a href="{{ route('tasks.show', $parent) }}">{{ $parent->title }}</a>
+                            <span class="text-muted">({{ __('cùng dự án với việc cha') }})</span></div>
+                    @else
+                        <x-select name="project_id" :label="__('Dự án')" :options="$projects" :value="$task->project_id" :placeholder="__('— Không thuộc dự án —')" :translate="false" />
+                    @endif
                     <div class="row">
                         <x-select name="related_type" :label="__('Liên quan đến')" :options="collect(App\Models\Task::RELATED_TYPES)->mapWithKeys(fn ($v, $k) => [$k => __('labels.'.$k)])->all()" :value="$task->related_type" :placeholder="__('— Không —')" col="col-md-4 mb-3" />
                         <div class="col-md-8 mb-3">
@@ -38,7 +45,9 @@
                 <div class="card mb-4"><div class="card-header">{{ __('Thiết lập') }}</div><div class="card-body">
                     <x-select name="status" :label="__('Trạng thái')" :options="App\Models\Task::STATUSES" :value="$task->status" required />
                     <x-select name="priority" :label="__('Mức ưu tiên')" :options="App\Models\Task::PRIORITIES" :value="$task->priority" required />
+                    <x-input name="start_date" type="date" :label="__('Ngày bắt đầu')" :value="optional($task->start_date)->format('Y-m-d')" />
                     <x-input name="due_date" type="datetime-local" :label="__('Hạn chót')" :value="optional($task->due_date)->format('Y-m-d\TH:i')" />
+                    <x-input name="estimated_hours" type="number" :label="__('Giờ ước tính')" :value="$task->estimated_hours !== null ? (float) $task->estimated_hours : null" min="0" max="9999" step="0.25" append="{{ __('giờ') }}" />
                     @can('tasks.assign')
                         <x-select name="assigned_to" label="Giao cho" :options="$users" :value="$task->assigned_to" :placeholder="__('— Chưa giao —')" />
                     @endcan

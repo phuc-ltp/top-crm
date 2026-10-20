@@ -15,6 +15,7 @@ class PermissionCatalog
         'leads' => ['label' => 'Leads', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export', 'assign']],
         'opportunities' => ['label' => 'Cơ hội / Pipeline', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export', 'assign']],
         'tasks' => ['label' => 'Công việc', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'assign']],
+        'projects' => ['label' => 'Dự án', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export']],
         'products' => ['label' => 'Sản phẩm', 'actions' => ['view', 'create', 'update', 'delete', 'export']],
         'suppliers' => ['label' => 'Nhà cung cấp', 'actions' => ['view', 'create', 'update', 'delete', 'export']],
         'inventory' => ['label' => 'Kho hàng', 'actions' => ['view', 'create', 'adjust', 'manage']],
@@ -91,6 +92,7 @@ class PermissionCatalog
                 'tasks' => '*', 'quotations' => '*', 'orders' => '*', 'invoices' => '*',
                 'products' => ['view', 'export'], 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'],
                 'reports' => '*', 'users' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'],
+                'projects' => ['view', 'create', 'update'],
             ]),
             'Sales Employee' => $pick([
                 'dashboard' => '*',
@@ -104,6 +106,7 @@ class PermissionCatalog
                 'invoices' => ['view'],
                 'products' => ['view'], 'inventory' => ['view'],
                 'tickets' => ['view', 'create'],
+                'projects' => ['view'],
             ]),
             'Marketing Employee' => $pick([
                 'dashboard' => '*', 'campaigns' => '*',
@@ -113,6 +116,7 @@ class PermissionCatalog
                 'products' => ['view'],
                 'tasks' => ['view', 'create', 'update'],
                 'reports' => ['view'],
+                'projects' => ['view'],
             ]),
             'Support Agent' => $pick([
                 'dashboard' => '*', 'tickets' => '*',
@@ -121,6 +125,7 @@ class PermissionCatalog
                 'products' => ['view'],
                 'tasks' => ['view', 'create', 'update'],
                 'reports' => ['view'],
+                'projects' => ['view'],
             ]),
             'Read-only Auditor' => $pick([
                 'dashboard' => ['view'],
@@ -129,37 +134,39 @@ class PermissionCatalog
                 'quotations' => ['view', 'view_all'], 'orders' => ['view', 'view_all'], 'invoices' => ['view', 'view_all'],
                 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'], 'reports' => ['view'],
                 'activity_logs' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'],
+                'projects' => ['view', 'view_all'],
             ]),
             'Marketing Manager' => $pick([
                 'dashboard' => '*', 'campaigns' => '*', 'leads' => '*', 'tasks' => '*', 'reports' => '*',
                 'customers' => ['view', 'view_all', 'export'], 'contacts' => ['view', 'view_all', 'export'],
-                'products' => ['view'], 'users' => ['view'],
+                'products' => ['view'], 'users' => ['view'], 'projects' => ['view', 'create', 'update'],
             ]),
             'Customer Support Manager' => $pick([
                 'dashboard' => '*', 'tickets' => '*', 'contacts' => '*', 'tasks' => '*', 'reports' => '*',
                 'customers' => ['view', 'view_all', 'update', 'export'], 'products' => ['view'], 'users' => ['view'],
+                'projects' => ['view', 'create', 'update'],
             ]),
             'Finance Manager' => $pick([
                 'dashboard' => '*', 'invoices' => '*', 'reports' => '*',
                 'orders' => ['view', 'view_all', 'export', 'approve'], 'quotations' => ['view', 'view_all', 'export'],
                 'customers' => ['view', 'view_all', 'export'], 'products' => ['view'], 'suppliers' => ['view', 'export'], 'inventory' => ['view'],
-                'tasks' => ['view', 'create', 'update'], 'users' => ['view'],
+                'tasks' => ['view', 'create', 'update'], 'users' => ['view'], 'projects' => ['view'],
             ]),
             'Accountant' => $pick([
                 'dashboard' => ['view'], 'invoices' => ['view', 'view_all', 'create', 'update', 'export'],
                 'orders' => ['view', 'view_all'], 'customers' => ['view', 'view_all'], 'products' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'],
-                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'],
+                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'],
             ]),
             'Inventory Manager' => $pick([
                 'dashboard' => ['view'], 'products' => '*', 'suppliers' => '*', 'inventory' => '*', 'orders' => ['view', 'view_all'],
-                'reports' => ['view'], 'tasks' => ['view', 'create', 'update'],
+                'reports' => ['view'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'],
             ]),
             'Project Manager' => $pick([
-                'dashboard' => '*', 'tasks' => '*', 'customers' => ['view', 'view_all'],
+                'dashboard' => '*', 'tasks' => '*', 'projects' => '*', 'customers' => ['view', 'view_all'],
                 'opportunities' => ['view', 'view_all'], 'reports' => ['view'], 'users' => ['view'],
             ]),
             'Employee' => $pick([
-                'dashboard' => ['view'], 'tasks' => ['view', 'create', 'update'],
+                'dashboard' => ['view'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'],
                 'customers' => ['view'], 'contacts' => ['view'], 'products' => ['view'],
             ]),
             default => [],

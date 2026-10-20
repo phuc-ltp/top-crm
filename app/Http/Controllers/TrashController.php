@@ -20,7 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 /**
- * Thùng rác: bản ghi đã xóa (xóa mềm) của 11 module, có thể khôi phục.
+ * Thùng rác: bản ghi đã xóa (xóa mềm) của các module, có thể khôi phục.
  *  - Chỉ hiện loại người dùng có quyền XÓA (cùng điều kiện với nút xóa), chỉ bản ghi trong phạm vi được xem
  *    (visibleTo) và trong tổ chức đang làm việc (global scope của model vẫn áp dụng với onlyTrashed).
  *  - Không có xóa vĩnh viễn: dữ liệu đã xóa luôn còn trong CSDL để khôi phục / đối chiếu.
@@ -40,6 +40,7 @@ class TrashController extends Controller
             'invoices' => ['class' => Invoice::class, 'label' => 'Hóa đơn', 'icon' => 'bi-receipt', 'module' => 'invoices', 'show' => 'invoices.show'],
             'products' => ['class' => Product::class, 'label' => 'Sản phẩm', 'icon' => 'bi-box-seam', 'module' => 'products', 'show' => 'products.show'],
             'suppliers' => ['class' => \App\Models\Supplier::class, 'label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'module' => 'suppliers', 'show' => 'suppliers.show'],
+            'projects' => ['class' => \App\Models\Project::class, 'label' => 'Dự án', 'icon' => 'bi-kanban', 'module' => 'projects', 'show' => 'projects.show'],
             'tasks' => ['class' => Task::class, 'label' => 'Công việc', 'icon' => 'bi-check2-square', 'module' => 'tasks', 'show' => 'tasks.show'],
             'tickets' => ['class' => SupportTicket::class, 'label' => 'Ticket hỗ trợ', 'icon' => 'bi-headset', 'module' => 'tickets', 'show' => 'tickets.show'],
             'campaigns' => ['class' => Campaign::class, 'label' => 'Chiến dịch', 'icon' => 'bi-megaphone', 'module' => 'campaigns', 'show' => 'campaigns.show'],

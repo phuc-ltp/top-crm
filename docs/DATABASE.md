@@ -143,7 +143,10 @@ erDiagram
 ### Vận hành & hệ thống
 | Bảng | Mô tả |
 |---|---|
-| `tasks`, `task_checklist_items`, `task_comments` | Công việc, checklist, bình luận. |
+| `tasks`, `task_checklist_items`, `task_comments` | Công việc, checklist, bình luận. Từ bước 4.1, `tasks` có thêm `project_id` (dự án), `parent_id` (việc con, một cấp), `start_date`, `estimated_hours`. |
+| `projects` | Dự án (bước 4.1): mã tự sinh DA00001, khách hàng (tùy chọn), người quản lý, trạng thái, mức ưu tiên, thời gian, ngân sách tham khảo; xóa mềm. |
+| `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
+| `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |
 | `campaigns`, `campaign_leads` | Chiến dịch marketing. |
 | `interactions` | **Hoạt động** (ghi chú, gọi, email, gặp, việc theo dõi) — đa hình (khách hàng, người liên hệ, lead, cơ hội). `status` planned/done, `scheduled_at`, `assigned_to`, `outcome`, `completed_at`, `reminded_at` (từ bước 2.2). |

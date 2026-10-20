@@ -20,6 +20,7 @@ use App\Http\Controllers\OpportunityController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -186,6 +187,10 @@ Route::middleware('auth')->group(function () {
 
     // Công việc
     Route::get('/tasks/calendar', [TaskController::class, 'calendar'])->name('tasks.calendar');
+    Route::get('/tasks/board', [TaskController::class, 'board'])->name('tasks.board');
+    Route::get('/tasks/workload', [TaskController::class, 'workload'])->name('tasks.workload');
+    Route::post('/tasks/{task}/dependencies', [TaskController::class, 'addDependency'])->name('tasks.dependencies.store');
+    Route::delete('/tasks/{task}/dependencies/{dependency}', [TaskController::class, 'removeDependency'])->whereNumber('dependency')->name('tasks.dependencies.destroy');
     Route::get('/tasks/export', [TaskController::class, 'export'])->name('tasks.export');
     Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])->name('tasks.status');
     Route::post('/tasks/{task}/checklist', [TaskController::class, 'addChecklist'])->name('tasks.checklist.store');
@@ -196,6 +201,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/tasks/{task}/attachments/{attachment}', [TaskController::class, 'downloadAttachment'])->name('tasks.attachments.download');
     Route::delete('/tasks/{task}/attachments/{attachment}', [TaskController::class, 'deleteAttachment'])->name('tasks.attachments.destroy');
     Route::resource('tasks', TaskController::class);
+    Route::get('/projects/export', [ProjectController::class, 'export'])->name('projects.export');
+    Route::resource('projects', ProjectController::class);
 
     // Sản phẩm
     Route::get('/products/export', [ProductController::class, 'export'])->name('products.export');
