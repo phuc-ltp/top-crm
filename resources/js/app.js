@@ -314,6 +314,41 @@ function initKanban() {
     refreshTotals();
 }
 
+/* ============ Kanban công việc: kéo thẻ sang cột khác = đổi trạng thái ============ */
+function initTaskBoard() {
+    const board = $('[data-task-board]');
+    if (!board) return;
+    const refresh = () => $$('.kanban-col', board).forEach((col) => {
+        const n = $$('.kanban-card', col).length;
+        $('.col-count', col).textContent = n;
+        $('.kanban-empty', col)?.classList.toggle('d-none', n > 0);
+    });
+    $$('.kanban-list', board).forEach((list) => {
+        Sortable.create(list, {
+            group: 'tasks',
+            animation: 160,
+            ghostClass: 'kanban-ghost',
+            chosenClass: 'kanban-chosen',
+            draggable: '.kanban-card',
+            filter: '.kanban-locked',   // thẻ không có quyền sửa: không kéo được
+            preventOnFilter: false,     // vẫn bấm được liên kết trong thẻ khóa
+            onEnd: async (evt) => {
+                if (evt.from === evt.to) return;   // chỉ đổi thứ tự trong cột: không lưu
+                const card = evt.item;
+                refresh();
+                try {
+                    const res = await api(card.dataset.moveUrl, { method: 'PATCH', body: { status: evt.to.dataset.status } });
+                    toast('success', res.message);
+                } catch (e) {
+                    toast('error', e.message);
+                    evt.from.insertBefore(card, evt.from.children[evt.oldIndex] || null);   // hoàn tác khi lỗi (VD: còn việc phải xong trước)
+                    refresh();
+                }
+            },
+        });
+    });
+}
+
 /* Hộp chọn lý do thất bại cho Kanban: trả về {id, note} hoặc null nếu hủy */
 function askLostReason() {
     return new Promise((resolve) => {
@@ -545,6 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initGlobalSearch();
     initNotifications();
     initKanban();
+    initTaskBoard();
     initDataCharts();
     initLineItems();
 

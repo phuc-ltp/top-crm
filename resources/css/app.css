@@ -478,6 +478,13 @@ th a.sort-link:hover { color: var(--crm-primary-text); }
 .kanban-card .value { color: var(--crm-primary-text); font-weight: 700; font-size: .88rem; }
 .kanban-ghost { opacity: .4; background: var(--crm-primary-soft); border: 2px dashed var(--crm-primary); }
 .kanban-chosen { box-shadow: var(--crm-shadow-lg); transform: rotate(1.5deg); }
+/* Dự án & bảng công việc */
+.avatar-stack { display: flex; align-items: center; }
+.avatar-stack > .avatar { border: 2px solid var(--crm-surface); margin-left: -8px; }
+.avatar-stack > .avatar:first-child { margin-left: 0; }
+.workload-bar { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--crm-surface-3); }
+.workload-bar > span { display: block; height: 100%; }
+.kanban-card.kanban-locked { cursor: default; }
 
 /* ---------- Lịch ---------- */
 .calendar { display: grid; grid-template-columns: repeat(7, 1fr); border: 1px solid var(--crm-border); border-radius: var(--crm-radius-sm); overflow: hidden; }

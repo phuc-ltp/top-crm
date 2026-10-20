@@ -44,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
             'lead' => \App\Models\Lead::class,
             'opportunity' => \App\Models\Opportunity::class,
             'task' => \App\Models\Task::class,
+            'project' => \App\Models\Project::class,
             'product' => \App\Models\Product::class,
             'supplier' => \App\Models\Supplier::class,
             'price_list' => \App\Models\PriceList::class,
