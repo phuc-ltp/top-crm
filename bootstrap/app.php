@@ -22,6 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
+        // Đứng sau reverse proxy / Cloudflare: TRUSTED_PROXIES=* hoặc danh sách IP (ngăn cách bởi dấu phẩy) để nhận đúng IP người dùng và HTTPS
+        if ($proxies = env('TRUSTED_PROXIES')) {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
         // API: phiên web (cùng tên miền) hoặc khóa API Bearer
         $middleware->statefulApi();
         // Xác định tài khoản / tổ chức TRƯỚC khi tìm bản ghi trên route ({customer}...) để không bao giờ

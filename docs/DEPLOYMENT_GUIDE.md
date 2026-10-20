@@ -10,6 +10,8 @@
 
 ## 2. Nếu muốn cho nhiều người dùng qua mạng hoặc Internet
 
+> **Hướng dẫn từng bước đầy đủ (VPS Linux, HTTPS, sao lưu tự động, kiểm tra go-live): [GO_LIVE.md](GO_LIVE.md).** Phần dưới đây là tóm tắt.
+
 Hãy nhờ người có chuyên môn thực hiện các bước sau:
 
 1. **Máy chủ riêng** (VPS Linux hoặc Windows Server) có PHP 8.2+, MySQL 8 / MariaDB 10.6+, Nginx hoặc Apache, HTTPS (Let's Encrypt).
