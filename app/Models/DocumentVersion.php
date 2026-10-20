@@ -43,6 +43,6 @@ class DocumentVersion extends Model
 
     public function isPreviewable(): bool
     {
-        return in_array($this->mime_type, Document::PREVIEWABLE, true);
+        return in_array($this->mime_type, Document::previewableMimes(), true);
     }
 }

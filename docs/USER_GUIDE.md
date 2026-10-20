@@ -219,6 +219,14 @@ Trên hóa đơn đã phát hành:
 - **Lịch chung** (Công việc › Lịch chung): xem theo tháng hoặc tuần, gồm lịch hẹn và hạn công việc. Quản lý xem được lịch của nhân viên.
 - Nút **.ics** tải tệp lịch để thêm vào Google Calendar hoặc Outlook.
 
+## 16e. Tài liệu (Phase 4)
+
+- **Tài liệu** (menu Vận hành): tải lên hợp đồng, báo giá, quy định...; chọn danh mục, liên kết khách hàng / cơ hội / dự án.
+- **Phạm vi xem:** Riêng tư (chỉ mình bạn), Theo nhóm (thành viên một nhóm bạn tham gia), Toàn công ty.
+- **Phiên bản:** tải bản mới ở trang chi tiết; bản cũ vẫn giữ và tải lại được.
+- **Xem trước** PDF / ảnh ngay trên trình duyệt; loại khác thì tải về. Mỗi lượt xem / tải được ghi lại.
+- An toàn: tệp không có đường dẫn công khai; loại tệp kiểm tra theo nội dung thật (tệp đổi đuôi giả mạo bị từ chối); tối đa 20 MB mỗi tệp.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

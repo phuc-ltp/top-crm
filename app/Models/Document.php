@@ -44,7 +44,10 @@ class Document extends Model
     }
 
     /** Loại tệp xem trước trực tiếp trên trình duyệt (an toàn để hiển thị inline). */
-    public const PREVIEWABLE = ['application/pdf', 'image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    public static function previewableMimes(): array
+    {
+        return ['application/pdf', 'image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    }
 
     protected $fillable = ['title', 'description', 'category', 'visibility', 'team_id', 'related_type', 'related_id', 'created_by'];
 

@@ -153,6 +153,8 @@ erDiagram
 | `support_tickets` (bổ sung 4.3) | `category_id`, hạn SLA `first_response_due_at` / `resolution_due_at`, `first_responded_at`, tạm dừng khi chờ khách `paused_at` / `paused_minutes`, leo thang `escalation_level` (0/1/2) / `escalated_at`, hài lòng `satisfaction_rating` (1–5) / `satisfaction_comment`. Ticket cũ để trống SLA. |
 | `interactions` (bổ sung 4.4) | `ends_at` (giờ kết thúc), `location` (địa điểm / link họp). |
 | `interaction_attendees` | Người tham dự nội bộ của lịch hẹn (duy nhất theo lịch hẹn + người dùng). |
+| `documents` | Tài liệu (bước 4.5): tên, mô tả, danh mục, phạm vi xem (private / team / organization, `team_id`), liên kết khách hàng / cơ hội / dự án (`related_type` / `related_id`); xóa mềm. |
+| `document_versions` | Phiên bản tệp (bất biến): số phiên bản, đường dẫn trong storage/app/private, tên gốc, MIME đọc từ nội dung, dung lượng, SHA-256, ghi chú. |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |
