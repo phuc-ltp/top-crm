@@ -9,14 +9,16 @@
 |---|---|---|
 | Organization Owner | Chủ sở hữu tổ chức | toàn bộ (khóa, không chỉnh/xóa được) |
 | Organization Administrator | Quản trị tổ chức | toàn bộ |
-| Sales Manager / Sales Employee | Quản lý / Nhân viên bán hàng | 63 / 26 |
-| Marketing Manager / Marketing Employee | Quản lý / Nhân viên marketing | 30 / 23 |
-| Customer Support Manager / Support Agent | Quản lý CSKH / Nhân viên hỗ trợ | 28 / 20 |
-| Finance Manager / Accountant | Quản lý tài chính / Kế toán | 24 / 16 |
-| Inventory Manager | Quản lý kho | 12 |
-| Project Manager | Quản lý dự án | 13 |
-| Employee | Nhân viên | 7 |
-| Read-only Auditor | Kiểm toán (chỉ xem) | 24 (gồm xem nhật ký) |
+| Sales Manager / Sales Employee | Quản lý / Nhân viên bán hàng | 68 / 28 |
+| Marketing Manager / Marketing Employee | Quản lý / Nhân viên marketing | 33 / 24 |
+| Customer Support Manager / Support Agent | Quản lý CSKH / Nhân viên hỗ trợ | 31 / 21 |
+| Finance Manager / Accountant | Quản lý tài chính / Kế toán | 28 / 19 |
+| Inventory Manager | Quản lý kho | 22 |
+| Project Manager | Quản lý dự án | 19 |
+| Employee | Nhân viên | 8 |
+| Read-only Auditor | Kiểm toán (chỉ xem) | 28 (gồm xem nhật ký) |
+
+*Số quyền tính theo `PermissionCatalog` sau bước 4.1 (97 quyền). Quyền dự án `projects.*`: chủ sở hữu, quản trị và quản lý dự án có toàn bộ; các quản lý bán hàng / marketing / CSKH được xem, tạo, sửa; nhân viên chỉ xem dự án mình là thành viên; kiểm toán xem tất cả.*
 
 - Dùng chế độ **teams** của spatie/laravel-permission, với team = `organization_id`. Bộ xác định `App\Support\Tenancy\OrganizationTeamResolver` lấy tổ chức từ `CurrentOrganization`, nên quyền luôn khớp với tổ chức đang làm việc.
 - Mỗi tổ chức có bản vai trò riêng (`App\Support\Tenancy\RoleProvisioner`). Chỉnh quyền ở tổ chức này không ảnh hưởng tổ chức khác. Cùng một người có thể giữ vai trò khác nhau ở các tổ chức khác nhau.

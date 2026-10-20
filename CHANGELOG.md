@@ -2,6 +2,15 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [Chưa phát hành] — Phase 4 Vận hành đội nhóm
+
+### Thêm mới
+- **Thông báo:** 7 nhóm, trang thông báo mới, chuông tự cập nhật, tùy chọn nhận theo từng người (ứng dụng / email), thông báo có thanh toán và hóa đơn đã thu đủ, tự dọn thông báo cũ.
+- **4.1 Dự án & công việc nâng cao:** dự án (thành viên, tiến độ, khách hàng, ngân sách), việc con một cấp, phụ thuộc giữa công việc (chặn vòng lặp, chặn hoàn thành khi việc trước chưa xong), bảng Kanban kéo thả, trang khối lượng công việc, lọc công việc theo dự án, xuất Excel dự án. Quyền mới `projects.*`.
+
+### Sửa lỗi
+- Sửa công việc mà biểu mẫu không gửi trường dự án / việc cha thì giữ nguyên liên kết cũ (trước đó có nguy cơ gỡ mất).
+
 ## [3.0.0] — Phase 3 Vận hành bán hàng — 19/10/2026
 
 ### Thêm mới

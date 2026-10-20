@@ -61,11 +61,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('task_dependencies');
+        // Gỡ khóa ngoại trước: chỉ mục (project_id, status) đang được khóa ngoại project_id dùng
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->dropForeign(['parent_id']);
+            $table->dropForeign(['project_id']);
+        });
         Schema::table('tasks', function (Blueprint $table) {
             $table->dropIndex(['project_id', 'status']);
-            $table->dropConstrainedForeignId('parent_id');
-            $table->dropConstrainedForeignId('project_id');
-            $table->dropColumn(['start_date', 'estimated_hours']);
+            $table->dropColumn(['project_id', 'parent_id', 'start_date', 'estimated_hours']);
         });
         Schema::dropIfExists('project_members');
         Schema::dropIfExists('projects');

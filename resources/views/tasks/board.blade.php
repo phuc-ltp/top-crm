@@ -24,7 +24,8 @@
 
     @php($colors = ['pending' => '#94a3b8', 'in_progress' => '#3b82f6', 'overdue' => '#ef4444', 'completed' => '#22c55e', 'cancelled' => '#475569'])
     <div class="kanban" data-task-board>
-        @foreach (App\Models\Task::STATUSES as $status => [$label])
+        @foreach (['pending', 'in_progress', 'overdue', 'completed', 'cancelled'] as $status)
+            @php($label = App\Models\Task::STATUSES[$status][0])
             @php($items = $tasks->get($status, collect()))
             <div class="kanban-col" style="--stage-color: {{ $colors[$status] }}">
                 <div class="kanban-col-header">

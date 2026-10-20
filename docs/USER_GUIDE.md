@@ -185,6 +185,14 @@ Trên hóa đơn đã phát hành:
 
 **Tác vụ tự động** (nhắc việc, báo giá hết hạn, nhắc hóa đơn sắp đến hạn / quá hạn, cảnh báo tồn thấp) chỉ chạy khi đã mở **`START_CRM.bat`**. Hãy chạy file này mỗi lần bật máy, kể cả khi dùng qua XAMPP.
 
+## 16a. Dự án và công việc nâng cao (Phase 4)
+
+- **Dự án** (menu Công việc › Dự án): tạo dự án, chọn người quản lý, thành viên, khách hàng (nếu có), thời gian và ngân sách tham khảo. Tiến độ tự tính theo số việc đã hoàn thành (không tính việc đã hủy). Thành viên xem được mọi công việc của dự án; chỉ người quản lý hoặc người tạo được sửa dự án.
+- **Việc con:** ở trang chi tiết công việc bấm **Thêm việc con**. Việc con luôn thuộc cùng dự án với việc cha, chỉ có một cấp.
+- **Phụ thuộc:** ở trang chi tiết công việc, mục **Phụ thuộc**, chọn việc phải xong trước. Hệ thống không cho tạo vòng lặp và không cho đánh dấu hoàn thành khi việc phải xong trước chưa xong.
+- **Bảng Kanban** (Công việc › Bảng Kanban): kéo thẻ sang cột khác để đổi trạng thái; thẻ không có quyền sửa thì không kéo được.
+- **Khối lượng công việc:** xem mỗi người đang giữ bao nhiêu việc, trễ bao nhiêu, đến hạn 7 ngày tới, tổng giờ ước tính. Nhân viên chỉ thấy dòng của mình.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
