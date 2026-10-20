@@ -145,6 +145,9 @@ erDiagram
 |---|---|
 | `tasks`, `task_checklist_items`, `task_comments` | Công việc, checklist, bình luận. Từ bước 4.1, `tasks` có thêm `project_id` (dự án), `parent_id` (việc con, một cấp), `start_date`, `estimated_hours`. |
 | `projects` | Dự án (bước 4.1): mã tự sinh DA00001, khách hàng (tùy chọn), người quản lý, trạng thái, mức ưu tiên, thời gian, ngân sách tham khảo; xóa mềm. |
+| `branches` | Chi nhánh / văn phòng (bước 4.2), duy nhất theo tên trong tổ chức. |
+| `teams`, `team_members` | Nhóm làm việc (trưởng nhóm, phòng ban tùy chọn) và thành viên. |
+| `employee_profiles` | Hồ sơ nhân viên 1–1 với thành viên tổ chức: mã NV, chức danh, quản lý trực tiếp (chặn vòng lặp), chi nhánh, ngày vào làm, trạng thái. Trường nhạy cảm (`date_of_birth`, `personal_phone`, `personal_email`, `home_address`, `id_number`, `emergency_contact`, `hr_notes`) mã hóa bằng APP_KEY, ẩn khỏi JSON và nhật ký. |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

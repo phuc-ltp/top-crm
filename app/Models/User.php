@@ -135,6 +135,18 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
         $this->unsetRelation('organizations');
     }
 
+    /** Hồ sơ nhân viên trong tổ chức đang làm việc (EmployeeProfile có global scope theo tổ chức). */
+    public function employeeProfile()
+    {
+        return $this->hasOne(EmployeeProfile::class);
+    }
+
+    /** Các nhóm (của tổ chức đang làm việc) người dùng tham gia. */
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_members')->withTimestamps();
+    }
+
     public function salesTargets()
     {
         return $this->hasMany(SalesTarget::class);

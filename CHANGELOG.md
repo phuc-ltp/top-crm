@@ -7,6 +7,7 @@
 ### Thêm mới
 - **Thông báo:** 7 nhóm, trang thông báo mới, chuông tự cập nhật, tùy chọn nhận theo từng người (ứng dụng / email), thông báo có thanh toán và hóa đơn đã thu đủ, tự dọn thông báo cũ.
 - **4.1 Dự án & công việc nâng cao:** dự án (thành viên, tiến độ, khách hàng, ngân sách), việc con một cấp, phụ thuộc giữa công việc (chặn vòng lặp, chặn hoàn thành khi việc trước chưa xong), bảng Kanban kéo thả, trang khối lượng công việc, lọc công việc theo dự án, xuất Excel dự án. Quyền mới `projects.*`.
+- **4.2 Nhân viên & nhóm:** danh bạ nhân viên, hồ sơ (thông tin công việc + thông tin cá nhân mã hóa, quyền xem riêng), sơ đồ tổ chức (chặn vòng lặp quản lý), nhóm (trưởng nhóm, thành viên), chi nhánh, KPI cá nhân / nhóm từ dữ liệu thật. Quyền mới `employees.*`, `teams.*`.
 
 ### Sửa lỗi
 - Sửa công việc mà biểu mẫu không gửi trường dự án / việc cha thì giữ nguyên liên kết cũ (trước đó có nguy cơ gỡ mất).

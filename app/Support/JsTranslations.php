@@ -44,6 +44,8 @@ class JsTranslations
         'phụ trách:',
         'Sửa phòng ban',
         'Thêm phòng ban',
+        'Sửa chi nhánh',
+        'Thêm chi nhánh',
         'Nội dung mục checklist',
         'Đã lưu thành công.',
         'Bạn chắc chắn muốn xóa bản ghi này?',

@@ -26,6 +26,8 @@ class PermissionCatalog
         'tickets' => ['label' => 'Hỗ trợ khách hàng', 'actions' => ['view', 'view_all', 'create', 'update', 'delete', 'export', 'assign']],
         'reports' => ['label' => 'Báo cáo', 'actions' => ['view', 'export']],
         'users' => ['label' => 'Người dùng & vai trò', 'actions' => ['view', 'create', 'update', 'delete', 'manage']],
+        'employees' => ['label' => 'Hồ sơ nhân viên', 'actions' => ['view', 'view_sensitive', 'update', 'export']],
+        'teams' => ['label' => 'Nhóm & chi nhánh', 'actions' => ['view', 'manage']],
         'activity_logs' => ['label' => 'Nhật ký hoạt động', 'actions' => ['view']],
         'settings' => ['label' => 'Cài đặt hệ thống', 'actions' => ['manage']],
         'api' => ['label' => 'Kết nối API', 'actions' => ['use']],
@@ -33,7 +35,7 @@ class PermissionCatalog
 
     public const ACTION_LABELS = [
         'view' => 'Xem', 'view_all' => 'Xem tất cả', 'create' => 'Tạo', 'update' => 'Sửa', 'delete' => 'Xóa',
-        'export' => 'Xuất', 'assign' => 'Phân công', 'approve' => 'Duyệt', 'manage' => 'Quản trị', 'use' => 'Sử dụng', 'adjust' => 'Điều chỉnh',
+        'export' => 'Xuất', 'assign' => 'Phân công', 'approve' => 'Duyệt', 'manage' => 'Quản trị', 'use' => 'Sử dụng', 'adjust' => 'Điều chỉnh', 'view_sensitive' => 'Xem thông tin nhạy cảm',
     ];
 
     /** Vai trò cấp nền tảng: không phải vai trò spatie mà là cờ users.is_platform_admin (toàn quyền mọi tổ chức). */
@@ -85,7 +87,7 @@ class PermissionCatalog
             return $out;
         };
 
-        return match ($role) {
+        $permissions = match ($role) {
             'Organization Owner', 'Organization Administrator' => $all,
             'Sales Manager' => $pick([
                 'dashboard' => '*', 'customers' => '*', 'contacts' => '*', 'leads' => '*', 'opportunities' => '*',
@@ -171,5 +173,12 @@ class PermissionCatalog
             ]),
             default => [],
         };
+
+        // Mọi vai trò còn lại đều xem được danh bạ nhân viên và nhóm (thông tin công việc, không gồm thông tin nhạy cảm)
+        if ($permissions && ! in_array($role, ['Organization Owner', 'Organization Administrator'], true)) {
+            $permissions = array_merge($permissions, ['employees.view', 'teams.view']);
+        }
+
+        return $permissions;
     }
 }

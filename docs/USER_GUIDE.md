@@ -193,6 +193,15 @@ Trên hóa đơn đã phát hành:
 - **Bảng Kanban** (Công việc › Bảng Kanban): kéo thẻ sang cột khác để đổi trạng thái; thẻ không có quyền sửa thì không kéo được.
 - **Khối lượng công việc:** xem mỗi người đang giữ bao nhiêu việc, trễ bao nhiêu, đến hạn 7 ngày tới, tổng giờ ước tính. Nhân viên chỉ thấy dòng của mình.
 
+## 16b. Nhân viên, nhóm, chi nhánh (Phase 4)
+
+- **Danh bạ nhân viên** (Quản trị › Nhân sự): tìm theo tên, email, chức danh, mã NV; lọc theo phòng ban, nhóm, chi nhánh, trạng thái.
+- **Hồ sơ nhân viên:** thông tin công việc, nhóm, cấp dưới trực tiếp và **KPI** (tháng / quý / năm): doanh thu đã thu so với chỉ tiêu, cơ hội thắng, việc hoàn thành và tỉ lệ đúng hạn, ticket đã giải quyết.
+- **Thông tin cá nhân** (ngày sinh, CCCD, địa chỉ...): chỉ chủ sở hữu / quản trị thấy và sửa; dữ liệu được mã hóa.
+- **Sơ đồ tổ chức:** vẽ theo quản lý trực tiếp; hệ thống không cho chọn quản lý tạo vòng lặp.
+- **Nhóm:** tạo nhóm, chọn trưởng nhóm và thành viên; trang nhóm hiện KPI cả nhóm và từng người.
+- **Chi nhánh:** thêm / sửa / ngừng hoạt động; không xóa được chi nhánh còn nhân viên.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
