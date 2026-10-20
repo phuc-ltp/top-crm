@@ -67,7 +67,11 @@ class Menu
             'Quản trị' => [
                 ['Nhân sự', 'bi-person-badge-fill', null, null, null, [
                     ['Người dùng', null, 'users.index', 'users.view', 'users.*'],
+                    ['Danh bạ nhân viên', null, 'employees.index', 'employees.view', ['employees.index', 'employees.show', 'employees.edit']],
+                    ['Sơ đồ tổ chức', null, 'employees.chart', 'employees.view', 'employees.chart'],
+                    ['Nhóm', null, 'teams.index', 'teams.view', 'teams.*'],
                     ['Phòng ban', null, 'departments.index', 'users.manage', 'departments.*'],
+                    ['Chi nhánh', null, 'branches.index', 'teams.manage', 'branches.*'],
                     ['Vai trò & quyền', null, 'roles.index', 'users.manage', 'roles.*'],
                 ]],
                 ['Hệ thống', 'bi-gear-fill', null, null, null, [
