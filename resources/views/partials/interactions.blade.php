@@ -1,7 +1,7 @@
 {{-- Hoạt động & dòng thời gian dùng chung. Biến: $subject (model), $type (customer|lead|contact|opportunity), $canAdd --}}
 @php
     $me = auth()->user();
-    $planned = $subject->interactions()->planned()->with(['assignee:id,name', 'user:id,name'])->reorder('scheduled_at')->get();
+    $planned = $subject->interactions()->planned()->with(['assignee:id,name', 'user:id,name', 'attendees:id,name'])->reorder('scheduled_at')->get();
     $timeline = app(\App\Services\TimelineService::class)->for($subject, $me);
     $memberOptions = \App\Support\Lookup::users();
     $uid = $type.'-'.$subject->id;
@@ -40,6 +40,11 @@
                             <div class="col-md-4"><select name="assigned_to" class="form-select form-select-sm" aria-label="{{ __('Người phụ trách') }}">
                                 @foreach ($memberOptions as $id => $name)<option value="{{ $id }}" @selected($id === $me->id)>{{ $name }}</option>@endforeach</select></div>
                             <div class="col-12"><input type="text" name="subject" class="form-control form-control-sm" placeholder="{{ __('Việc cần làm, VD: Gọi lại báo giá') }}" maxlength="255"></div>
+                            <div class="col-md-4"><input type="datetime-local" name="ends_at" class="form-control form-control-sm" aria-label="{{ __('Giờ kết thúc') }}" title="{{ __('Giờ kết thúc (không bắt buộc)') }}"></div>
+                            <div class="col-md-8"><input type="text" name="location" class="form-control form-control-sm" placeholder="{{ __('Địa điểm hoặc link họp (không bắt buộc)') }}" maxlength="255"></div>
+                            <div class="col-12"><select name="attendees[]" class="form-select form-select-sm" multiple size="3" aria-label="{{ __('Người tham dự') }}" title="{{ __('Người tham dự (giữ Ctrl để chọn nhiều)') }}">
+                                @foreach ($memberOptions as $id => $name)@if ($id !== $me->id)<option value="{{ $id }}">{{ $name }}</option>@endif @endforeach</select>
+                                <div class="form-text">{{ __('Người tham dự nội bộ (giữ Ctrl để chọn nhiều) — được mời, nhắc lịch và cảnh báo trùng lịch.') }}</div></div>
                             <div class="col-12"><textarea name="content" class="form-control form-control-sm" rows="2" placeholder="{{ __('Ghi chú chuẩn bị (không bắt buộc)') }}" maxlength="5000"></textarea></div>
                             <div class="col-12 text-end"><button class="btn btn-primary btn-sm"><i class="bi bi-calendar-plus me-1"></i>{{ __('Lên lịch') }}</button></div>
                         </div>
@@ -60,11 +65,15 @@
                                 <div class="fw-semibold small">{{ label_of(App\Models\Interaction::TYPES, $a->type) }}@if ($a->subject) · {{ $a->subject }}@endif</div>
                                 <div class="small {{ $a->isOverdue() ? 'text-danger fw-semibold' : 'text-muted' }}">
                                     <i class="bi bi-clock me-1"></i>{{ vn_date($a->scheduled_at, true) }}@if ($a->isOverdue()) · {{ __('Quá hạn :time', ['time' => $a->scheduled_at->diffForHumans(null, true)]) }}@endif
+                                    @if ($a->ends_at)– {{ $a->ends_at->copy()->timezone(crm_timezone())->format('H:i') }}@endif
                                     · {{ $a->assignee?->name ?? '—' }}
+                                    @if ($a->location) · <i class="bi bi-geo-alt"></i> {{ $a->location }}@endif
+                                    @if ($a->attendees->isNotEmpty()) · <i class="bi bi-people"></i> {{ $a->attendees->pluck('name')->implode(', ') }}@endif
                                 </div>
                                 @if ($a->content)<div class="small mt-1" style="white-space: pre-line">{{ $a->content }}</div>@endif
                             </div>
                             <div class="d-flex gap-1 flex-shrink-0">
+                                <a href="{{ route('calendar.ics', $a) }}" class="btn btn-light btn-icon btn-sm" title="{{ __('Thêm vào Google / Outlook Calendar (.ics)') }}" aria-label="{{ __('Tải tệp lịch .ics') }}"><i class="bi bi-calendar-plus"></i></a>
                                 @if ($a->completableBy($me))
                                     <button class="btn btn-light btn-icon btn-sm text-success" type="button" data-bs-toggle="collapse" data-bs-target="#done-{{ $a->id }}" title="{{ __('Đánh dấu hoàn thành') }}" aria-label="{{ __('Đánh dấu hoàn thành') }}"><i class="bi bi-check2"></i></button>
                                 @endif
@@ -90,6 +99,11 @@
                                     <div class="col-md-4"><input type="datetime-local" name="scheduled_at" class="form-control form-control-sm" required value="{{ $a->scheduled_at?->copy()->timezone(crm_timezone())->format('Y-m-d\TH:i') }}" aria-label="{{ __('Thời điểm hẹn') }}"></div>
                                     <div class="col-md-4"><select name="assigned_to" class="form-select form-select-sm" aria-label="{{ __('Người phụ trách') }}">@foreach ($memberOptions as $id => $name)<option value="{{ $id }}" @selected($a->assigned_to === $id)>{{ $name }}</option>@endforeach</select></div>
                                     <div class="col-12"><input type="text" name="subject" class="form-control form-control-sm" value="{{ $a->subject }}" maxlength="255" aria-label="{{ __('Tiêu đề') }}"></div>
+                                    <div class="col-md-4"><input type="datetime-local" name="ends_at" class="form-control form-control-sm" value="{{ $a->ends_at?->copy()->timezone(crm_timezone())->format('Y-m-d\TH:i') }}" aria-label="{{ __('Giờ kết thúc') }}"></div>
+                                    <div class="col-md-8"><input type="text" name="location" class="form-control form-control-sm" value="{{ $a->location }}" maxlength="255" placeholder="{{ __('Địa điểm hoặc link họp (không bắt buộc)') }}" aria-label="{{ __('Địa điểm') }}"></div>
+                                    <div class="col-12"><input type="hidden" name="attendees_present" value="1">
+                                        <select name="attendees[]" class="form-select form-select-sm" multiple size="3" aria-label="{{ __('Người tham dự') }}">
+                                            @foreach ($memberOptions as $id => $name)<option value="{{ $id }}" @selected($a->attendees->contains('id', $id))>{{ $name }}</option>@endforeach</select></div>
                                     <div class="col-12"><textarea name="content" class="form-control form-control-sm" rows="2" maxlength="5000" aria-label="{{ __('Nội dung') }}">{{ $a->content }}</textarea></div>
                                     <div class="col-12 text-end"><button class="btn btn-primary btn-sm">{{ __('Lưu') }}</button></div>
                                 </div>

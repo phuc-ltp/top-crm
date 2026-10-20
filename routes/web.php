@@ -146,6 +146,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/interactions/{interaction}', [InteractionController::class, 'update'])->name('interactions.update');
     Route::patch('/interactions/{interaction}/complete', [InteractionController::class, 'complete'])->name('interactions.complete');
     Route::delete('/interactions/{interaction}', [InteractionController::class, 'destroy'])->name('interactions.destroy');
+    Route::get('/calendar', [\App\Http\Controllers\CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/{interaction}/ics', [\App\Http\Controllers\CalendarController::class, 'ics'])->name('calendar.ics');
     Route::get('/activities', [\App\Http\Controllers\ActivityController::class, 'index'])->name('activities.index');
 
     // Khách hàng

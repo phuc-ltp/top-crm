@@ -34,12 +34,17 @@ class InteractionController extends Controller
             'occurred_at' => ['nullable', 'date', 'before_or_equal:'.now()->addDay()->toDateTimeString()],
             'scheduled_at' => [$mode === 'plan' ? 'required' : 'nullable', 'date'],
             'assigned_to' => ['nullable', TenantRule::member()],
+            'ends_at' => ['nullable', 'date', 'after:scheduled_at'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'attendees' => ['nullable', 'array', 'max:50'],
+            'attendees.*' => ['integer', 'distinct', TenantRule::member()],
         ];
     }
 
     private function attributes(): array
     {
-        return ['type' => __('Loại hoạt động'), 'content' => __('Nội dung'), 'scheduled_at' => __('Thời điểm hẹn'), 'assigned_to' => __('Người phụ trách'), 'occurred_at' => __('Thời điểm')];
+        return ['type' => __('Loại hoạt động'), 'content' => __('Nội dung'), 'scheduled_at' => __('Thời điểm hẹn'), 'assigned_to' => __('Người phụ trách'), 'occurred_at' => __('Thời điểm'),
+            'ends_at' => __('Giờ kết thúc'), 'location' => __('Địa điểm'), 'attendees.*' => __('Người tham dự')];
     }
 
     public function store(Request $request, string $type, int $id)
@@ -54,11 +59,14 @@ class InteractionController extends Controller
         if ($mode === 'plan') {
             $activity = $subject->interactions()->create([
                 'type' => $data['type'], 'status' => 'planned', 'subject' => $data['subject'] ?? null, 'content' => $data['content'] ?? null,
-                'scheduled_at' => $data['scheduled_at'], 'user_id' => $user->id, 'assigned_to' => $data['assigned_to'] ?? $user->id,
+                'scheduled_at' => $data['scheduled_at'], 'ends_at' => $data['ends_at'] ?? null, 'location' => $data['location'] ?? null,
+                'user_id' => $user->id, 'assigned_to' => $data['assigned_to'] ?? $user->id,
             ]);
+            $activity->attendees()->sync($data['attendees'] ?? []);
             $this->notifyAssignee($activity, $user);
+            $this->notifyAttendees($activity, $data['attendees'] ?? [], $user);
 
-            return back()->with('success', __('Đã lên lịch hoạt động.'));
+            return back()->with('success', __('Đã lên lịch hoạt động.'))->with('warning', $this->conflictWarning($activity));
         }
 
         $subject->interactions()->create([
@@ -79,6 +87,8 @@ class InteractionController extends Controller
         $interaction->fill(collect($data)->only(['type', 'subject', 'content'])->all());
         if ($mode === 'plan') {
             $interaction->scheduled_at = $data['scheduled_at'];
+            $interaction->ends_at = $data['ends_at'] ?? null;
+            $interaction->location = $data['location'] ?? null;
             $interaction->assigned_to = $data['assigned_to'] ?? $interaction->assigned_to;
             if ($interaction->isDirty('scheduled_at')) {
                 $interaction->reminded_at = null;   // đổi giờ hẹn → nhắc lại theo giờ mới
@@ -90,8 +100,13 @@ class InteractionController extends Controller
         if ($interaction->assigned_to !== $previousAssignee) {
             $this->notifyAssignee($interaction, $request->user());
         }
+        if ($mode === 'plan' && $request->has('attendees_present')) {
+            $before = $interaction->attendees()->pluck('users.id')->all();
+            $interaction->attendees()->sync($data['attendees'] ?? []);
+            $this->notifyAttendees($interaction, array_diff($data['attendees'] ?? [], $before), $request->user());
+        }
 
-        return back()->with('success', __('Đã cập nhật hoạt động.'));
+        return back()->with('success', __('Đã cập nhật hoạt động.'))->with('warning', $mode === 'plan' ? $this->conflictWarning($interaction) : null);
     }
 
     public function complete(Request $request, Interaction $interaction)
@@ -115,6 +130,29 @@ class InteractionController extends Controller
         $interaction->delete();
 
         return back()->with('success', __('Đã xóa hoạt động.'));
+    }
+
+    /** Cảnh báo (không chặn) khi người phụ trách / người tham dự đã có lịch hẹn khác trùng giờ. */
+    private function conflictWarning(Interaction $activity): ?string
+    {
+        $people = $activity->attendees()->pluck('users.id')->push($activity->assigned_to)->filter()->all();
+        $conflicts = app(\App\Services\CalendarService::class)->conflicts($people, $activity->scheduled_at, \App\Services\CalendarService::endOf($activity), $activity->id);
+        if ($conflicts->isEmpty()) {
+            return null;
+        }
+
+        return __('Cảnh báo trùng lịch: :list.', ['list' => $conflicts->take(5)->map(fn ($c) => $c['user']->name.' ('.vn_date($c['activity']->scheduled_at, true).' — '
+            .($c['activity']->subject ?: label_of(Interaction::TYPES, $c['activity']->type)).')')->implode('; ')]);
+    }
+
+    /** Báo người tham dự mới (trừ người thao tác và người phụ trách — người phụ trách đã có thông báo riêng). */
+    private function notifyAttendees(Interaction $activity, array $userIds, User $actor): void
+    {
+        foreach (User::whereIn('id', $userIds)->whereKeyNot($actor->id)->where('id', '!=', (int) $activity->assigned_to)->get() as $u) {
+            CrmNotification::send($u, 'task_assigned', __(':actor mời bạn tham dự ":title" lúc :time', [
+                'actor' => $actor->name, 'title' => $activity->subject ?: label_of(Interaction::TYPES, $activity->type), 'time' => vn_date($activity->scheduled_at, true),
+            ], $u->preferredLocale()), route('calendar.index', ['view' => 'week', 'date' => $activity->scheduled_at->toDateString()]), 'bi-calendar-event');
+        }
     }
 
     private function notifyAssignee(Interaction $activity, User $actor): void

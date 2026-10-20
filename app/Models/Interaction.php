@@ -37,11 +37,12 @@ class Interaction extends Model
         'opportunity' => [Opportunity::class, 'opportunities'],
     ];
 
-    protected $fillable = ['type', 'status', 'subject', 'content', 'outcome', 'occurred_at', 'scheduled_at', 'completed_at', 'user_id', 'assigned_to'];
+    protected $fillable = ['type', 'status', 'subject', 'content', 'outcome', 'occurred_at', 'scheduled_at', 'ends_at', 'location', 'completed_at', 'user_id', 'assigned_to'];
 
     protected $casts = [
         'occurred_at' => 'datetime',
         'scheduled_at' => 'datetime',
+        'ends_at' => 'datetime',
         'completed_at' => 'datetime',
         'reminded_at' => 'datetime',
     ];
@@ -59,6 +60,12 @@ class Interaction extends Model
     public function assignee()
     {
         return $this->belongsTo(User::class, 'assigned_to');
+    }
+
+    /** Người tham dự nội bộ (bước 4.4). */
+    public function attendees()
+    {
+        return $this->belongsToMany(User::class, 'interaction_attendees')->withTimestamps();
     }
 
     /** Tên morph của đối tượng (customer / contact / lead / opportunity). */
@@ -125,7 +132,8 @@ class Interaction extends Model
         $classes = collect(self::SUBJECTS)->filter(fn ($def) => $user->can($def[1].'.view'))->map(fn ($def) => $def[0])->values()->all();
 
         return $query->where(function ($q) use ($user, $classes) {
-            $q->where('assigned_to', $user->id)->orWhere('user_id', $user->id);
+            $q->where('assigned_to', $user->id)->orWhere('user_id', $user->id)
+                ->orWhereHas('attendees', fn ($a) => $a->where('users.id', $user->id));
             if ($classes) {
                 $q->orWhereHasMorph('interactable', $classes, fn ($sub) => $sub->visibleTo($user));
             }

@@ -54,12 +54,12 @@ class TaskReminderService
 
         // Hoạt động đã lên lịch (gọi, hẹn, theo dõi...) trong 1 giờ tới: nhắc người phụ trách 1 lần
         $activities = 0;
-        \App\Models\Interaction::with(['assignee', 'interactable'])->planned()->whereNull('reminded_at')
+        \App\Models\Interaction::with(['assignee', 'interactable', 'attendees'])->planned()->whereNull('reminded_at')
             ->whereBetween('scheduled_at', [now()->subMinutes(15), now()->addHour()])
             ->chunkById(200, function ($items) use (&$activities) {
                 foreach ($items as $a) {
-                    $who = $a->assignee ?? $a->user;
-                    if ($who) {
+                    // Người phụ trách (hoặc người tạo) và mọi người tham dự, mỗi người một lần
+                    foreach (collect([$a->assignee ?? $a->user])->merge($a->attendees)->filter()->unique('id') as $who) {
                         CrmNotification::send($who, 'task_due', __('Sắp đến giờ: :title (:subject) lúc :time', [
                             'title' => $a->subject ?: label_of(\App\Models\Interaction::TYPES, $a->type), 'subject' => $a->subjectLabel(), 'time' => vn_date($a->scheduled_at, true),
                         ], $who->preferredLocale()), $a->subjectUrl(), 'bi-alarm');

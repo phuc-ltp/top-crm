@@ -1,7 +1,7 @@
 @php
     $flash = [];
     foreach (['success', 'error', 'warning', 'info'] as $type) {
-        if (session()->has($type)) {
+        if (filled(session($type))) {   // bỏ qua thông báo rỗng (VD: không có cảnh báo trùng lịch)
             $flash[] = [$type, session($type)];
         }
     }

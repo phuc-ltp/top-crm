@@ -56,6 +56,7 @@ class Menu
                     ['Dự án', null, 'projects.index', 'projects.view', 'projects.*'],
                     ['Danh sách công việc', null, 'tasks.index', 'tasks.view', ['tasks.index', 'tasks.show', 'tasks.create', 'tasks.edit']],
                     ['Bảng Kanban', null, 'tasks.board', 'tasks.view', 'tasks.board'],
+                    ['Lịch chung', null, 'calendar.index', 'dashboard.view', 'calendar.*'],
                     ['Lịch công việc', null, 'tasks.calendar', 'tasks.view', 'tasks.calendar'],
                     ['Khối lượng công việc', null, 'tasks.workload', 'tasks.view', 'tasks.workload'],
                     ['Hoạt động & lịch hẹn', null, 'activities.index', 'dashboard.view', 'activities.*'],
