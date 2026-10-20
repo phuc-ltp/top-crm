@@ -19,17 +19,17 @@
 
     <div class="row g-4">
         @foreach (['Theo danh mục' => $byCategory, 'Theo nhân viên' => $byAgent] as $title => $rows)
-            <div class="col-xl-6">
-                <div class="card h-100">
+            <div class="col-12">
+                <div class="card">
                     <div class="card-header">{{ __($title) }}</div>
                     @if ($rows->isEmpty())
                         <x-empty-state icon="bi-bar-chart" :title="__('Chưa có ticket trong kỳ')" />
                     @else
-                        <div class="table-responsive"><table class="table mb-0 align-middle">
+                        <div class="table-responsive"><table class="table table-sm mb-0 align-middle">
                             <thead><tr><th></th><th class="text-end">{{ __('Ticket') }}</th><th class="text-end">{{ __('Đã giải quyết') }}</th><th class="text-end">{{ __('Vi phạm SLA') }}</th><th class="text-end">{{ __('TB xử lý') }}</th><th class="text-end">CSAT</th></tr></thead>
                             <tbody>
                             @foreach ($rows as $r)
-                                <tr><td class="small fw-semibold">{{ $r['label'] }}</td><td class="text-end small">{{ $r['count'] }}</td><td class="text-end small">{{ $r['resolved'] }}</td>
+                                <tr><td class="small fw-semibold text-nowrap">{{ $r['label'] }}</td><td class="text-end small">{{ $r['count'] }}</td><td class="text-end small">{{ $r['resolved'] }}</td>
                                     <td class="text-end small {{ $r['breached'] ? 'text-danger fw-semibold' : '' }}">{{ $r['breached'] }}</td><td class="text-end small">{{ $dur($r['avg_resolution']) }}</td><td class="text-end small">{{ $r['csat'] ?? '—' }}</td></tr>
                             @endforeach
                             </tbody>
