@@ -24,6 +24,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Production chạy HTTPS (APP_URL https://...): mọi URL sinh ra đều là https, kể cả khi đứng sau proxy
+        if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         // Quy định mật khẩu chung cho mọi nơi đặt mật khẩu (cài đặt, đổi, đặt lại, tạo tài khoản)
         \Illuminate\Validation\Rules\Password::defaults(fn () => \App\Support\Security\PasswordPolicy::rule());
 
