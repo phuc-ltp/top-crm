@@ -23,7 +23,7 @@
             </div>
             @if ($editSensitive)
                 <div class="col-lg-6">
-                    <div class="card mb-4"><div class="card-header"><i class="bi bi-shield-lock me-1"></i>{{ __('Thông tin cá nhân (nhạy cảm)') }}</div><div class="card-body">
+                    <div class="card mb-4"><div class="card-header"><span><i class="bi bi-shield-lock me-1"></i>{{ __('Thông tin cá nhân (nhạy cảm)') }}</span></div><div class="card-body">
                         <div class="row">
                             <x-input name="date_of_birth" type="date" :label="__('Ngày sinh')" :value="$profile->date_of_birth" col="col-md-6 mb-3" />
                             <x-input name="id_number" :label="__('Số CCCD / hộ chiếu')" :value="$profile->id_number" maxlength="30" col="col-md-6 mb-3" />

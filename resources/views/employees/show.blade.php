@@ -33,7 +33,7 @@
             </div></div>
             @if ($showSensitive)
                 <div class="card mb-4">
-                    <div class="card-header"><i class="bi bi-shield-lock me-1"></i>{{ __('Thông tin cá nhân (nhạy cảm)') }}</div>
+                    <div class="card-header"><span><i class="bi bi-shield-lock me-1"></i>{{ __('Thông tin cá nhân (nhạy cảm)') }}</span></div>
                     <div class="card-body">
                         <dl class="detail-list">
                             <dt>{{ __('Ngày sinh') }}</dt><dd>{{ $profile?->date_of_birth ? vn_date(\Illuminate\Support\Carbon::parse($profile->date_of_birth)) : '—' }}</dd>

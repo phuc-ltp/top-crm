@@ -19,8 +19,8 @@
     @include('employees._kpi', ['k' => $total])
 
     <div class="card mt-4">
-        <div class="card-header">{{ __('Thành viên (:count)', ['count' => $team->members->count()]) }}
-            <span class="small text-muted fw-normal">· {{ $team->department?->name ?? __('Không thuộc phòng ban') }}</span></div>
+        <div class="card-header"><span>{{ __('Thành viên (:count)', ['count' => $team->members->count()]) }}</span>
+            <span class="small text-muted fw-normal">{{ $team->department?->name ?? __('Không thuộc phòng ban') }}</span></div>
         @if ($team->members->isEmpty())
             <x-empty-state icon="bi-people" :title="__('Chưa có thành viên.')" />
         @else
@@ -32,7 +32,7 @@
                     @php($r = $kpi[$m->id])
                     <tr>
                         <td><div class="d-flex align-items-center gap-2"><x-avatar :user="$m" size="sm" />
-                            <a href="{{ route('employees.show', $m->id) }}" class="row-link">{{ $m->name }}</a>
+                            <a href="{{ route('employees.show', $m->id) }}" class="row-link text-nowrap">{{ $m->name }}</a>
                             @if ($m->id === $team->leader_id)<span class="badge badge-soft-orange">{{ __('Trưởng nhóm') }}</span>@endif</div></td>
                         <td class="text-end small">{{ money($r['revenue']) }}</td>
                         <td class="text-end small">{{ $r['achievement'] !== null ? $r['achievement'].'%' : '—' }}</td>
