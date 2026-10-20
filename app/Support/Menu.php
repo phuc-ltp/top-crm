@@ -61,6 +61,7 @@ class Menu
                     ['Khối lượng công việc', null, 'tasks.workload', 'tasks.view', 'tasks.workload'],
                     ['Hoạt động & lịch hẹn', null, 'activities.index', 'dashboard.view', 'activities.*'],
                 ]],
+                ['Tài liệu', 'bi-folder2-open', 'documents.index', 'documents.view', 'documents.*'],
                 ['Marketing', 'bi-megaphone-fill', 'campaigns.index', 'campaigns.view', 'campaigns.*'],
                 ['Hỗ trợ khách hàng', 'bi-headset', null, null, null, [
                     ['Danh sách ticket', null, 'tickets.index', 'tickets.view', ['tickets.index', 'tickets.show', 'tickets.create', 'tickets.edit']],
