@@ -58,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
             'payment' => \App\Models\Payment::class,
             'campaign' => \App\Models\Campaign::class,
             'ticket' => \App\Models\SupportTicket::class,
+            'ticket_category' => \App\Models\TicketCategory::class,
             'department' => \App\Models\Department::class,
             'branch' => \App\Models\Branch::class,
             'team' => \App\Models\Team::class,

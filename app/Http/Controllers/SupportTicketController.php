@@ -16,7 +16,7 @@ class SupportTicketController extends Controller
 {
     private function filtered(Request $request)
     {
-        return SupportTicket::visibleTo($request->user())->with(['customer:id,name', 'assignee:id,name,avatar'])
+        return SupportTicket::visibleTo($request->user())->with(['customer:id,name', 'assignee:id,name,avatar', 'category:id,name'])
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = $this->like($request->q);
                 $q->where(fn ($w) => $w->where('subject', 'like', $term)->orWhere('code', 'like', $term)
@@ -25,7 +25,9 @@ class SupportTicketController extends Controller
             ->when($request->filled('status'), fn ($q) => $request->status === 'active'
                 ? $q->whereIn('status', ['open', 'in_progress', 'waiting']) : $q->where('status', $request->status))
             ->when($request->filled('priority'), fn ($q) => $q->where('priority', $request->priority))
-            ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->assigned_to));
+            ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->assigned_to))
+            ->when($request->filled('category_id'), fn ($q) => $q->where('category_id', $request->integer('category_id')))
+            ->when($request->input('sla') === 'breached', fn ($q) => $q->slaBreached());
     }
 
     public function index(Request $request)
@@ -35,7 +37,10 @@ class SupportTicketController extends Controller
             ->paginate($this->perPage($request))->withQueryString();
         $counts = SupportTicket::visibleTo($request->user())->selectRaw('status, COUNT(*) as cnt')->groupBy('status')->pluck('cnt', 'status');
 
-        return view('tickets.index', ['tickets' => $tickets, 'counts' => $counts, 'users' => Lookup::users()]);
+        $breached = SupportTicket::visibleTo($request->user())->slaBreached()->count();
+
+        return view('tickets.index', ['tickets' => $tickets, 'counts' => $counts, 'users' => Lookup::users(), 'breached' => $breached,
+            'categories' => \App\Models\TicketCategory::orderBy('name')->pluck('name', 'id')->all()]);
     }
 
     public function create(Request $request)
@@ -68,7 +73,7 @@ class SupportTicketController extends Controller
     public function show(SupportTicket $ticket)
     {
         $this->authorize('view', $ticket);
-        $ticket->load(['customer', 'contact', 'assignee', 'creator', 'replies.user:id,name,avatar']);
+        $ticket->load(['customer', 'contact', 'assignee', 'creator', 'replies.user:id,name,avatar', 'category', 'statusHistories.user:id,name']);
 
         return view('tickets.show', ['ticket' => $ticket, 'users' => Lookup::users()]);
     }
@@ -111,6 +116,9 @@ class SupportTicketController extends Controller
         ], [], ['body' => __('Nội dung')]);
 
         $ticket->replies()->create(['body' => $data['body'], 'is_internal' => $request->boolean('is_internal'), 'user_id' => $request->user()->id]);
+        if (! $request->boolean('is_internal')) {
+            app(\App\Services\SlaService::class)->markResponded($ticket);   // SLA phản hồi đầu: chỉ tính phản hồi gửi khách
+        }
         if (! empty($data['status']) && $data['status'] !== $ticket->status) {
             $ticket->update($this->statusTimestamps($data['status'], $ticket) + ['status' => $data['status']]);
         } elseif ($ticket->status === 'open' && ! $request->boolean('is_internal')) {
@@ -118,6 +126,59 @@ class SupportTicketController extends Controller
         }
 
         return back()->with('success', $request->boolean('is_internal') ? __('Đã thêm ghi chú nội bộ.') : __('Đã gửi phản hồi.'));
+    }
+
+    /** Ghi nhận điểm hài lòng (1–5) khách báo lại sau khi ticket đã giải quyết / đóng. */
+    public function satisfaction(Request $request, SupportTicket $ticket)
+    {
+        $this->authorize('update', $ticket);
+        abort_unless(in_array($ticket->status, ['resolved', 'closed'], true), 422, __('Chỉ ghi nhận đánh giá khi ticket đã giải quyết hoặc đã đóng.'));
+        $data = $request->validate([
+            'satisfaction_rating' => ['required', 'integer', 'between:1,5'],
+            'satisfaction_comment' => ['nullable', 'string', 'max:1000'],
+        ], [], ['satisfaction_rating' => __('Điểm hài lòng')]);
+        $ticket->update($data);
+
+        return back()->with('success', __('Đã ghi nhận đánh giá của khách hàng.'));
+    }
+
+    /** Phân tích hỗ trợ theo kỳ: khối lượng, tỉ lệ đạt SLA, thời gian phản hồi / xử lý, hài lòng, theo danh mục và nhân viên. */
+    public function analytics(Request $request)
+    {
+        $this->authorize('viewAny', SupportTicket::class);
+        [$from, $to, $period] = \App\Services\EmployeeKpiService::period($request->input('period'));
+        $tickets = SupportTicket::visibleTo($request->user())->with(['category:id,name', 'assignee:id,name'])
+            ->whereBetween('created_at', [$from, $to])->limit(10000)->get();
+        $resolved = SupportTicket::visibleTo($request->user())->whereBetween('resolved_at', [$from, $to])->limit(10000)->get();
+
+        $rate = function ($items, string $key) {
+            $judged = $items->map(fn ($t) => $t->sla_state[$key])->filter(fn ($s) => in_array($s, ['met', 'breached'], true));
+
+            return $judged->isEmpty() ? null : (int) round($judged->filter(fn ($s) => $s === 'met')->count() * 100 / $judged->count());
+        };
+        $avgMinutes = fn ($items, callable $f) => ($vals = $items->map($f)->filter(fn ($v) => $v !== null))->isEmpty() ? null : (int) round($vals->avg());
+        $responseMin = fn ($t) => $t->first_responded_at ? max(0, $t->created_at->diffInMinutes($t->first_responded_at)) : null;
+        $resolveMin = fn ($t) => $t->resolved_at ? max(0, $t->created_at->diffInMinutes($t->resolved_at) - $t->paused_minutes) : null;
+        $csat = fn ($items) => ($r = $items->whereNotNull('satisfaction_rating'))->isEmpty() ? null : round($r->avg('satisfaction_rating'), 1);
+
+        $summary = [
+            'created' => $tickets->count(), 'resolved' => $resolved->count(),
+            'response_rate' => $rate($tickets, 'response'), 'resolution_rate' => $rate($tickets, 'resolution'),
+            'avg_response' => $avgMinutes($tickets, $responseMin), 'avg_resolution' => $avgMinutes($resolved, $resolveMin),
+            'csat' => $csat($resolved), 'csat_count' => $resolved->whereNotNull('satisfaction_rating')->count(),
+        ];
+        $group = fn ($items, callable $key, callable $label) => $items->groupBy($key)->map(fn ($g) => [
+            'label' => $label($g->first()), 'count' => $g->count(),
+            'resolved' => $g->whereNotNull('resolved_at')->count(),
+            'breached' => $g->filter(fn ($t) => in_array('breached', $t->sla_state, true))->count(),
+            'avg_resolution' => $avgMinutes($g, $resolveMin), 'csat' => $csat($g),
+        ])->sortByDesc('count')->values();
+
+        return view('tickets.analytics', [
+            'summary' => $summary, 'period' => $period, 'from' => $from, 'to' => $to,
+            'byCategory' => $group($tickets, fn ($t) => $t->category_id ?? 0, fn ($t) => $t->category?->name ?? __('Chưa phân loại')),
+            'byAgent' => $group($tickets, fn ($t) => $t->assigned_to ?? 0, fn ($t) => $t->assignee?->name ?? __('Chưa giao')),
+        ]);
     }
 
     public function export(Request $request, ExportService $exporter)
@@ -149,7 +210,8 @@ class SupportTicketController extends Controller
             'priority' => ['required', Rule::in(array_keys(SupportTicket::PRIORITIES))],
             'status' => ['required', Rule::in(array_keys(SupportTicket::STATUSES))],
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
-        ], [], ['subject' => __('Chủ đề'), 'description' => __('Mô tả')]);
+            'category_id' => ['nullable', 'integer', \App\Support\Tenancy\TenantRule::exists('ticket_categories')],
+        ], [], ['subject' => __('Chủ đề'), 'description' => __('Mô tả'), 'category_id' => __('Danh mục')]);
 
         // Ticket gắn với khách hàng mà người tạo được phép xem (CSKH có quyền xem tất cả khách hàng)
         abort_unless(Customer::visibleTo($request->user())->whereKey($data['customer_id'])->exists(), 403, __('Bạn không có quyền với khách hàng này.'));
@@ -169,6 +231,7 @@ class SupportTicketController extends Controller
             'customers' => Lookup::customers($request->user()),
             'contacts' => Contact::visibleTo($request->user())->orderBy('full_name')->get(['id', 'full_name', 'customer_id']),
             'users' => Lookup::users(),
+            'categories' => \App\Models\TicketCategory::where('is_active', true)->orderBy('name')->pluck('name', 'id')->all(),
         ];
     }
 }

@@ -2,6 +2,7 @@
 @section('title', __('Hỗ trợ khách hàng'))
 @section('content')
     <x-page-header :title="__('Hỗ trợ khách hàng')" :breadcrumbs="['Hỗ trợ' => null]" :subtitle="__('Tiếp nhận và xử lý yêu cầu hỗ trợ')">
+        <a href="{{ route('tickets.analytics') }}" class="btn btn-light"><i class="bi bi-graph-up me-1"></i>{{ __('Phân tích hỗ trợ') }}</a>
         @can('export', App\Models\SupportTicket::class)<a href="{{ route('tickets.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>@endcan
         @can('create', App\Models\SupportTicket::class)<a href="{{ route('tickets.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Tạo ticket') }}</a>@endcan
     </x-page-header>
@@ -11,6 +12,8 @@
             <div class="col-6 col-md-4 col-xl"><a href="{{ route('tickets.index', ['status' => $k]) }}" class="card card-hover p-3 d-block text-reset {{ request('status') === $k ? 'border-warning' : '' }}">
                 <div class="small text-muted">{{ __($label) }}</div><div class="fs-4 fw-bold">{{ $counts[$k] ?? 0 }}</div></a></div>
         @endforeach
+        <div class="col-6 col-md-4 col-xl"><a href="{{ route('tickets.index', ['sla' => 'breached']) }}" class="card card-hover p-3 d-block text-reset {{ request('sla') === 'breached' ? 'border-danger' : '' }}">
+            <div class="small text-danger"><i class="bi bi-stopwatch me-1"></i>{{ __('Vi phạm SLA') }}</div><div class="fs-4 fw-bold {{ $breached ? 'text-danger' : '' }}">{{ $breached }}</div></a></div>
     </div>
 
     <div class="card">
@@ -22,6 +25,10 @@
             @can('tickets.view_all')
                 <select name="assigned_to" class="form-select"><option value="">{{ __('Mọi nhân viên') }}</option>@foreach ($users as $id => $name)<option value="{{ $id }}" @selected(request('assigned_to') == $id)>{{ $name }}</option>@endforeach</select>
             @endcan
+            @if ($categories)
+                <select name="category_id" class="form-select" aria-label="{{ __('Danh mục') }}"><option value="">{{ __('Mọi danh mục') }}</option>@foreach ($categories as $id => $name)<option value="{{ $id }}" @selected(request('category_id') == $id)>{{ $name }}</option>@endforeach</select>
+            @endif
+            @if (request('sla'))<input type="hidden" name="sla" value="{{ request('sla') }}">@endif
             <button class="btn btn-soft-primary"><i class="bi bi-funnel me-1"></i>{{ __('Lọc') }}</button>
         </form>
         @if ($tickets->isEmpty())
@@ -29,15 +36,18 @@
         @else
             <div class="table-responsive"><table class="table table-hover">
                 <thead><tr><th><x-sort-link column="code" :label="__('Mã')" /></th><th><x-sort-link column="subject" :label="__('Chủ đề')" /></th><th>{{ __('labels.customer') }}</th><th><x-sort-link column="priority" :label="__('Ưu tiên')" /></th>
-                    <th><x-sort-link column="status" :label="__('Trạng thái')" /></th><th>{{ __('Phụ trách') }}</th><th><x-sort-link column="created_at" :label="__('Tạo lúc')" /></th><th class="text-end">{{ __('Thao tác') }}</th></tr></thead>
+                    <th><x-sort-link column="status" :label="__('Trạng thái')" /></th><th>SLA</th><th>{{ __('Phụ trách') }}</th><th><x-sort-link column="created_at" :label="__('Tạo lúc')" /></th><th class="text-end">{{ __('Thao tác') }}</th></tr></thead>
                 <tbody>
                 @foreach ($tickets as $t)
                     <tr>
                         <td class="small text-muted">{{ $t->code }}</td>
-                        <td><a href="{{ route('tickets.show', $t) }}" class="row-link">{{ $t->subject }}</a></td>
+                        <td><a href="{{ route('tickets.show', $t) }}" class="row-link">{{ $t->subject }}</a>@if ($t->category)<div class="small text-muted">{{ $t->category->name }}</div>@endif</td>
                         <td class="small">{{ $t->customer?->name }}</td>
                         <td>{!! badge(App\Models\SupportTicket::PRIORITIES, $t->priority) !!}</td>
                         <td>{!! badge(App\Models\SupportTicket::STATUSES, $t->status) !!}</td>
+                        @php($st = $t->sla_state)
+                        <td class="small text-nowrap">@if (in_array('breached', $st, true)) @include('tickets._sla', ['state' => 'breached', 'due' => $st['response'] === 'breached' ? $t->first_response_due_at : $t->resolution_due_at])
+                            @else @include('tickets._sla', ['state' => in_array($t->status, ['resolved', 'closed'], true) ? $st['resolution'] : ($st['response'] === 'pending' ? 'pending' : $st['resolution']), 'due' => $st['response'] === 'pending' ? $t->first_response_due_at : $t->resolution_due_at]) @endif</td>
                         <td class="small">{{ $t->assignee?->name ?? __('Chưa giao') }}</td>
                         <td class="small text-muted">{{ vn_date($t->created_at, true) }}</td>
                         <td class="table-actions">

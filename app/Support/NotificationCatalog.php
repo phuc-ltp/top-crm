@@ -38,6 +38,8 @@ class NotificationCatalog
         'invoice_paid' => ['sales', 'Hóa đơn đã thu đủ'],
         'low_stock' => ['inventory', 'Tồn kho thấp'],
         'ticket_new' => ['support', 'Ticket hỗ trợ mới'],
+        'ticket_sla_warning' => ['support', 'Ticket sắp trễ SLA'],
+        'ticket_escalated' => ['support', 'Ticket vi phạm SLA (leo thang)'],
         'security' => ['security', 'Cảnh báo bảo mật (đăng nhập lạ, đổi quyền...)'],
     ];
 

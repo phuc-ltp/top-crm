@@ -61,7 +61,11 @@ class Menu
                     ['Hoạt động & lịch hẹn', null, 'activities.index', 'dashboard.view', 'activities.*'],
                 ]],
                 ['Marketing', 'bi-megaphone-fill', 'campaigns.index', 'campaigns.view', 'campaigns.*'],
-                ['Hỗ trợ khách hàng', 'bi-headset', 'tickets.index', 'tickets.view', 'tickets.*'],
+                ['Hỗ trợ khách hàng', 'bi-headset', null, null, null, [
+                    ['Danh sách ticket', null, 'tickets.index', 'tickets.view', ['tickets.index', 'tickets.show', 'tickets.create', 'tickets.edit']],
+                    ['Phân tích hỗ trợ', null, 'tickets.analytics', 'tickets.view', 'tickets.analytics'],
+                    ['Danh mục ticket', null, 'ticket-categories.index', 'tickets.assign', 'ticket-categories.*'],
+                ]],
                 ['Báo cáo', 'bi-bar-chart-line-fill', 'reports.index', 'reports.view', 'reports.*'],
             ],
             'Quản trị' => [
