@@ -71,7 +71,7 @@ Artisan::command('crm:purge-demo {--force}', function () {
         DB::table('price_list_items')->whereIn('product_id', $demoProducts)->delete();
         DB::table('credit_notes')->where('is_demo', true)->delete();
 
-        $tables = ['payments', 'invoices', 'sales_orders', 'quotations', 'support_tickets', 'tasks', 'opportunities',
+        $tables = ['payments', 'invoices', 'sales_orders', 'quotations', 'support_tickets', 'tasks', 'projects', 'opportunities',
             'leads', 'contacts', 'campaigns', 'customers', 'products', 'suppliers'];
         foreach ($tables as $table) {
             $count = DB::table($table)->where('is_demo', true)->delete();
@@ -83,6 +83,8 @@ Artisan::command('crm:purge-demo {--force}', function () {
             $u->forceDelete();
         }
         $this->line('  - users: '.$demoUsers->count().' bản ghi');
+        // Thông báo của tài khoản demo vừa xóa (bảng notifications không có khóa ngoại tới users)
+        $this->line('  - notifications: '.DB::table('notifications')->where('notifiable_type', 'user')->whereNotIn('notifiable_id', DB::table('users')->select('id'))->delete().' bản ghi');
         // Hoạt động / lịch hẹn gắn với bản ghi demo vừa xóa (khách hàng, người liên hệ, lead, cơ hội)
         $orphans = 0;
         foreach (['customer' => 'customers', 'contact' => 'contacts', 'lead' => 'leads', 'opportunity' => 'opportunities'] as $type => $table) {
@@ -189,6 +191,73 @@ Artisan::command('crm:health', function () {
 
     return $ok ? 0 : 1;
 })->purpose('Kiểm tra tình trạng hệ thống OrangeCRM');
+
+/*
+| Kiểm tra trước khi đưa lên web công khai (go-live). [LỖI] = bắt buộc sửa; [CẢNH BÁO] = nên sửa.
+| Chạy trên máy chủ thật sau khi cấu hình .env: php artisan crm:production-check
+| Chỉ đọc cấu hình đã nạp (config), không in ra bất kỳ giá trị bí mật nào.
+*/
+Artisan::command('crm:production-check', function () {
+    $fail = 0;
+    $warn = 0;
+    $check = function (bool $pass, string $text, bool $critical = true) use (&$fail, &$warn) {
+        if ($pass) {
+            $this->line('  [OK]        '.$text);
+        } elseif ($critical) {
+            $fail++;
+            $this->line('  <fg=red>[LỖI]</>       '.$text);
+        } else {
+            $warn++;
+            $this->line('  <fg=yellow>[CẢNH BÁO]</>  '.$text);
+        }
+    };
+
+    $this->info('Cấu hình ứng dụng');
+    $check(app()->isProduction(), 'APP_ENV=production');
+    $check(! config('app.debug'), 'APP_DEBUG=false (không lộ chi tiết lỗi, mã nguồn, cấu hình cho người lạ)');
+    $check((bool) config('app.key'), 'APP_KEY đã đặt (dùng mã hóa thông tin nhạy cảm — phải sao lưu, không được đổi)');
+    $check(str_starts_with((string) config('app.url'), 'https://'), 'APP_URL dùng https://');
+    $check((bool) config('session.secure'), 'SESSION_SECURE_COOKIE=true (cookie phiên chỉ gửi qua HTTPS)');
+    $check((bool) config('session.encrypt'), 'SESSION_ENCRYPT=true');
+    $check(! config('crm.demo_data'), 'CRM_DEMO_DATA=false (không tự tạo dữ liệu demo)');
+    $check(config('logging.channels.single.level', 'debug') !== 'debug', 'LOG_LEVEL không phải debug (khuyến nghị warning hoặc error)', false);
+    $check(! in_array(config('mail.default'), ['log', 'array'], true) && filled(config('mail.from.address')),
+        'Máy chủ gửi thư (MAIL_*) đã cấu hình — cần cho quên mật khẩu, thông báo email', false);
+    $check(app()->configurationIsCached(), 'Đã cache cấu hình (php artisan config:cache)', false);
+    $check(app()->routesAreCached(), 'Đã cache route (php artisan route:cache)', false);
+
+    $this->info('Cơ sở dữ liệu');
+    try {
+        DB::connection()->getPdo();
+        $check(true, 'Kết nối MySQL');
+        $check(config('database.connections.mysql.username') !== 'root', 'Không dùng tài khoản MySQL root (tạo user riêng chỉ có quyền trên database CRM)');
+        $check(filled(config('database.connections.mysql.password')), 'Tài khoản MySQL có mật khẩu');
+        $pending = collect(app('migrator')->getMigrationFiles(database_path('migrations')))->keys()->diff(DB::table('migrations')->pluck('migration'));
+        $check($pending->isEmpty(), 'Đã chạy đủ migration'.($pending->isEmpty() ? '' : ' (thiếu '.$pending->count().')'));
+        $demo = collect(['customers', 'leads', 'opportunities', 'invoices', 'products', 'tasks', 'users', 'projects'])
+            ->sum(fn ($t) => DB::table($t)->where('is_demo', true)->count());
+        $check($demo === 0, 'Không còn dữ liệu demo'.($demo ? " (còn $demo bản ghi — chạy php artisan crm:purge-demo sau khi sao lưu)" : ''));
+        $check(User::where('is_platform_admin', true)->exists(), 'Đã có tài khoản quản trị nền tảng');
+        $check(\App\Models\Setting::get('require_2fa_admins') === '1', 'Bắt buộc xác thực 2 lớp cho quản trị (Cài đặt › Bảo mật)', false);
+    } catch (\Throwable $e) {
+        $check(false, 'Kết nối MySQL thất bại');
+    }
+
+    $this->info('Tệp & thư mục');
+    $check(file_exists(public_path('build/manifest.json')), 'Giao diện đã build (npm run build)');
+    $check(is_writable(storage_path('logs')) && is_writable(storage_path('framework')), 'storage/ ghi được');
+    $check(file_exists(public_path('storage')), 'Đã tạo liên kết storage (php artisan storage:link) — cần cho ảnh đại diện, logo', false);
+    $check(! file_exists(public_path('.env')), 'Không có tệp .env trong thư mục public');
+
+    $this->newLine();
+    if ($fail === 0) {
+        $this->info("=> Sẵn sàng go-live".($warn ? " (còn $warn cảnh báo nên xử lý)." : '.'));
+    } else {
+        $this->error("=> CHƯA sẵn sàng: $fail lỗi bắt buộc, $warn cảnh báo. Xem docs/GO_LIVE.md.");
+    }
+
+    return $fail === 0 ? 0 : 1;
+})->purpose('Kiểm tra cấu hình trước khi đưa lên web công khai');
 
 Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
