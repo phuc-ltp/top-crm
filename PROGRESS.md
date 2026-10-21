@@ -107,6 +107,8 @@
 - [x] 4.3 SLA ticket (20/10): ticket_categories, ticket_status_histories, cột SLA trên support_tickets; SlaService (policy theo tổ chức sla_response_*/sla_resolve_*, tạm dừng/dời hạn khi waiting, state none/pending/paused/met/breached, leo thang 2 mức), hook ở model SupportTicket, crm:ticket-sla mỗi 10 phút, TicketCategoryController, analytics, CSAT. TicketSlaTest 6 test.
 - [x] 4.4 Lịch & lịch hẹn (20/10): interactions.ends_at/location, interaction_attendees, CalendarService (trùng lịch, .ics RFC 5545), CalendarController (calendar.index tháng/tuần, calendar.ics), cảnh báo trùng lịch khi lên lịch / sửa, nhắc lịch cả người tham dự, người tham dự được xem hoạt động. Sửa partials/flash bỏ qua thông báo rỗng. CalendarTest 5 test.
 - [x] 4.5 Tài liệu (20/10): documents, document_versions, DocumentController (tải lên / phiên bản / xem trước / tải xuống có nhật ký 'downloaded'), kiểm tra MIME 2 lớp (mimes + finfo, Document::previewableMimes), quyền documents.view/create/manage, thùng rác (khóa 'permission' riêng). DocumentTest 5 test.
-- TIẾP THEO: 4.6 hoàn thiện Phase 4 (dữ liệu demo, báo cáo năng suất / ticket, tìm kiếm toàn cục cho dự án / tài liệu / lịch hẹn, phiên bản 4.0.0). Go-live theo docs/GO_LIVE.md khi có VPS + tên miền.
+- [x] 4.6 (21/10): tìm kiếm toàn cục cho dự án & tài liệu (visibleTo). Báo cáo năng suất công việc đã có ở trang Khối lượng công việc, báo cáo ticket ở Phân tích hỗ trợ. Chưa bổ sung dữ liệu demo cho các module Phase 4 (demo đã xóa khỏi CSDL thật; preview có dữ liệu mẫu tạo tay).
+
+**PHASE 4 HOÀN TẤT (21/10/2026) — v4.0.0.** Tiếp theo: tích hợp các module do thầy Giason gửi (chờ tài liệu), go-live theo docs/GO_LIVE.md khi có VPS + tên miền.
 
 **PHASE 3 HOÀN TẤT (19/10/2026) — v3.0.0.** Tiếp theo theo lộ trình Master Prompt: Phase 4 — Team Operations (dự án, công việc, nhóm, nhân viên, ticket, lịch, tài liệu).
