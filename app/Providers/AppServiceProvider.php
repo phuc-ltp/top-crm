@@ -68,6 +68,8 @@ class AppServiceProvider extends ServiceProvider
             'department' => \App\Models\Department::class,
             'branch' => \App\Models\Branch::class,
             'pay_grade' => \App\Models\PayGrade::class,
+            'attendance_record' => \App\Models\AttendanceRecord::class,
+            'work_location' => \App\Models\WorkLocation::class,
             'team' => \App\Models\Team::class,
             'employee_profile' => \App\Models\EmployeeProfile::class,
             'custom_field' => \App\Models\CustomFieldDefinition::class,

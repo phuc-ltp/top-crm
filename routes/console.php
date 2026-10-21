@@ -130,6 +130,31 @@ Artisan::command('crm:ticket-sla', function (\App\Services\SlaService $service) 
     $this->info('Cảnh báo sắp trễ: '.$r['warned'].' · Leo thang: '.$r['escalated']);
 })->purpose('Cảnh báo và leo thang ticket vi phạm SLA');
 
+/*
+| Xóa ảnh selfie chấm công quá hạn lưu (cài đặt attendance_selfie_days của từng tổ chức, mặc định 90 ngày). Giờ công giữ nguyên.
+*/
+Artisan::command('crm:prune-attendance-selfies', function () {
+    $deleted = 0;
+    foreach (\App\Models\Organization::pluck('id') as $orgId) {
+        app(\App\Support\Tenancy\CurrentOrganization::class)->run((int) $orgId, function () use (&$deleted) {
+            $before = now()->subDays((int) \App\Services\AttendanceService::setting('attendance_selfie_days'))->toDateString();
+            \App\Models\AttendanceRecord::where('work_date', '<', $before)->where(fn ($q) => $q->whereNotNull('check_in_selfie')->orWhereNotNull('check_out_selfie'))
+                ->chunkById(200, function ($records) use (&$deleted) {
+                    foreach ($records as $r) {
+                        foreach (['check_in_selfie', 'check_out_selfie'] as $f) {
+                            if ($r->{$f}) {
+                                \Illuminate\Support\Facades\Storage::disk('local')->delete($r->{$f});
+                                $deleted++;
+                            }
+                        }
+                        $r->forceFill(['check_in_selfie' => null, 'check_out_selfie' => null])->saveQuietly();
+                    }
+                });
+        });
+    }
+    $this->info("Đã xóa $deleted ảnh selfie quá hạn lưu.");
+})->purpose('Xóa ảnh selfie chấm công quá hạn lưu');
+
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
     $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']} · Nhắc hoạt động: {$result['activities']}");
@@ -271,5 +296,6 @@ Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlappi
 Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
 Schedule::command('crm:prune-notifications')->dailyAt('02:30');
 Schedule::command('crm:ticket-sla')->everyTenMinutes()->withoutOverlapping();
+Schedule::command('crm:prune-attendance-selfies')->dailyAt('03:00');
 // Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
 Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

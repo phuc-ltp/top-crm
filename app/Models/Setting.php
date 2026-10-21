@@ -76,6 +76,9 @@ class Setting extends Model
         // SLA ticket (bước 4.3): giờ phản hồi đầu / giờ xử lý theo mức ưu tiên (trống = mặc định SlaService::DEFAULTS)
         'sla_response_urgent', 'sla_resolve_urgent', 'sla_response_high', 'sla_resolve_high',
         'sla_response_medium', 'sla_resolve_medium', 'sla_response_low', 'sla_resolve_low',
+        // Chấm công (bước 5.2) — trống = mặc định AttendanceService::DEFAULTS
+        'work_morning_start', 'work_morning_end', 'work_afternoon_start', 'work_afternoon_end', 'work_ot_start', 'work_ot_end',
+        'work_days', 'attendance_late_grace', 'attendance_selfie_days',
     ];
 
     private const CACHE_KEY = 'crm.settings';
