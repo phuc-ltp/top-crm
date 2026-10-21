@@ -182,4 +182,23 @@ class GlobalSearchTest extends TestCase
             ->assertSee('data-results-url="'.route('search.results').'"', false)
             ->assertSee('class="topbar-icon d-md-none"', false);
     }
+
+    public function test_projects_and_documents_respect_membership_and_visibility(): void
+    {
+        $owner = $this->userWithRole('Sales Employee');
+        $member = $this->userWithRole('Employee');
+        $outsider = $this->userWithRole('Employee');
+        $p = \App\Models\Project::create(['name' => 'Dự án Sao Mai', 'status' => 'active', 'priority' => 'low', 'created_by' => $owner->id]);
+        $p->members()->sync([$member->id]);
+        \App\Models\Document::create(['title' => 'Sao Mai hợp đồng chung', 'category' => 'contract', 'visibility' => 'organization', 'created_by' => $owner->id]);
+        \App\Models\Document::create(['title' => 'Sao Mai riêng tư', 'category' => 'other', 'visibility' => 'private', 'created_by' => $owner->id]);
+
+        $m = $this->found($this->actingAs($member)->getJson(route('search', ['q' => 'Sao Mai'])));
+        $this->assertSame(['Dự án Sao Mai'], $m['projects'] ?? []);
+        $this->assertSame(['Sao Mai hợp đồng chung'], $m['documents'] ?? []);
+
+        $o = $this->found($this->actingAs($outsider)->getJson(route('search', ['q' => 'Sao Mai'])));
+        $this->assertArrayNotHasKey('projects', $o);
+        $this->assertSame(['Sao Mai hợp đồng chung'], $o['documents'] ?? []);
+    }
 }

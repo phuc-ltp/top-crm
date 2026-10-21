@@ -14,7 +14,10 @@ php artisan test --filter=two_factor               # theo tên
 - **Không chạy hai bộ test cùng lúc** (dùng chung database test).
 - Giao diện phải được build (`npm run build`) trước khi chạy test trang.
 
-## 2. Phạm vi bao phủ (310 test)
+## 2. Phạm vi bao phủ (350 test — v4.0.0)
+
+Phase 4 bổ sung: `ProjectTaskTest`, `EmployeeTeamTest`, `TicketSlaTest`, `CalendarTest`, `DocumentTest`, `NotificationCenterTest`, `ProductionReadinessTest` (dự án / việc con / phụ thuộc, thông tin nhạy cảm nhân viên, SLA và leo thang, trùng lịch và .ics, tải tệp an toàn, header bảo mật production, xóa demo).
+
 
 | Tệp | Số test | Nội dung chính |
 |---|---:|---|
