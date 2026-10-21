@@ -29,6 +29,8 @@ class NotificationCatalog
         'task_overdue' => ['work', 'Công việc quá hạn'],
         'task_comment' => ['work', 'Bình luận mới trong công việc'],
         'project_member' => ['work', 'Được thêm vào dự án'],
+        'overtime_request' => ['work', 'Đề nghị tăng ca cần duyệt'],
+        'overtime_decision' => ['work', 'Kết quả duyệt tăng ca'],
         'order_approved' => ['sales', 'Đơn hàng được duyệt'],
         'quotation_approval' => ['sales', 'Duyệt báo giá (chờ duyệt, kết quả duyệt)'],
         'quotation_expired' => ['sales', 'Báo giá hết hạn'],

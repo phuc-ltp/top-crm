@@ -243,6 +243,13 @@ Trên hóa đơn đã phát hành:
 - **Bảng công tháng** (quản lý / kế toán): ký hiệu từng ngày. Dấu ! là chấm công ngoài khu vực văn phòng; bấm vào ô để xem ảnh, vị trí, điều chỉnh (bắt buộc ghi lý do).
 - **Cài đặt chấm công:** giờ làm, khung tăng ca, ngày làm việc, phút cho phép trễ, số ngày lưu ảnh, văn phòng (tọa độ lấy từ Google Maps, bán kính 100–200 m).
 
+## 16h. Tăng ca (Phase 5)
+
+- Menu **Chấm công → Tăng ca** → **Đề nghị tăng ca**: chọn ngày, giờ (trong khung 18:00–21:00), mức độ công việc, ghi lý do.
+- Đơn giá: Cao 100.000 đ/giờ, Vừa 70.000, Thấp 40.000 — nhưng không thấp hơn 150% lương giờ của bạn (theo luật). Đơn giá được chốt khi duyệt.
+- Quản lý trực tiếp (hoặc người quản lý lương) xem tab **Chờ tôi duyệt** để **Duyệt** / **Từ chối** (phải ghi lý do). Không ai tự duyệt đơn của mình.
+- Đơn đang chờ có thể **Hủy đơn**. Giờ tăng ca đã duyệt sẽ được tính vào bảng lương tháng.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

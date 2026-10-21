@@ -63,6 +63,7 @@ class Menu
                 ]],
                 ['Chấm công', 'bi-fingerprint', null, null, null, [
                     ['Chấm công của tôi', null, 'attendance.index', 'dashboard.view', 'attendance.index'],
+                    ['Tăng ca', null, 'overtime.index', 'dashboard.view', 'overtime.*'],
                     ['Bảng công tháng', null, 'attendance.board', 'payroll.view_all', ['attendance.board', 'attendance.records.*']],
                     ['Cài đặt chấm công', null, 'attendance.settings', 'payroll.manage', 'attendance.settings'],
                 ]],

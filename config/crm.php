@@ -13,6 +13,8 @@ return [
     // Lương theo giờ (bước 5.1): đơn giá tối thiểu / tối đa (đồng / giờ)
     'pay_rate_min' => 35000,
     'pay_rate_max' => 200000,
+    // Đơn giá tăng ca theo mức độ công việc (đồng / giờ, bước 5.3) — luôn không thấp hơn 150% lương giờ của người đó
+    'ot_rates' => ['high' => 100000, 'medium' => 70000, 'low' => 40000],
 
     'per_page' => 15,
 
