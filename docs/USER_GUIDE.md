@@ -227,6 +227,12 @@ Trên hóa đơn đã phát hành:
 - **Xem trước** PDF / ảnh ngay trên trình duyệt; loại khác thì tải về. Mỗi lượt xem / tải được ghi lại.
 - An toàn: tệp không có đường dẫn công khai; loại tệp kiểm tra theo nội dung thật (tệp đổi đuôi giả mạo bị từ chối); tối đa 20 MB mỗi tệp.
 
+## 16f. Tài khoản nhân viên và bậc lương (Phase 5)
+
+- **Thêm nhân viên** (Danh bạ nhân viên › Thêm nhân viên): nhập họ tên, email, điện thoại, vai trò. Hệ thống tạo mật khẩu tạm và **chỉ hiện một lần**. Hãy chép và gửi cho nhân viên qua kênh an toàn. Nhân viên phải đổi mật khẩu ở lần đăng nhập đầu.
+- **Bậc lương** (Quản trị › Nhân sự › Bậc lương): đơn giá theo giờ từ 35.000 đến 200.000 đ. Mỗi vai trò có một bậc mặc định; chỉnh bậc hoặc đơn giá riêng trong hồ sơ từng nhân viên.
+- Lương theo giờ chỉ hiện cho chính nhân viên đó và người có quyền lương.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

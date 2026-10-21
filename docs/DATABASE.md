@@ -155,6 +155,7 @@ erDiagram
 | `interaction_attendees` | Người tham dự nội bộ của lịch hẹn (duy nhất theo lịch hẹn + người dùng). |
 | `documents` | Tài liệu (bước 4.5): tên, mô tả, danh mục, phạm vi xem (private / team / organization, `team_id`), liên kết khách hàng / cơ hội / dự án (`related_type` / `related_id`); xóa mềm. |
 | `document_versions` | Phiên bản tệp (bất biến): số phiên bản, đường dẫn trong storage/app/private, tên gốc, MIME đọc từ nội dung, dung lượng, SHA-256, ghi chú. |
+| `pay_grades` | Bậc lương theo giờ (bước 5.1): tên, đơn giá / giờ, vai trò dùng làm mặc định (JSON). `employee_profiles` thêm `pay_grade_id`, `hourly_rate` (đơn giá riêng); `users.must_change_password` (tài khoản tạo nhanh với mật khẩu tạm). |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

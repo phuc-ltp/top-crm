@@ -109,6 +109,8 @@
 - [x] 4.5 Tài liệu (20/10): documents, document_versions, DocumentController (tải lên / phiên bản / xem trước / tải xuống có nhật ký 'downloaded'), kiểm tra MIME 2 lớp (mimes + finfo, Document::previewableMimes), quyền documents.view/create/manage, thùng rác (khóa 'permission' riêng). DocumentTest 5 test.
 - [x] 4.6 (21/10): tìm kiếm toàn cục cho dự án & tài liệu (visibleTo). Báo cáo năng suất công việc đã có ở trang Khối lượng công việc, báo cáo ticket ở Phân tích hỗ trợ. Chưa bổ sung dữ liệu demo cho các module Phase 4 (demo đã xóa khỏi CSDL thật; preview có dữ liệu mẫu tạo tay).
 
+- [x] 5.1 Tài khoản nhân viên & bậc lương (21/10): pay_grades (7 bậc mặc định tạo khi cần, PayRateService::rateFor ưu tiên riêng → bậc hồ sơ → bậc vai trò → thấp nhất, kẹp 35k–200k), employee_profiles.pay_grade_id/hourly_rate, users.must_change_password + middleware RequirePasswordChange, EmployeeController@storeAccount (mật khẩu tạm Str::password chỉ trong flash), PayGradeController, quyền payroll.view_all/manage. EmployeeAccountPayGradeTest 5 test. Kế hoạch Phase 5: docs/PHASE5_PLAN.md. TIẾP THEO: 5.2 chấm công GPS + selfie.
+
 **PHASE 4 HOÀN TẤT (21/10/2026) — v4.0.0.** Tiếp theo: tích hợp các module do thầy Giason gửi (chờ tài liệu), go-live theo docs/GO_LIVE.md khi có VPS + tên miền.
 
 **PHASE 3 HOÀN TẤT (19/10/2026) — v3.0.0.** Tiếp theo theo lộ trình Master Prompt: Phase 4 — Team Operations (dự án, công việc, nhóm, nhân viên, ticket, lịch, tài liệu).

@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [Chưa phát hành] — Phase 5 Nhân sự & tài sản
+
+### Thêm mới
+- **5.1 Tài khoản nhân viên & bậc lương:** tạo nhanh tài khoản từ Danh bạ nhân viên (tên, email, điện thoại, vai trò) với mật khẩu tạm chỉ hiện một lần và bắt buộc đổi ở lần đăng nhập đầu; bảng bậc lương theo giờ (35.000–200.000 đ/giờ, 7 bậc mặc định theo vai trò); bậc / đơn giá riêng trong hồ sơ nhân viên; quyền mới `payroll.view_all`, `payroll.manage`.
+
 ## [4.0.0] — Phase 4 Vận hành đội nhóm — 21/10/2026
 
 - **4.6 Hoàn thiện:** tìm kiếm toàn cục gồm dự án và tài liệu (theo đúng quyền xem / thành viên dự án).
