@@ -2911,5 +2911,21 @@
     "Xem thông tin bảo mật": "Viewed secret",
     "Tài sản mượn quá hạn": "Overdue asset loan",
     "Giấy phép phần mềm sắp hết hạn": "Software licence expiring",
-    "VD: Microsoft 365 Business Standard": "E.g. Microsoft 365 Business Standard"
+    "VD: Microsoft 365 Business Standard": "E.g. Microsoft 365 Business Standard",
+    "Giờ công trong ca từ bảng công (tối đa 8 giờ / ngày) và tăng ca đã duyệt theo đơn giá đã chốt, trong khoảng ngày đã chọn.": "Shift hours from timesheets (max 8 hours / day) and approved overtime at locked rates, within the selected date range.",
+    "Phút đi trễ": "Minutes late",
+    "Nhân viên có công": "Employees with attendance",
+    "Tổng giờ tăng ca": "Total overtime hours",
+    "Tổng tiền tăng ca": "Total overtime pay",
+    "Giờ công theo nhân viên": "Hours by employee",
+    "Tổng hợp phiếu lương của các kỳ đã duyệt hoặc đã trả có tháng nằm trong khoảng ngày; phòng ban theo phân công hiện tại của nhân viên.": "Payslips from approved or paid periods whose month falls in the date range; departments follow each employee’s current assignment.",
+    "Số nhân viên": "Employees",
+    "Số kỳ lương": "Payroll periods",
+    "Quỹ lương theo phòng ban": "Payroll by department",
+    "Tài sản chưa thanh lý tại thời điểm xem; giá trị còn lại theo khấu hao đường thẳng đến hôm nay. Không phụ thuộc khoảng ngày.": "Non-disposed assets at the time of viewing; book value uses straight-line depreciation to today. Independent of the date range.",
+    "Đang sử dụng / cho mượn": "In use / on loan",
+    "Bảo trì / hỏng / thất lạc": "Maintenance / broken / lost",
+    "Giá trị còn lại theo nhóm": "Book value by category",
+    "Giờ công & tăng ca": "Hours & overtime",
+    "Giá trị tài sản": "Asset value"
 }

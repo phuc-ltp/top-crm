@@ -14,7 +14,9 @@ php artisan test --filter=two_factor               # theo tên
 - **Không chạy hai bộ test cùng lúc** (dùng chung database test).
 - Giao diện phải được build (`npm run build`) trước khi chạy test trang.
 
-## 2. Phạm vi bao phủ (350 test — v4.0.0)
+## 2. Phạm vi bao phủ (381 test — v5.0.0)
+
+Phase 5 bổ sung: `EmployeeAccountPayGradeTest`, `AttendanceTest`, `OvertimeTest`, `PayrollTest`, `AssetTest`, `LicenseTest`, `HrReportTest` (tài khoản nhanh & mật khẩu tạm, bậc lương 35k–200k, giờ công theo ca và chấm công selfie + GPS, khung tăng ca và đơn giá ≥ 150%, bảng lương khớp tính tay và khóa khi duyệt, máy trạng thái tài sản / khấu hao / QR / kiểm kê, khóa bản quyền mã hóa và nhắc hết hạn, báo cáo nhân sự theo quyền).
 
 Phase 4 bổ sung: `ProjectTaskTest`, `EmployeeTeamTest`, `TicketSlaTest`, `CalendarTest`, `DocumentTest`, `NotificationCenterTest`, `ProductionReadinessTest` (dự án / việc con / phụ thuộc, thông tin nhạy cảm nhân viên, SLA và leo thang, trùng lịch và .ics, tải tệp an toàn, header bảo mật production, xóa demo).
 

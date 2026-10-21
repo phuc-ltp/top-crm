@@ -134,7 +134,7 @@ Tiền tố `/api/v1`, xác thực bằng khóa API (`Authorization: Bearer topc
 - Chưa đo hiệu năng dưới tải lớn, nên không đưa ra cam kết số liệu.
 
 ## 7. Lệnh Artisan riêng
-`crm:install`, `crm:health`, `crm:create-admin`, `crm:purge-demo`, `crm:task-reminders` (mỗi 15 phút), `model:prune` cho `LoginEvent` (hằng ngày) — scheduler chạy qua `schedule:work`, được `START_CRM.bat` khởi động.
+`crm:install`, `crm:health`, `crm:create-admin`, `crm:purge-demo`, `crm:task-reminders` (mỗi 15 phút), `crm:ticket-sla` (mỗi 10 phút), `crm:sales-automation` (mỗi giờ), `crm:prune-notifications` (02:30), `crm:prune-attendance-selfies` (03:00), `crm:asset-reminders` (08:00), `model:prune` cho `LoginEvent` (hằng ngày) — scheduler chạy qua `schedule:work`, được `START_CRM.bat` khởi động.
 
 ## 8. Kiểm thử
 `php artisan test` — chạy trên database riêng `orangecrm_test` (cấu hình `phpunit.xml`); `TestCase` từ chối chạy nếu trỏ vào `orangecrm_db`. Chi tiết: [TESTING.md](TESTING.md).

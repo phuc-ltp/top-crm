@@ -34,12 +34,17 @@ class ReportService
         'products' => ['Bán hàng theo sản phẩm', 'bi-box-seam'],
         'inventory' => ['Nhập – xuất – tồn kho', 'bi-boxes'],
         'receivables' => ['Công nợ phải thu (tuổi nợ)', 'bi-wallet2'],
+        // Phase 5
+        'hr_attendance' => ['Giờ công & tăng ca', 'bi-fingerprint'],
+        'hr_payroll' => ['Quỹ lương theo phòng ban', 'bi-cash-stack'],
+        'assets' => ['Giá trị tài sản', 'bi-pc-display'],
     ];
 
     /** Quyền module cần thêm (ngoài reports.view) cho từng báo cáo. */
     public static function permissionFor(string $type): ?string
     {
-        return ['products' => 'invoices.view', 'inventory' => 'inventory.view', 'receivables' => 'invoices.view'][$type] ?? null;
+        return ['products' => 'invoices.view', 'inventory' => 'inventory.view', 'receivables' => 'invoices.view',
+            'hr_attendance' => 'payroll.view_all', 'hr_payroll' => 'payroll.view_all', 'assets' => 'assets.view'][$type] ?? null;
     }
 
     /** Báo cáo người dùng được xem. */
@@ -410,6 +415,99 @@ class ReportService
                 [__('Khẩn cấp'), $tickets->where('priority', 'urgent')->count(), 'bi-exclamation-octagon'],
             ],
             'chart' => ['type' => 'doughnut', 'label' => __('Ticket theo trạng thái'), 'labels' => array_map(fn ($s) => __($s[0]), array_values(SupportTicket::STATUSES)), 'values' => $byStatus->values()->all()],
+        ];
+    }
+    /** Giờ công & tăng ca theo nhân viên trong khoảng ngày (bước 5.7). */
+    private function hr_attendance(): array
+    {
+        [$from, $to] = [$this->from->toDateString(), $this->to->toDateString()];
+        $att = \App\Models\AttendanceRecord::whereBetween('work_date', [$from, $to])->when($this->userId, fn ($q) => $q->where('user_id', $this->userId))
+            ->get(['user_id', 'worked_minutes', 'late_minutes'])->groupBy('user_id');
+        $ots = \App\Models\OvertimeRequest::whereBetween('work_date', [$from, $to])->where('status', 'approved')
+            ->when($this->userId, fn ($q) => $q->where('user_id', $this->userId))->get(['user_id', 'hours', 'rate'])->groupBy('user_id');
+        $departments = \App\Models\Department::pluck('name', 'id');
+        $users = User::inOrganization()->whereIn('id', $att->keys()->merge($ots->keys())->unique())->with('organizations')->orderBy('name')->get();
+        $rows = $users->map(function ($u) use ($att, $ots, $departments) {
+            $a = $att->get($u->id, collect());
+            $o = $ots->get($u->id, collect());
+
+            return [$u->name, $departments[$u->departmentIdIn()] ?? '—', $a->where('worked_minutes', '>', 0)->count(), round($a->sum('worked_minutes') / 60, 1),
+                (int) $a->sum('late_minutes'), (float) \App\Support\Decimal::sum($o->pluck('hours')),
+                (float) \App\Support\Decimal::round(\App\Support\Decimal::sum($o->map(fn ($r) => \App\Support\Decimal::mul($r->hours, $r->rate))), 0)];
+        })->values();
+
+        return [
+            'definition' => __('Giờ công trong ca từ bảng công (tối đa 8 giờ / ngày) và tăng ca đã duyệt theo đơn giá đã chốt, trong khoảng ngày đã chọn.'),
+            'statuses' => [],
+            'headings' => [__('Nhân viên'), __('Phòng ban'), __('Ngày công'), __('Giờ công'), __('Phút đi trễ'), __('Giờ tăng ca'), __('Tiền tăng ca')],
+            'money_cols' => [6],
+            'rows' => $rows->all(),
+            'summary' => [
+                [__('Nhân viên có công'), $rows->count(), 'bi-people'],
+                [__('Tổng giờ công'), round($rows->sum(3), 1), 'bi-clock'],
+                [__('Tổng giờ tăng ca'), $rows->sum(5), 'bi-moon-stars'],
+                [__('Tổng tiền tăng ca'), money($rows->sum(6)), 'bi-cash-coin'],
+            ],
+            'chart' => ['type' => 'bar', 'label' => __('Giờ công theo nhân viên'), 'labels' => $rows->pluck(0)->take(20)->all(), 'values' => $rows->pluck(3)->take(20)->all()],
+        ];
+    }
+
+    /** Quỹ lương theo phòng ban — các kỳ lương đã duyệt / đã trả có tháng nằm trong khoảng ngày (bước 5.7). */
+    private function hr_payroll(): array
+    {
+        $slips = \App\Models\Payslip::with(['user.organizations', 'period'])
+            ->whereHas('period', fn ($q) => $q->whereIn('status', ['approved', 'paid'])->whereBetween('period', [$this->from->copy()->startOfMonth()->toDateString(), $this->to->toDateString()]))
+            ->when($this->userId, fn ($q) => $q->where('user_id', $this->userId))->get();
+        $departments = \App\Models\Department::pluck('name', 'id');
+        $D = \App\Support\Decimal::class;
+        $rows = $slips->groupBy(fn ($s) => $departments[$s->user?->departmentIdIn()] ?? __('Chưa có phòng ban'))
+            ->map(fn ($g, $dept) => [$dept, $g->pluck('user_id')->unique()->count(), (float) $D::sum($g->pluck('base_pay')), (float) $D::sum($g->pluck('ot_pay')),
+                (float) $D::sum($g->map(fn ($s) => $D::add($s->allowance, $s->bonus))), (float) $D::sum($g->pluck('gross_pay')),
+                (float) $D::sum($g->map(fn ($s) => $s->insurance_total)), (float) $D::sum($g->pluck('personal_income_tax')), (float) $D::sum($g->pluck('net_pay'))])
+            ->sortByDesc(5)->values();
+
+        return [
+            'definition' => __('Tổng hợp phiếu lương của các kỳ đã duyệt hoặc đã trả có tháng nằm trong khoảng ngày; phòng ban theo phân công hiện tại của nhân viên.'),
+            'statuses' => [],
+            'headings' => [__('Phòng ban'), __('Số nhân viên'), __('Lương giờ làm'), __('Tăng ca'), __('Phụ cấp + thưởng'), __('Tổng thu nhập'), __('Bảo hiểm'), __('Thuế TNCN'), __('Thực nhận')],
+            'money_cols' => [2, 3, 4, 5, 6, 7, 8],
+            'rows' => $rows->all(),
+            'summary' => [
+                [__('Số kỳ lương'), $slips->pluck('payroll_period_id')->unique()->count(), 'bi-calendar3'],
+                [__('Tổng thu nhập'), money($rows->sum(5)), 'bi-wallet2'],
+                [__('Bảo hiểm + thuế TNCN'), money($rows->sum(6) + $rows->sum(7)), 'bi-shield-check'],
+                [__('Tổng thực nhận'), money($rows->sum(8)), 'bi-cash-stack'],
+            ],
+            'chart' => ['type' => 'bar', 'money' => true, 'label' => __('Quỹ lương theo phòng ban'), 'labels' => $rows->pluck(0)->all(), 'values' => $rows->pluck(5)->all()],
+        ];
+    }
+
+    /** Giá trị tài sản theo nhóm tại thời điểm xem (bước 5.7). */
+    private function assets(): array
+    {
+        $service = app(\App\Services\AssetService::class);
+        $assets = \App\Models\Asset::with('category:id,name')->where('status', '!=', 'disposed')->get();
+        $D = \App\Support\Decimal::class;
+        $rows = $assets->groupBy(fn ($a) => $a->category?->name ?? __('Chưa phân nhóm'))->map(function ($g, $name) use ($service, $D) {
+            $book = $D::sum($g->map(fn ($a) => $service->depreciation($a)['book_value']));
+
+            return [$name, $g->count(), $g->where('status', 'in_use')->count() + $g->where('status', 'borrowed')->count(), $g->whereIn('status', ['maintenance', 'broken', 'lost'])->count(),
+                (float) $D::sum($g->pluck('purchase_cost')), (float) $book];
+        })->sortByDesc(4)->values();
+
+        return [
+            'definition' => __('Tài sản chưa thanh lý tại thời điểm xem; giá trị còn lại theo khấu hao đường thẳng đến hôm nay. Không phụ thuộc khoảng ngày.'),
+            'statuses' => [],
+            'headings' => [__('Nhóm tài sản'), __('Số lượng'), __('Đang sử dụng / cho mượn'), __('Bảo trì / hỏng / thất lạc'), __('Nguyên giá'), __('Giá trị còn lại')],
+            'money_cols' => [4, 5],
+            'rows' => $rows->all(),
+            'summary' => [
+                [__('Tài sản đang quản lý'), $assets->count(), 'bi-pc-display'],
+                [__('Tổng nguyên giá'), money($rows->sum(4)), 'bi-cash-coin'],
+                [__('Giá trị còn lại'), money($rows->sum(5)), 'bi-graph-down'],
+                [__('Đã khấu hao'), money($rows->sum(4) - $rows->sum(5)), 'bi-percent'],
+            ],
+            'chart' => ['type' => 'bar', 'money' => true, 'label' => __('Giá trị còn lại theo nhóm'), 'labels' => $rows->pluck(0)->all(), 'values' => $rows->pluck(5)->all()],
         ];
     }
 }

@@ -2,7 +2,7 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
-## [Chưa phát hành] — Phase 5 Nhân sự & tài sản
+## [5.0.0] — Phase 5 Nhân sự & tài sản — 21/10/2026
 
 ### Thêm mới
 - **5.1 Tài khoản nhân viên & bậc lương:** tạo nhanh tài khoản từ Danh bạ nhân viên (tên, email, điện thoại, vai trò) với mật khẩu tạm chỉ hiện một lần và bắt buộc đổi ở lần đăng nhập đầu; bảng bậc lương theo giờ (35.000–200.000 đ/giờ, 7 bậc mặc định theo vai trò); bậc / đơn giá riêng trong hồ sơ nhân viên; quyền mới `payroll.view_all`, `payroll.manage`.
@@ -11,6 +11,7 @@
 - **5.4 Bảng lương:** kỳ lương theo tháng (nháp → chờ duyệt → đã duyệt → đã trả) tính tự động từ bảng công và tăng ca đã duyệt; phụ cấp / thưởng / khấu trừ nhập tay; BHXH 8%, BHYT 1,5%, BHTN 1% (có trần) và thuế TNCN lũy tiến với giảm trừ bản thân / người phụ thuộc, phần chênh tăng ca được miễn thuế — bật / tắt và chỉnh mức trong cài đặt. Kỳ đã duyệt bị khóa; nhân viên nhận thông báo và xem / tải PDF phiếu lương của mình; xuất Excel bảng lương. Hồ sơ nhân viên có thêm số người phụ thuộc.
 - **5.5 Quản lý tài sản:** tổng quan (số lượng, nguyên giá, giá trị còn lại theo khấu hao đường thẳng, theo trạng thái / nhóm, mượn quá hạn, sắp hết bảo hành, chi phí bảo trì); danh mục tài sản có mã tự sinh, nhóm với số tháng khấu hao mặc định, nhà cung cấp, chi nhánh, vị trí, bảo hành; cấp phát / thu hồi / cho mượn có hạn trả / bảo trì / đổi tình trạng / thanh lý với lịch sử luân chuyển không sửa được; in tem QR hàng loạt ra PDF, quét QR bằng camera điện thoại để mở tài sản; kiểm kê theo đợt; nhân viên xem tài sản mình đang giữ; xuất Excel.
 - **5.6 Bản quyền phần mềm:** quản lý giấy phép (loại, nhà phát hành, số chỗ, hạn dùng, chi phí theo chu kỳ, người phụ trách) với khóa bản quyền mã hóa — chỉ người quản lý xem được và mỗi lần xem được ghi nhật ký; gán cho người hoặc thiết bị không vượt số chỗ, có lịch sử gán / thu hồi; tự nhắc trước 30 ngày, 7 ngày và đúng ngày hết hạn; nhắc tài sản mượn quá hạn hằng ngày (lệnh `crm:asset-reminders` lúc 08:00).
+- **5.7 Báo cáo:** giờ công & tăng ca theo nhân viên, quỹ lương theo phòng ban (kỳ đã duyệt / đã trả), giá trị tài sản theo nhóm — xem trên web, xuất Excel / PDF; chỉ người có quyền lương / tài sản mới thấy.
 
 ## [4.0.0] — Phase 4 Vận hành đội nhóm — 21/10/2026
 
