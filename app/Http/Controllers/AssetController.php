@@ -89,6 +89,7 @@ class AssetController extends Controller
             'canView' => $canView, 'dep' => $this->assets->depreciation($asset), 'users' => $user->can('assets.manage') ? Lookup::users() : [],
             'openAudits' => $user->can('assets.manage') ? AssetAudit::where('status', 'open')->latest()->get(['id', 'name']) : collect(),
             'qr' => QrImage::dataUri(route('assets.scan', $asset->qr_token), 5),
+            'licenses' => $user->can('licenses.view') ? \App\Models\LicenseAssignment::with('license')->where('asset_id', $asset->id)->whereNull('released_at')->get()->filter(fn ($a) => $a->license && ! $a->license->trashed()) : collect(),
         ]);
     }
 
@@ -173,7 +174,8 @@ class AssetController extends Controller
 
     public function mine(Request $request)
     {
-        return view('assets.mine', ['assets' => Asset::with('category:id,name')->where('holder_id', $request->user()->id)->orderBy('code')->get()]);
+        return view('assets.mine', ['assets' => Asset::with('category:id,name')->where('holder_id', $request->user()->id)->orderBy('code')->get(),
+            'licenses' => \App\Models\LicenseAssignment::with('license')->where('user_id', $request->user()->id)->whereNull('released_at')->get()->filter(fn ($a) => $a->license && ! $a->license->trashed())]);
     }
 
     private function formData(): array

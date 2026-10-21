@@ -155,6 +155,14 @@ Artisan::command('crm:prune-attendance-selfies', function () {
     $this->info("Đã xóa $deleted ảnh selfie quá hạn lưu.");
 })->purpose('Xóa ảnh selfie chấm công quá hạn lưu');
 
+/*
+| Nhắc giấy phép phần mềm sắp / đã hết hạn (mốc 30 / 7 / 0 ngày) và tài sản mượn quá hạn. Chạy 08:00 mỗi ngày, hoặc: php artisan crm:asset-reminders
+*/
+Artisan::command('crm:asset-reminders', function (\App\Services\LicenseService $service) {
+    $r = $service->runReminders();
+    $this->info('Nhắc giấy phép: '.$r['licenses'].' · Nhắc mượn quá hạn: '.$r['loans']);
+})->purpose('Nhắc giấy phép sắp hết hạn và tài sản mượn quá hạn');
+
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
     $this->info("Nhắc sắp đến hạn: {$result['due_soon']} · Chuyển quá hạn: {$result['overdue']} · Nhắc hoạt động: {$result['activities']}");
@@ -297,5 +305,6 @@ Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
 Schedule::command('crm:prune-notifications')->dailyAt('02:30');
 Schedule::command('crm:ticket-sla')->everyTenMinutes()->withoutOverlapping();
 Schedule::command('crm:prune-attendance-selfies')->dailyAt('03:00');
+Schedule::command('crm:asset-reminders')->dailyAt('08:00')->withoutOverlapping();
 // Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
 Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

@@ -77,6 +77,14 @@
         </div>
 
         <div class="col-lg-8">
+            @if ($licenses->isNotEmpty())
+                <div class="card mb-3"><div class="card-body">
+                    <h6 class="mb-2">{{ __('Phần mềm cài trên thiết bị') }}</h6>
+                    @foreach ($licenses as $l)
+                        <a href="{{ route('licenses.show', $l->license) }}" class="badge badge-soft-primary text-decoration-none me-1 mb-1"><i class="bi bi-key me-1"></i>{{ $l->license->name }}</a>
+                    @endforeach
+                </div></div>
+            @endif
             <div class="card"><div class="card-body">
                 <h6 class="mb-3">{{ __('Lịch sử luân chuyển') }}</h6>
                 <ul class="list-unstyled mb-0">

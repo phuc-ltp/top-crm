@@ -323,6 +323,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/assets/audits/{audit}/check', [\App\Http\Controllers\AssetAuditController::class, 'check'])->name('assets.audits.check');
     Route::post('/assets/audits/{audit}/close', [\App\Http\Controllers\AssetAuditController::class, 'close'])->name('assets.audits.close');
     Route::resource('assets', \App\Http\Controllers\AssetController::class);
+    Route::resource('licenses', \App\Http\Controllers\SoftwareLicenseController::class)->parameters(['licenses' => 'license']);
+    Route::post('/licenses/{license}/reveal-key', [\App\Http\Controllers\SoftwareLicenseController::class, 'revealKey'])->name('licenses.reveal')->middleware('throttle:10,1');
+    Route::post('/licenses/{license}/assign', [\App\Http\Controllers\SoftwareLicenseController::class, 'assign'])->name('licenses.assign');
+    Route::post('/licenses/{license}/assignments/{assignment}/release', [\App\Http\Controllers\SoftwareLicenseController::class, 'release'])->name('licenses.release');
     Route::post('/assets/{asset}/act/{action}', [\App\Http\Controllers\AssetController::class, 'act'])->name('assets.act')->whereIn('action', ['assign', 'recall', 'borrow', 'return', 'maintenance', 'repaired', 'status', 'dispose']);
     Route::get('/assets/{asset}/qr', [\App\Http\Controllers\AssetController::class, 'qr'])->name('assets.qr');
     Route::get('/a/{token}', [\App\Http\Controllers\AssetController::class, 'scan'])->name('assets.scan')->where('token', '[A-Za-z0-9]{32}');

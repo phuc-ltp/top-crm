@@ -74,6 +74,7 @@ class Menu
                     ['Danh mục tài sản', null, 'assets.index', 'assets.view', ['assets.index', 'assets.create', 'assets.show', 'assets.edit']],
                     ['Kiểm kê', null, 'assets.audits.index', 'assets.view', 'assets.audits.*'],
                     ['Nhóm tài sản', null, 'assets.categories.index', 'assets.view', 'assets.categories.*'],
+                    ['Bản quyền phần mềm', null, 'licenses.index', 'licenses.view', 'licenses.*'],
                     ['Tài sản của tôi', null, 'assets.mine', 'dashboard.view', 'assets.mine'],
                 ]],
                 ['Tài liệu', 'bi-folder2-open', 'documents.index', 'documents.view', 'documents.*'],

@@ -23,4 +23,21 @@
             </table></div>
         @endif
     </div>
+
+    @if ($licenses->isNotEmpty())
+        <div class="card mt-3">
+            <div class="card-body pb-0"><h6>{{ __('Phần mềm được cấp quyền sử dụng') }}</h6></div>
+            <div class="table-responsive"><table class="table align-middle mb-0">
+                <tbody>
+                @foreach ($licenses as $a)
+                    <tr>
+                        <td><i class="bi bi-key me-1"></i>{{ $a->license->name }}@if ($a->license->edition)<span class="text-muted small"> · {{ $a->license->edition }}</span>@endif</td>
+                        <td class="small text-nowrap">{{ $a->license->expires_at ? __('Hết hạn :d', ['d' => vn_date($a->license->expires_at)]) : __('Không thời hạn') }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table></div>
+            <div class="card-body border-top small text-muted py-2">{{ __('Cần khóa kích hoạt? Liên hệ người quản lý bản quyền của công ty.') }}</div>
+        </div>
+    @endif
 @endsection
