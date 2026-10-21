@@ -41,6 +41,7 @@ class TrashController extends Controller
             'products' => ['class' => Product::class, 'label' => 'Sản phẩm', 'icon' => 'bi-box-seam', 'module' => 'products', 'show' => 'products.show'],
             'suppliers' => ['class' => \App\Models\Supplier::class, 'label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'module' => 'suppliers', 'show' => 'suppliers.show'],
             'projects' => ['class' => \App\Models\Project::class, 'label' => 'Dự án', 'icon' => 'bi-kanban', 'module' => 'projects', 'show' => 'projects.show'],
+            'assets' => ['class' => \App\Models\Asset::class, 'label' => 'Tài sản', 'icon' => 'bi-pc-display', 'module' => 'assets', 'permission' => 'assets.manage', 'show' => 'assets.show'],
             'documents' => ['class' => \App\Models\Document::class, 'label' => 'Tài liệu', 'icon' => 'bi-folder2-open', 'module' => 'documents', 'permission' => 'documents.manage', 'show' => 'documents.show'],
             'tasks' => ['class' => Task::class, 'label' => 'Công việc', 'icon' => 'bi-check2-square', 'module' => 'tasks', 'show' => 'tasks.show'],
             'tickets' => ['class' => SupportTicket::class, 'label' => 'Ticket hỗ trợ', 'icon' => 'bi-headset', 'module' => 'tickets', 'show' => 'tickets.show'],
@@ -60,7 +61,7 @@ class TrashController extends Controller
         $query = $class::onlyTrashed();
 
         // Sản phẩm là danh mục chung của tổ chức (không có người phụ trách); các loại khác lọc theo phạm vi xem
-        return in_array($class, [Product::class, \App\Models\Supplier::class], true) ? $query : $query->visibleTo($user);
+        return in_array($class, [Product::class, \App\Models\Supplier::class, \App\Models\Asset::class], true) ? $query : $query->visibleTo($user);
     }
 
     /** Tên hiển thị của một bản ghi bất kỳ trong thùng rác. */

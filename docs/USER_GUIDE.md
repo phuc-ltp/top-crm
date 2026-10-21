@@ -258,6 +258,14 @@ Trên hóa đơn đã phát hành:
 - Khung bên phải: bật / tắt khấu trừ bảo hiểm và thuế TNCN, chỉnh trần đóng bảo hiểm, mức giảm trừ bản thân / người phụ thuộc. Số người phụ thuộc nhập trong hồ sơ nhân viên. **Nhờ kế toán kiểm tra các mức này trước khi trả lương thật.**
 - Nhân viên xem và tải PDF ở **Phiếu lương của tôi** (chỉ khi kỳ lương đã duyệt).
 
+## 16j. Quản lý tài sản (Phase 5)
+
+- Menu **Tài sản → Danh mục tài sản → Thêm tài sản**: tên, nhóm, serial, nguyên giá, ngày mua, số tháng khấu hao (trống = theo nhóm). Mã TS-000001 tự sinh.
+- Trang tài sản: **Cấp phát** (cho người dùng lâu dài), **Thu hồi**, **Cho mượn** (có hạn trả), **Nhận trả**, **Đưa đi bảo trì / Bảo trì xong** (ghi chi phí), **Đổi tình trạng** (hỏng / thất lạc), **Thanh lý**. Mọi thao tác lưu vào lịch sử, không sửa được.
+- **In tem QR**: chọn tài sản trong danh mục rồi bấm In tem QR → PDF khổ A4 3 cột, dán lên thiết bị. Quét tem bằng camera điện thoại sẽ mở trang tài sản (cần đăng nhập; người không có quyền không xem được).
+- **Kiểm kê**: mở đợt → đi quét tem từng tài sản, bấm **Có mặt** / **Có mặt, hư hỏng** (hoặc đánh dấu trong danh sách) → **Đóng đợt**: tài sản chưa kiểm ghi là không tìm thấy.
+- Nhân viên xem thiết bị mình đang giữ ở **Tài sản của tôi**.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

@@ -161,6 +161,10 @@ erDiagram
 | `overtime_requests` | Đề nghị tăng ca (bước 5.3): ngày, giờ bắt đầu / kết thúc, số giờ, mức độ (high / medium / low), lý do, trạng thái (pending / approved / rejected / cancelled), người duyệt, thời điểm, ghi chú; `rate` = đơn giá / giờ chốt lúc duyệt. |
 | `payroll_periods` | Kỳ lương tháng (bước 5.4, duy nhất theo tổ chức + tháng): trạng thái draft / submitted / approved / paid, người tạo / duyệt, thời điểm tính / gửi / duyệt / trả. |
 | `payslips` | Phiếu lương (duy nhất theo kỳ + người): ảnh chụp đơn giá giờ, ngày / phút công, phút trễ, lương giờ làm, giờ & tiền tăng ca, phần tăng ca miễn thuế, phụ cấp / thưởng / khấu trừ khác (nhập tay), tổng thu nhập, mức đóng & 3 khoản bảo hiểm, người phụ thuộc, thu nhập tính thuế, thuế TNCN, thực nhận, `meta` (tham số đã dùng). `employee_profiles.dependents`: số người phụ thuộc. |
+| `asset_categories` | Nhóm tài sản (bước 5.5): tên (duy nhất theo tổ chức), số tháng khấu hao mặc định, mô tả. |
+| `assets` | Tài sản: mã (duy nhất theo tổ chức), tên, nhóm, serial, model, nhà cung cấp, chi nhánh, vị trí, ngày mua, nguyên giá, giá trị thu hồi, số tháng khấu hao, bảo hành, trạng thái, người giữ, hạn trả, `qr_token` (khóa ngẫu nhiên trong mã QR), thanh lý; xóa mềm. |
+| `asset_events` | Lịch sử luân chuyển tài sản (bất biến): loại thao tác, người thực hiện, người nhận, trạng thái trước / sau, chi phí, tình trạng, ghi chú, đợt kiểm kê. |
+| `asset_audits`, `asset_audit_items` | Đợt kiểm kê (mở / đóng) và kết quả từng tài sản (có mặt / hư hỏng / không tìm thấy, người kiểm, thời điểm). |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

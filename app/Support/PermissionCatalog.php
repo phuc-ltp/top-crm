@@ -30,6 +30,7 @@ class PermissionCatalog
         'teams' => ['label' => 'Nhóm & chi nhánh', 'actions' => ['view', 'manage']],
         'documents' => ['label' => 'Tài liệu', 'actions' => ['view', 'create', 'manage']],
         'payroll' => ['label' => 'Lương & chấm công', 'actions' => ['view_all', 'manage']],
+        'assets' => ['label' => 'Tài sản', 'actions' => ['view', 'manage']],
         'activity_logs' => ['label' => 'Nhật ký hoạt động', 'actions' => ['view']],
         'settings' => ['label' => 'Cài đặt hệ thống', 'actions' => ['manage']],
         'api' => ['label' => 'Kết nối API', 'actions' => ['use']],
@@ -137,7 +138,7 @@ class PermissionCatalog
                 'opportunities' => ['view', 'view_all'], 'tasks' => ['view', 'view_all'], 'products' => ['view'],
                 'quotations' => ['view', 'view_all'], 'orders' => ['view', 'view_all'], 'invoices' => ['view', 'view_all'],
                 'campaigns' => ['view', 'view_all'], 'tickets' => ['view', 'view_all'], 'reports' => ['view'],
-                'activity_logs' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'],
+                'activity_logs' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'], 'assets' => ['view'],
                 'projects' => ['view', 'view_all'],
             ]),
             'Marketing Manager' => $pick([
@@ -154,15 +155,15 @@ class PermissionCatalog
                 'dashboard' => '*', 'invoices' => '*', 'reports' => '*',
                 'orders' => ['view', 'view_all', 'export', 'approve'], 'quotations' => ['view', 'view_all', 'export'],
                 'customers' => ['view', 'view_all', 'export'], 'products' => ['view'], 'suppliers' => ['view', 'export'], 'inventory' => ['view'],
-                'tasks' => ['view', 'create', 'update'], 'users' => ['view'], 'projects' => ['view'], 'payroll' => '*',
+                'tasks' => ['view', 'create', 'update'], 'users' => ['view'], 'projects' => ['view'], 'payroll' => '*', 'assets' => ['view'],
             ]),
             'Accountant' => $pick([
                 'dashboard' => ['view'], 'invoices' => ['view', 'view_all', 'create', 'update', 'export'],
                 'orders' => ['view', 'view_all'], 'customers' => ['view', 'view_all'], 'products' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'],
-                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'], 'payroll' => ['view_all'],
+                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'], 'payroll' => ['view_all'], 'assets' => ['view'],
             ]),
             'Inventory Manager' => $pick([
-                'dashboard' => ['view'], 'products' => '*', 'suppliers' => '*', 'inventory' => '*', 'orders' => ['view', 'view_all'],
+                'dashboard' => ['view'], 'products' => '*', 'suppliers' => '*', 'inventory' => '*', 'orders' => ['view', 'view_all'], 'assets' => '*',
                 'reports' => ['view'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'],
             ]),
             'Project Manager' => $pick([
