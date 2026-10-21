@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.0.3] — 21/10/2026
+
+### Sửa lỗi
+- PDF hóa đơn / báo giá / đơn hàng / phiếu lương: khối chữ ký “Khách hàng” bị lệch thấp hơn “Người lập” ~7 mm — hai khối nay căn trên, chia đều 50/50.
+
 ## [5.0.2] — 21/10/2026
 
 ### Thêm mới
