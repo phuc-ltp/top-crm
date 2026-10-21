@@ -6,6 +6,7 @@
 
 ### Thêm mới
 - **5.1 Tài khoản nhân viên & bậc lương:** tạo nhanh tài khoản từ Danh bạ nhân viên (tên, email, điện thoại, vai trò) với mật khẩu tạm chỉ hiện một lần và bắt buộc đổi ở lần đăng nhập đầu; bảng bậc lương theo giờ (35.000–200.000 đ/giờ, 7 bậc mặc định theo vai trò); bậc / đơn giá riêng trong hồ sơ nhân viên; quyền mới `payroll.view_all`, `payroll.manage`.
+- **5.2 Chấm công:** chấm công vào / ra trên điện thoại với ảnh selfie + GPS (giờ lấy theo máy chủ, khoảng cách tới văn phòng tính ở máy chủ, ngoài bán kính bị gắn cờ), nhân viên đồng ý trước khi thu thập; giờ công theo ca 7:30–11:30 & 13:30–17:30 (tối đa 8 giờ), đi trễ / về sớm với số phút cho phép; bảng công tháng; điều chỉnh công có lý do và nhật ký; cài đặt giờ làm, ngày làm việc, văn phòng; tự xóa ảnh selfie quá hạn lưu. `Permissions-Policy` cho phép camera / định vị trên chính tên miền.
 
 ## [4.0.0] — Phase 4 Vận hành đội nhóm — 21/10/2026
 
