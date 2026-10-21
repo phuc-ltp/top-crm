@@ -24,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // PDF chỉ nhúng các ký tự font thực sự dùng (thay vì cả bộ DejaVu ~800 KB): file nhỏ hơn ~25–30 lần, hiển thị như cũ
+        config(['dompdf.options.enable_font_subsetting' => true]);
+
         // Production chạy HTTPS (APP_URL https://...): mọi URL sinh ra đều là https, kể cả khi đứng sau proxy
         if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
