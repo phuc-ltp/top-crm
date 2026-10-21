@@ -69,6 +69,13 @@ class Menu
                     ['Bảng lương', null, 'payroll.index', 'payroll.view_all', 'payroll.*'],
                     ['Cài đặt chấm công', null, 'attendance.settings', 'payroll.manage', 'attendance.settings'],
                 ]],
+                ['Tài sản', 'bi-pc-display', null, null, null, [
+                    ['Tổng quan tài sản', null, 'assets.overview', 'assets.view', 'assets.overview'],
+                    ['Danh mục tài sản', null, 'assets.index', 'assets.view', ['assets.index', 'assets.create', 'assets.show', 'assets.edit']],
+                    ['Kiểm kê', null, 'assets.audits.index', 'assets.view', 'assets.audits.*'],
+                    ['Nhóm tài sản', null, 'assets.categories.index', 'assets.view', 'assets.categories.*'],
+                    ['Tài sản của tôi', null, 'assets.mine', 'dashboard.view', 'assets.mine'],
+                ]],
                 ['Tài liệu', 'bi-folder2-open', 'documents.index', 'documents.view', 'documents.*'],
                 ['Marketing', 'bi-megaphone-fill', 'campaigns.index', 'campaigns.view', 'campaigns.*'],
                 ['Hỗ trợ khách hàng', 'bi-headset', null, null, null, [
