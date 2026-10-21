@@ -52,6 +52,37 @@ Artisan::command('crm:create-admin {--email=} {--name=}', function () {
 /*
 | Xóa toàn bộ dữ liệu demo (is_demo = 1). Không ảnh hưởng dữ liệu thật.
 */
+/*
+| Nạp dữ liệu DEMO (is_demo = 1) vào MỘT tổ chức để thử nghiệm: php artisan crm:seed-demo 1
+| Không chạy ở production; bỏ qua nếu tổ chức đã có dữ liệu demo. Xóa lại bằng: php artisan crm:purge-demo
+*/
+Artisan::command('crm:seed-demo {organization : ID tổ chức} {--force}', function () {
+    $org = \App\Models\Organization::find((int) $this->argument('organization'));
+    if (! $org) {
+        $this->error('Không tìm thấy tổ chức.');
+
+        return 1;
+    }
+    if (app()->environment('production')) {
+        $this->error('Không nạp dữ liệu demo trên môi trường production.');
+
+        return 1;
+    }
+    if (! $this->option('force') && ! $this->confirm("Nạp dữ liệu DEMO vào tổ chức #{$org->id} \"{$org->name}\"?")) {
+        return 1;
+    }
+    \App\Services\ActivityLogger::$enabled = false;
+    app(\App\Support\Tenancy\CurrentOrganization::class)->run($org->id, function () {
+        $seeder = new \Database\Seeders\DemoDataSeeder;
+        $seeder->setCommand($this);
+        $seeder->run();
+    });
+    \App\Services\ActivityLogger::$enabled = true;
+    cache()->forget('crm.has_demo.'.$org->id);
+
+    return 0;
+})->purpose('Nạp dữ liệu demo vào một tổ chức');
+
 Artisan::command('crm:purge-demo {--force}', function () {
     if (! $this->option('force') && ! $this->confirm('Xóa VĨNH VIỄN toàn bộ dữ liệu demo (is_demo = 1)?')) {
         return 1;
@@ -72,7 +103,9 @@ Artisan::command('crm:purge-demo {--force}', function () {
         DB::table('credit_notes')->where('is_demo', true)->delete();
 
         $tables = ['payments', 'invoices', 'sales_orders', 'quotations', 'support_tickets', 'tasks', 'projects', 'opportunities',
-            'leads', 'contacts', 'campaigns', 'customers', 'products', 'suppliers'];
+            'leads', 'contacts', 'campaigns', 'customers', 'products', 'suppliers',
+            // Phase 5 (lịch sử luân chuyển, kết quả kiểm kê, lần gán giấy phép, phiếu lương tự xóa theo khóa ngoại)
+            'software_licenses', 'asset_audits', 'assets', 'payroll_periods'];
         foreach ($tables as $table) {
             $count = DB::table($table)->where('is_demo', true)->delete();
             $this->line("  - $table: $count bản ghi");

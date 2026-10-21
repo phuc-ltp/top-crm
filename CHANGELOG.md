@@ -2,6 +2,14 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.0.2] — 21/10/2026
+
+### Thêm mới
+- **Dữ liệu demo cho Phase 4–5:** lệnh `php artisan crm:seed-demo <id tổ chức>` nạp dữ liệu mẫu (khách hàng, bán hàng, dự án, hồ sơ nhân viên, chấm công 2 tháng, tăng ca, bảng lương tháng trước đã duyệt, tài sản, bản quyền phần mềm) vào đúng một tổ chức; `crm:purge-demo` xóa sạch kể cả dữ liệu Phase 5 (thêm cờ `is_demo` cho tài sản, đợt kiểm kê, giấy phép, kỳ lương).
+
+### Sửa lỗi
+- Seeder demo không tạo được ghi chú / lịch hẹn khách hàng (cột liên kết không nằm trong danh sách được gán hàng loạt).
+
 ## [5.0.1] — 21/10/2026
 
 ### Cải thiện
