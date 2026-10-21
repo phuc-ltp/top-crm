@@ -61,10 +61,12 @@ class Menu
                     ['Khối lượng công việc', null, 'tasks.workload', 'tasks.view', 'tasks.workload'],
                     ['Hoạt động & lịch hẹn', null, 'activities.index', 'dashboard.view', 'activities.*'],
                 ]],
-                ['Chấm công', 'bi-fingerprint', null, null, null, [
+                ['Chấm công & lương', 'bi-fingerprint', null, null, null, [
                     ['Chấm công của tôi', null, 'attendance.index', 'dashboard.view', 'attendance.index'],
                     ['Tăng ca', null, 'overtime.index', 'dashboard.view', 'overtime.*'],
                     ['Bảng công tháng', null, 'attendance.board', 'payroll.view_all', ['attendance.board', 'attendance.records.*']],
+                    ['Phiếu lương của tôi', null, 'payslips.mine', 'dashboard.view', ['payslips.mine', 'payslips.show']],
+                    ['Bảng lương', null, 'payroll.index', 'payroll.view_all', 'payroll.*'],
                     ['Cài đặt chấm công', null, 'attendance.settings', 'payroll.manage', 'attendance.settings'],
                 ]],
                 ['Tài liệu', 'bi-folder2-open', 'documents.index', 'documents.view', 'documents.*'],

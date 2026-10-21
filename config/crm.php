@@ -15,6 +15,14 @@ return [
     'pay_rate_max' => 200000,
     // Đơn giá tăng ca theo mức độ công việc (đồng / giờ, bước 5.3) — luôn không thấp hơn 150% lương giờ của người đó
     'ot_rates' => ['high' => 100000, 'medium' => 70000, 'low' => 40000],
+    // Bảng lương (bước 5.4). Mức giảm trừ gia cảnh và trần bảo hiểm chỉnh trong màn hình Bảng lương.
+    'payroll' => [
+        // Tỷ lệ bảo hiểm phần người lao động đóng (%)
+        'insurance' => ['social' => 8, 'health' => 1.5, 'unemployment' => 1],
+        // Biểu thuế TNCN lũy tiến từng phần theo tháng: [ngưỡng trên (đồng) hoặc null = phần còn lại, % thuế].
+        // Mặc định theo biểu 5 bậc của Luật Thuế TNCN sửa đổi 2025 — kế toán cần xác nhận trước khi trả lương thật.
+        'pit_brackets' => [[10000000, 5], [30000000, 10], [60000000, 20], [100000000, 30], [null, 35]],
+    ],
 
     'per_page' => 15,
 

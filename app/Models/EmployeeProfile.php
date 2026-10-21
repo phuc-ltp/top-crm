@@ -28,7 +28,7 @@ class EmployeeProfile extends Model
     }
 
     protected $fillable = [
-        'user_id', 'employee_code', 'job_title', 'manager_id', 'branch_id', 'pay_grade_id', 'hourly_rate', 'attendance_consent_at', 'hire_date', 'employment_status', 'work_phone',
+        'user_id', 'employee_code', 'job_title', 'manager_id', 'branch_id', 'pay_grade_id', 'hourly_rate', 'dependents', 'attendance_consent_at', 'hire_date', 'employment_status', 'work_phone',
         'date_of_birth', 'personal_phone', 'personal_email', 'home_address', 'id_number', 'emergency_contact', 'hr_notes',
     ];
 
