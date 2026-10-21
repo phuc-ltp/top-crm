@@ -18,6 +18,13 @@
                         <x-select name="employment_status" :label="__('Trạng thái làm việc')" :options="App\Models\EmployeeProfile::STATUSES" :value="$profile->employment_status" required col="col-md-6 mb-3" />
                     </div>
                     <x-input name="work_phone" :label="__('Điện thoại công việc')" :value="$profile->work_phone" maxlength="30" />
+                    @if ($payGrades !== null)
+                        <div class="row">
+                            <x-select name="pay_grade_id" :label="__('Bậc lương')" :options="$payGrades" :value="$profile->pay_grade_id" :placeholder="__('— Theo vai trò —')" :translate="false" col="col-md-7 mb-3" />
+                            <x-input name="hourly_rate" type="number" :label="__('Đơn giá riêng / giờ')" :value="$profile->hourly_rate !== null ? (float) $profile->hourly_rate : null" :min="config('crm.pay_rate_min')" :max="config('crm.pay_rate_max')" step="1000" append="₫" col="col-md-5 mb-3"
+                                     :help="__('Để trống để dùng bậc lương.')" />
+                        </div>
+                    @endif
                     <div class="form-text">{{ __('Phòng ban và vai trò được chỉnh ở trang Người dùng.') }}</div>
                 </div></div>
             </div>

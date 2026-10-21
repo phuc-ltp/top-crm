@@ -10,6 +10,9 @@ return [
     // Thư viện tài liệu (bước 4.5): loại tệp kiểm tra theo nội dung; dung lượng tối đa mỗi tệp (KB)
     'document_mimes' => 'pdf,doc,docx,xls,xlsx,ppt,pptx,csv,txt,png,jpg,jpeg,gif,webp,zip',
     'document_max_kb' => 20480,
+    // Lương theo giờ (bước 5.1): đơn giá tối thiểu / tối đa (đồng / giờ)
+    'pay_rate_min' => 35000,
+    'pay_rate_max' => 200000,
 
     'per_page' => 15,
 

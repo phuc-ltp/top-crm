@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
             'ticket_category' => \App\Models\TicketCategory::class,
             'department' => \App\Models\Department::class,
             'branch' => \App\Models\Branch::class,
+            'pay_grade' => \App\Models\PayGrade::class,
             'team' => \App\Models\Team::class,
             'employee_profile' => \App\Models\EmployeeProfile::class,
             'custom_field' => \App\Models\CustomFieldDefinition::class,

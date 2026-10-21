@@ -50,6 +50,7 @@ class ProfileController extends Controller
         ], [], ['current_password' => __('Mật khẩu hiện tại'), 'password' => __('Mật khẩu mới')]);
 
         $request->user()->update(['password' => $request->password]);
+        $request->user()->forceFill(['must_change_password' => false])->save();   // đã thay mật khẩu tạm
         // Đăng xuất các thiết bị khác sau khi đổi mật khẩu
         Auth::logoutOtherDevices($request->password);
         DB::table('sessions')->where('user_id', $request->user()->id)->where('id', '!=', $request->session()->getId())->delete();

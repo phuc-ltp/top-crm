@@ -293,6 +293,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class)->except(['show']);
     Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+    Route::post('/employees/accounts', [EmployeeController::class, 'storeAccount'])->name('employees.accounts.store')->middleware('throttle:20,1');
+    Route::resource('pay-grades', \App\Http\Controllers\PayGradeController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/employees/chart', [EmployeeController::class, 'chart'])->name('employees.chart');
     Route::get('/employees/export', [EmployeeController::class, 'export'])->name('employees.export');
     Route::get('/employees/{employee}', [EmployeeController::class, 'show'])->whereNumber('employee')->name('employees.show');

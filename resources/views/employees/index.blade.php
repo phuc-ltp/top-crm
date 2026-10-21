@@ -4,7 +4,33 @@
     <x-page-header :title="__('Danh bạ nhân viên')" :breadcrumbs="['Nhân viên' => null]" :subtitle="__('Chức danh, phòng ban, nhóm, chi nhánh và liên hệ công việc')">
         <a href="{{ route('employees.chart') }}" class="btn btn-light"><i class="bi bi-diagram-3 me-1"></i>{{ __('Sơ đồ tổ chức') }}</a>
         @can('employees.export')<a href="{{ route('employees.export', request()->query()) }}" class="btn btn-light"><i class="bi bi-download me-1"></i>{{ __('Xuất Excel') }}</a>@endcan
+        @can('create', App\Models\User::class)<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newEmployeeModal"><i class="bi bi-person-plus me-1"></i>{{ __('Thêm nhân viên') }}</button>@endcan
     </x-page-header>
+
+    @can('create', App\Models\User::class)
+        <div class="modal fade" id="newEmployeeModal" tabindex="-1" aria-labelledby="newEmployeeTitle" aria-hidden="true"><div class="modal-dialog"><div class="modal-content">
+            <form method="POST" action="{{ route('employees.accounts.store') }}" class="needs-validation" novalidate>@csrf
+                <div class="modal-header"><h5 class="modal-title" id="newEmployeeTitle">{{ __('Thêm nhân viên nhanh') }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Đóng') }}"></button></div>
+                <div class="modal-body">
+                    <x-input name="name" :label="__('Họ tên')" required maxlength="255" />
+                    <div class="row">
+                        <x-input name="email" type="email" label="Email" required maxlength="255" col="col-md-7 mb-3" />
+                        <x-input name="phone" :label="__('Số điện thoại')" maxlength="30" col="col-md-5 mb-3" />
+                    </div>
+                    <div class="row">
+                        <x-select name="role" :label="__('Vai trò')" :options="$assignableRoles" value="Employee" required :translate="false" col="col-md-6 mb-3" />
+                        <x-select name="department_id" :label="__('Phòng ban')" :options="$departments" :placeholder="__('— Không —')" :translate="false" col="col-md-6 mb-3" />
+                    </div>
+                    <x-input name="job_title" :label="__('Chức danh')" maxlength="150" />
+                    <div class="small text-muted"><i class="bi bi-shield-lock me-1"></i>{{ __('Hệ thống tạo mật khẩu tạm và chỉ hiện một lần sau khi lưu. Nhân viên phải đổi mật khẩu ở lần đăng nhập đầu. Lương theo giờ lấy theo bậc mặc định của vai trò (chỉnh trong hồ sơ).') }}</div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('Hủy') }}</button><button class="btn btn-primary"><i class="bi bi-check2 me-1"></i>{{ __('Tạo tài khoản') }}</button></div>
+            </form>
+        </div></div></div>
+        @if ($errors->hasAny(['name', 'email', 'phone', 'role', 'department_id', 'job_title']))
+            @push('scripts')<script>document.addEventListener('DOMContentLoaded', () => bootstrap.Modal.getOrCreateInstance(document.getElementById('newEmployeeModal')).show());</script>@endpush
+        @endif
+    @endcan
 
     <div class="card">
         <form method="GET" class="filter-bar" data-auto-submit>

@@ -29,6 +29,7 @@ class PermissionCatalog
         'employees' => ['label' => 'Hồ sơ nhân viên', 'actions' => ['view', 'view_sensitive', 'update', 'export']],
         'teams' => ['label' => 'Nhóm & chi nhánh', 'actions' => ['view', 'manage']],
         'documents' => ['label' => 'Tài liệu', 'actions' => ['view', 'create', 'manage']],
+        'payroll' => ['label' => 'Lương & chấm công', 'actions' => ['view_all', 'manage']],
         'activity_logs' => ['label' => 'Nhật ký hoạt động', 'actions' => ['view']],
         'settings' => ['label' => 'Cài đặt hệ thống', 'actions' => ['manage']],
         'api' => ['label' => 'Kết nối API', 'actions' => ['use']],
@@ -153,12 +154,12 @@ class PermissionCatalog
                 'dashboard' => '*', 'invoices' => '*', 'reports' => '*',
                 'orders' => ['view', 'view_all', 'export', 'approve'], 'quotations' => ['view', 'view_all', 'export'],
                 'customers' => ['view', 'view_all', 'export'], 'products' => ['view'], 'suppliers' => ['view', 'export'], 'inventory' => ['view'],
-                'tasks' => ['view', 'create', 'update'], 'users' => ['view'], 'projects' => ['view'],
+                'tasks' => ['view', 'create', 'update'], 'users' => ['view'], 'projects' => ['view'], 'payroll' => '*',
             ]),
             'Accountant' => $pick([
                 'dashboard' => ['view'], 'invoices' => ['view', 'view_all', 'create', 'update', 'export'],
                 'orders' => ['view', 'view_all'], 'customers' => ['view', 'view_all'], 'products' => ['view'], 'suppliers' => ['view'], 'inventory' => ['view'],
-                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'],
+                'reports' => ['view', 'export'], 'tasks' => ['view', 'create', 'update'], 'projects' => ['view'], 'payroll' => ['view_all'],
             ]),
             'Inventory Manager' => $pick([
                 'dashboard' => ['view'], 'products' => '*', 'suppliers' => '*', 'inventory' => '*', 'orders' => ['view', 'view_all'],

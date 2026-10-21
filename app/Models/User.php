@@ -38,6 +38,7 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',
             'two_factor_last_step' => 'integer',
+            'must_change_password' => 'boolean',
             'notification_preferences' => 'array',
         ];
     }
