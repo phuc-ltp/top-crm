@@ -165,6 +165,8 @@ erDiagram
 | `assets` | Tài sản: mã (duy nhất theo tổ chức), tên, nhóm, serial, model, nhà cung cấp, chi nhánh, vị trí, ngày mua, nguyên giá, giá trị thu hồi, số tháng khấu hao, bảo hành, trạng thái, người giữ, hạn trả, `qr_token` (khóa ngẫu nhiên trong mã QR), thanh lý; xóa mềm. |
 | `asset_events` | Lịch sử luân chuyển tài sản (bất biến): loại thao tác, người thực hiện, người nhận, trạng thái trước / sau, chi phí, tình trạng, ghi chú, đợt kiểm kê. |
 | `asset_audits`, `asset_audit_items` | Đợt kiểm kê (mở / đóng) và kết quả từng tài sản (có mặt / hư hỏng / không tìm thấy, người kiểm, thời điểm). |
+| `software_licenses` | Giấy phép phần mềm (bước 5.6): tên, nhà phát hành, phiên bản, loại, `license_key` (mã hóa), số chỗ, ngày mua / hết hạn, chi phí, chu kỳ, nhà cung cấp, người phụ trách, mốc nhắc đã gửi; xóa mềm. |
+| `license_assignments` | Lịch sử gán giấy phép cho người dùng hoặc thiết bị (`asset_id`): người gán, thời điểm, người / thời điểm thu hồi (`released_at` trống = đang dùng chỗ). `assets.overdue_reminded_on`: ngày đã nhắc mượn quá hạn. |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

@@ -266,6 +266,12 @@ Trên hóa đơn đã phát hành:
 - **Kiểm kê**: mở đợt → đi quét tem từng tài sản, bấm **Có mặt** / **Có mặt, hư hỏng** (hoặc đánh dấu trong danh sách) → **Đóng đợt**: tài sản chưa kiểm ghi là không tìm thấy.
 - Nhân viên xem thiết bị mình đang giữ ở **Tài sản của tôi**.
 
+## 16k. Bản quyền phần mềm (Phase 5)
+
+- Menu **Tài sản → Bản quyền phần mềm → Thêm giấy phép**: tên, số chỗ, ngày hết hạn, chi phí, khóa bản quyền (được mã hóa), người phụ trách gia hạn.
+- Trên trang giấy phép: **Gán** cho người dùng hoặc thiết bị (không vượt số chỗ), **Thu hồi** khi nghỉ việc / đổi máy. **Hiện khóa** chỉ dành cho người quản lý bản quyền và được ghi nhật ký.
+- Hệ thống nhắc người phụ trách trước 30 ngày, 7 ngày và đúng ngày hết hạn; gia hạn bằng **Sửa / gia hạn** → nhập ngày hết hạn mới. Tài sản mượn quá hạn cũng được nhắc mỗi sáng (cần chạy START_CRM.bat để bộ lập lịch hoạt động).
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

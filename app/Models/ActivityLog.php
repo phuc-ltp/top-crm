@@ -33,6 +33,7 @@ class ActivityLog extends Model
         'payment' => ['Thanh toán', 'success'],
         'assigned' => ['Phân công', 'primary'],
         'approved' => ['Duyệt', 'success'],
+        'viewed_secret' => ['Xem thông tin bảo mật', 'warning'],
     ];
 
     protected $fillable = [
