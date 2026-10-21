@@ -158,6 +158,7 @@ erDiagram
 | `pay_grades` | Bậc lương theo giờ (bước 5.1): tên, đơn giá / giờ, vai trò dùng làm mặc định (JSON). `employee_profiles` thêm `pay_grade_id`, `hourly_rate` (đơn giá riêng); `users.must_change_password` (tài khoản tạo nhanh với mật khẩu tạm). |
 | `work_locations` | Văn phòng / địa điểm chấm công (bước 5.2): tọa độ, bán kính (m), đang dùng. |
 | `attendance_records` | Công một ngày / người (duy nhất theo tổ chức + người + ngày): giờ vào / ra (giờ máy chủ), tọa độ, sai số, khoảng cách, văn phòng gần nhất, trong / ngoài vùng, ảnh selfie (storage/app/private), IP; giờ công, phút trễ / về sớm, trạng thái; người / lý do điều chỉnh. `employee_profiles.attendance_consent_at`: thời điểm đồng ý thu thập ảnh & vị trí. |
+| `overtime_requests` | Đề nghị tăng ca (bước 5.3): ngày, giờ bắt đầu / kết thúc, số giờ, mức độ (high / medium / low), lý do, trạng thái (pending / approved / rejected / cancelled), người duyệt, thời điểm, ghi chú; `rate` = đơn giá / giờ chốt lúc duyệt. |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |
