@@ -63,7 +63,7 @@ class EmployeeController extends Controller
         $employees = $this->filtered($request)->orderBy('name')->paginate($this->perPage($request))->withQueryString();
 
         return view('employees.index', [
-            'employees' => $employees, 'departments' => Lookup::departments(),
+            'employees' => $employees, 'departments' => Lookup::departments(), 'assignableRoles' => $this->assignableRoles($request),
             'teams' => Team::orderBy('name')->pluck('name', 'id')->all(), 'branches' => Branch::orderBy('name')->pluck('name', 'id')->all(),
         ]);
     }
@@ -79,7 +79,11 @@ class EmployeeController extends Controller
         [$from, $to, $period] = EmployeeKpiService::period($request->input('period'));
         $kpi = app(EmployeeKpiService::class)->forUsers([$user->id], $from, $to)[$user->id];
 
+        $canSeePay = $request->user()->id === $user->id || $request->user()->can('payroll.view_all');
+        $rates = app(\App\Services\PayRateService::class);
+
         return view('employees.show', [
+            'hourlyRate' => $canSeePay ? $rates->rateFor($user) : null, 'rateSource' => $canSeePay ? $rates->sourceFor($user) : null,
             'user' => $user, 'profile' => $user->employeeProfile, 'reports' => $reports, 'kpi' => $kpi, 'period' => $period,
             'from' => $from, 'to' => $to, 'showSensitive' => $request->user()->can('employees.view_sensitive'),
         ]);
@@ -94,6 +98,8 @@ class EmployeeController extends Controller
         return view('employees.form', [
             'user' => $user, 'profile' => $profile, 'branches' => Branch::where('is_active', true)->orderBy('name')->pluck('name', 'id')->all(),
             'managers' => collect(Lookup::users())->except($user->id)->all(), 'editSensitive' => $request->user()->can('employees.view_sensitive'),
+            'payGrades' => $request->user()->can('payroll.manage') ? (function () { app(\App\Services\PayRateService::class)->ensureDefaults();
+                return \App\Models\PayGrade::orderByDesc('hourly_rate')->get()->mapWithKeys(fn ($g) => [$g->id => $g->name.' — '.money($g->hourly_rate).'/h'])->all(); })() : null,
         ]);
     }
 
@@ -112,6 +118,12 @@ class EmployeeController extends Controller
             'employment_status' => ['required', Rule::in(array_keys(EmployeeProfile::STATUSES))],
             'work_phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\-\s().]{6,30}$/'],
         ];
+        if ($request->user()->can('payroll.manage')) {
+            $rules += [
+                'pay_grade_id' => ['nullable', 'integer', TenantRule::exists('pay_grades')],
+                'hourly_rate' => ['nullable', 'numeric', 'min:'.config('crm.pay_rate_min'), 'max:'.config('crm.pay_rate_max')],
+            ];
+        }
         if ($sensitive) {
             $rules += [
                 'date_of_birth' => ['nullable', 'date', 'before:today'],
@@ -132,6 +144,49 @@ class EmployeeController extends Controller
         DB::transaction(fn () => EmployeeProfile::updateOrCreate(['user_id' => $user->id], $data));
 
         return redirect()->route('employees.show', $user->id)->with('success', __('Đã cập nhật hồ sơ nhân viên.'));
+    }
+
+    /**
+     * Tạo nhanh tài khoản nhân viên (bước 5.1): tên, email, điện thoại, vai trò, phòng ban, bậc lương (tùy chọn).
+     * Mật khẩu tạm sinh ngẫu nhiên, chỉ hiện MỘT lần cho người tạo; nhân viên bắt buộc đổi ở lần đăng nhập đầu.
+     */
+    public function storeAccount(Request $request)
+    {
+        $this->authorize('create', User::class);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
+            'phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\-\s().]{6,30}$/'],
+            'role' => ['required', Rule::in(array_keys($this->assignableRoles($request)))],
+            'department_id' => ['nullable', TenantRule::exists('departments')],
+            'job_title' => ['nullable', 'string', 'max:150'],
+        ], [], ['name' => __('Họ tên'), 'role' => __('Vai trò'), 'email' => 'Email']);
+
+        $password = \Illuminate\Support\Str::password(14);
+        $user = DB::transaction(function () use ($data, $password) {
+            $user = User::create(['name' => $data['name'], 'email' => mb_strtolower($data['email']), 'phone' => $data['phone'] ?? null,
+                'password' => $password, 'status' => 'active']);   // tự là thành viên tổ chức hiện tại
+            $user->forceFill(['must_change_password' => true])->save();
+            $user->assignDepartment($data['department_id'] ?? null);
+            $user->syncRoles([$data['role']]);
+            EmployeeProfile::create(['user_id' => $user->id, 'job_title' => $data['job_title'] ?? null, 'employment_status' => 'active', 'hire_date' => today()]);
+
+            return $user;
+        });
+        \App\Services\ActivityLogger::log('created', $user, 'Tạo nhanh tài khoản nhân viên '.$user->email.' (vai trò: '.$data['role'].')');
+
+        // Mật khẩu tạm chỉ nằm trong flash của phiên người tạo (hiện một lần), không ghi log / CSDL dạng đọc được
+        return redirect()->route('employees.show', $user->id)->with('temp_password', ['email' => $user->email, 'password' => $password]);
+    }
+
+    /** Vai trò được gán (chỉ chủ sở hữu / quản trị nền tảng gán được vai trò chủ sở hữu). */
+    private function assignableRoles(Request $request): array
+    {
+        $canGrantOwner = $request->user()->isPlatformAdmin() || $request->user()->isOrganizationOwner();
+
+        return \Spatie\Permission\Models\Role::where('organization_id', $this->orgId())->orderBy('id')->get()
+            ->reject(fn ($r) => $r->name === \App\Support\PermissionCatalog::OWNER && ! $canGrantOwner)
+            ->mapWithKeys(fn ($r) => [$r->name => __($r->name)])->all();
     }
 
     /** Không cho tự làm quản lý của mình hoặc tạo vòng (A quản lý B, B quản lý A...). */

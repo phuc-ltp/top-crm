@@ -78,6 +78,7 @@ class Menu
                     ['Nhóm', null, 'teams.index', 'teams.view', 'teams.*'],
                     ['Phòng ban', null, 'departments.index', 'users.manage', 'departments.*'],
                     ['Chi nhánh', null, 'branches.index', 'teams.manage', 'branches.*'],
+                    ['Bậc lương', null, 'pay-grades.index', 'payroll.manage', 'pay-grades.*'],
                     ['Vai trò & quyền', null, 'roles.index', 'users.manage', 'roles.*'],
                 ]],
                 ['Hệ thống', 'bi-gear-fill', null, null, null, [

@@ -6,6 +6,15 @@
         @can('employees.update')<a href="{{ route('employees.edit', $user->id) }}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>{{ __('Sửa hồ sơ') }}</a>@endcan
     </x-page-header>
 
+    @if ($temp = session('temp_password'))
+        <div class="alert alert-warning d-flex flex-wrap align-items-center gap-2" role="alert">
+            <i class="bi bi-key fs-5"></i>
+            <div class="flex-grow-1">{{ __('Tài khoản :email đã được tạo. Mật khẩu tạm (chỉ hiện một lần — hãy gửi cho nhân viên qua kênh an toàn):', ['email' => $temp['email']]) }}
+                <code class="fs-6 user-select-all ms-1" id="tempPassword">{{ $temp['password'] }}</code></div>
+            <button type="button" class="btn btn-sm btn-light" onclick="navigator.clipboard.writeText(document.getElementById('tempPassword').textContent); this.textContent = t('Đã chép')">{{ __('Chép') }}</button>
+        </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
         <h2 class="h6 mb-0">{{ __('KPI') }} <span class="text-muted fw-normal small">{{ vn_date($from) }} → {{ vn_date($to) }}</span></h2>
         <div class="btn-group btn-group-sm" role="group" aria-label="{{ __('Kỳ') }}">
@@ -29,6 +38,7 @@
                     <dt>{{ __('Trạng thái làm việc') }}</dt><dd>{!! badge(App\Models\EmployeeProfile::STATUSES, $profile?->employment_status ?? 'active') !!}</dd>
                     <dt>Email</dt><dd><a href="mailto:{{ $user->email }}">{{ $user->email }}</a></dd>
                     <dt>{{ __('Điện thoại công việc') }}</dt><dd>{{ $profile?->work_phone ?? $user->phone ?? '—' }}</dd>
+                    @if ($hourlyRate !== null)<dt>{{ __('Lương theo giờ') }}</dt><dd>{{ money($hourlyRate) }}/h <span class="small text-muted">· {{ $rateSource }}@if ($profile?->payGrade) ({{ $profile->payGrade->name }})@endif</span></dd>@endif
                 </dl>
             </div></div>
             @if ($showSensitive)
