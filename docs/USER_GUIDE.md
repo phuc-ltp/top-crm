@@ -257,6 +257,7 @@ Trên hóa đơn đã phát hành:
 - **Gửi duyệt** → người có quyền **Duyệt** → số liệu bị khóa, nhân viên nhận thông báo; sau khi chuyển khoản bấm **Đánh dấu đã trả**. **Xuất Excel** để gửi kế toán / ngân hàng.
 - Khung bên phải: bật / tắt khấu trừ bảo hiểm và thuế TNCN, chỉnh trần đóng bảo hiểm, mức giảm trừ bản thân / người phụ thuộc. Số người phụ thuộc nhập trong hồ sơ nhân viên. **Nhờ kế toán kiểm tra các mức này trước khi trả lương thật.**
 - Nhân viên xem và tải PDF ở **Phiếu lương của tôi** (chỉ khi kỳ lương đã duyệt).
+- Menu **Báo cáo**: **Giờ công & tăng ca**, **Quỹ lương theo phòng ban**, **Giá trị tài sản** — chọn khoảng ngày, xuất Excel / PDF (chỉ người có quyền lương / tài sản thấy).
 
 ## 16j. Quản lý tài sản (Phase 5)
 
