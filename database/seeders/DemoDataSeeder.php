@@ -6,7 +6,6 @@ use App\Models\Campaign;
 use App\Models\Contact;
 use App\Models\Customer;
 use App\Models\Department;
-use App\Models\Interaction;
 use App\Models\Lead;
 use App\Models\LeadSource;
 use App\Models\Opportunity;
@@ -103,8 +102,7 @@ class DemoDataSeeder extends Seeder
                 'company' => $customer->company ?? $customer->name, 'created_by' => $customer->assigned_to, 'is_demo' => true,
             ]);
 
-            Interaction::create([
-                'interactable_type' => 'customer', 'interactable_id' => $customer->id,
+            $customer->interactions()->create([
                 'type' => $faker->randomElement(['call', 'email', 'meeting', 'note']),
                 'subject' => 'Trao đổi nhu cầu', 'content' => 'Nội dung tương tác demo với khách hàng.',
                 'occurred_at' => $created->copy()->addDays(mt_rand(0, 5)), 'user_id' => $customer->assigned_to,
@@ -268,6 +266,7 @@ class DemoDataSeeder extends Seeder
 
         $this->phase2Extras($customers, $sales);
         $this->phase3Extras($users['Sales Manager']);
+        $this->phase45Extras($users, $customers);
 
         $this->command?->info('Đã tạo dữ liệu DEMO (is_demo = 1).');
     }
@@ -341,8 +340,7 @@ class DemoDataSeeder extends Seeder
         // Lịch hẹn: 6 việc theo dõi sắp tới + 2 đã quá hẹn (để thấy nhắc việc & trang Hoạt động)
         foreach (range(0, 7) as $i) {
             $customer = $customers[$i * 3];
-            Interaction::create([
-                'interactable_type' => 'customer', 'interactable_id' => $customer->id,
+            $customer->interactions()->create([
                 'type' => ['call', 'meeting', 'follow_up', 'email'][$i % 4], 'status' => 'planned',
                 'subject' => ['Gọi lại tư vấn gói', 'Hẹn demo sản phẩm', 'Theo dõi báo giá', 'Gửi tài liệu'][$i % 4].' (demo)',
                 'scheduled_at' => now()->addDays($i < 6 ? $i + 1 : -($i - 4))->setTime(9 + $i, 0),
@@ -394,5 +392,131 @@ class DemoDataSeeder extends Seeder
         }
 
         return $users;
+    }
+    /**
+     * Bổ sung cho Phase 4–5 (chạy sau cùng): dự án, hồ sơ nhân viên + bậc lương, chấm công 2 tháng, tăng ca, kỳ lương tháng trước (đã duyệt),
+     * tài sản (cấp phát / mượn quá hạn / bảo trì), bản quyền phần mềm. Bảng không gắn tài khoản được đánh dấu is_demo;
+     * dữ liệu gắn tài khoản demo (hồ sơ, chấm công, tăng ca, phiếu lương) tự xóa theo khóa ngoại khi crm:purge-demo xóa tài khoản demo.
+     */
+    private function phase45Extras(array $users, $customers): void
+    {
+        $tz = crm_timezone();
+        $admin = $users['Administrator'];
+        $manager = $users['Sales Manager'];
+        $staff = collect($users)->except('Administrator')->values();
+
+        // Dự án: gắn một phần công việc demo
+        foreach ([['Triển khai CRM cho khách hàng (demo)', 'active', 120000000], ['Chiến dịch ra mắt gói Chuyên nghiệp (demo)', 'planning', 45000000]] as $i => [$name, $status, $budget]) {
+            $project = \App\Models\Project::create(['name' => $name, 'description' => 'Dự án demo.', 'customer_id' => $customers->get($i)?->id, 'manager_id' => $manager->id,
+                'status' => $status, 'priority' => $i ? 'medium' : 'high', 'start_date' => now()->subDays(20 - $i * 10)->toDateString(), 'end_date' => now()->addDays(40 + $i * 20)->toDateString(),
+                'budget' => $budget, 'created_by' => $manager->id, 'is_demo' => true]);
+            $project->members()->syncWithoutDetaching($staff->take(4)->pluck('id')->all());
+            Task::where('is_demo', true)->whereNull('project_id')->limit(5)->update(['project_id' => $project->id]);
+        }
+
+        // Hồ sơ nhân viên + bậc lương mặc định theo vai trò
+        app(\App\Services\PayRateService::class)->ensureDefaults();
+        $i = 0;
+        foreach ($users as $key => $u) {
+            \App\Models\EmployeeProfile::updateOrCreate(['user_id' => $u->id], [
+                'employee_code' => sprintf('DEMO-%02d', ++$i), 'job_title' => $u->position, 'manager_id' => $key === 'Administrator' ? null : ($key === 'Sales Manager' ? $admin->id : $manager->id),
+                'hire_date' => now()->subMonths(6 + $i * 3)->toDateString(), 'employment_status' => 'active', 'dependents' => $i % 3, 'attendance_consent_at' => now()->subMonths(2),
+            ]);
+        }
+
+        // Chấm công: từ đầu tháng trước đến hôm qua, ngày làm việc; thỉnh thoảng đi trễ / về sớm / quên chấm ra / nghỉ
+        $attendance = app(\App\Services\AttendanceService::class);
+        foreach ($users as $u) {
+            for ($d = now($tz)->subMonthNoOverflow()->startOfMonth(); $d->lt(today($tz)); $d->addDay()) {
+                if (! $attendance->isWorkDay($d) || mt_rand(1, 100) <= 4) {
+                    continue;                                                     // ngày nghỉ hoặc vắng
+                }
+                $roll = mt_rand(1, 100);
+                $in = $d->copy()->setTime(7, mt_rand(10, 29));
+                $out = $d->copy()->setTime(17, mt_rand(31, 55));
+                if ($roll <= 10) {
+                    $in = $d->copy()->setTime(7, mt_rand(40, 59));                // đi trễ
+                } elseif ($roll <= 14) {
+                    $out = $d->copy()->setTime(16, mt_rand(30, 59));              // về sớm
+                } elseif ($roll <= 16) {
+                    $out = null;                                                  // quên chấm ra
+                }
+                $r = (new \App\Models\AttendanceRecord(['user_id' => $u->id, 'work_date' => $d->toDateString()]))
+                    ->forceFill(['check_in_at' => $in, 'check_out_at' => $out, 'check_in_ip' => '127.0.0.1']);
+                $attendance->recalculate($r);
+                $r->save();
+            }
+        }
+
+        // Tăng ca: tháng trước 2 đơn đã duyệt / người kinh doanh, tháng này 1 đơn chờ duyệt
+        $ot = app(\App\Services\OvertimeService::class);
+        foreach ([$users['Sales Staff'], $users['Sales Staff 2'], $users['Marketing Staff']] as $n => $u) {
+            foreach ([[now()->subMonthNoOverflow()->startOfMonth()->addDays(8 + $n), 'approved', 'high'], [now()->subMonthNoOverflow()->startOfMonth()->addDays(15 + $n), 'approved', 'medium'],
+                [now()->subDays(1 + $n), 'pending', 'low']] as [$date, $status, $level]) {
+                $req = \App\Models\OvertimeRequest::create(['user_id' => $u->id, 'work_date' => $date->toDateString(), 'start_time' => '18:00', 'end_time' => $level === 'low' ? '19:30' : '21:00',
+                    'hours' => $level === 'low' ? 1.5 : 3, 'level' => $level, 'reason' => 'Hoàn thiện hồ sơ khách hàng (demo)', 'status' => $status]);
+                if ($status === 'approved') {
+                    $req->forceFill(['approver_id' => $manager->id, 'decided_at' => $date->copy()->addDay(), 'rate' => $ot->rateFor($u, $level)])->save();
+                }
+            }
+        }
+
+        // Bảng lương tháng trước — đã tính và đã duyệt
+        $period = \App\Models\PayrollPeriod::create(['period' => now()->subMonthNoOverflow()->startOfMonth()->toDateString(), 'status' => 'draft']);
+        $period->forceFill(['created_by' => $admin->id, 'is_demo' => true])->save();
+        app(\App\Services\PayrollService::class)->calculate($period);
+        \App\Models\Payslip::where('payroll_period_id', $period->id)->where('user_id', $manager->id)->update(['allowance' => 1500000]);
+        foreach (\App\Models\Payslip::where('payroll_period_id', $period->id)->get() as $slip) {
+            app(\App\Services\PayrollService::class)->compute($slip)->save();
+        }
+        $period->forceFill(['status' => 'approved', 'submitted_at' => now()->subDays(3), 'approved_at' => now()->subDays(2), 'approved_by' => $admin->id])->save();
+
+        // Tài sản
+        $assets = app(\App\Services\AssetService::class);
+        $assets->ensureCategories();
+        $cat = \App\Models\AssetCategory::pluck('id', 'name');
+        $catOf = fn ($name) => $cat[__($name)] ?? null;
+        $list = [
+            ['Laptop Dell Latitude 5440', 'Máy tính & thiết bị CNTT', 28500000, 36, 14, 'DL5440-D01'], ['Laptop MacBook Air M3', 'Máy tính & thiết bị CNTT', 32900000, 36, 5, 'MBA-D02'],
+            ['Laptop HP ProBook 450', 'Máy tính & thiết bị CNTT', 19800000, 36, 22, 'HP450-D03'], ['Màn hình LG 27 inch', 'Máy tính & thiết bị CNTT', 6200000, 36, 10, 'LG27-D04'],
+            ['Máy in Canon LBP2900', 'Thiết bị văn phòng', 3900000, 36, 30, 'CN2900-D05'], ['Máy chiếu Epson EB-X51', 'Thiết bị văn phòng', 11500000, 36, 18, 'EPX51-D06'],
+            ['Bàn họp 12 chỗ', 'Nội thất', 18000000, 60, 26, null], ['Ghế công thái học', 'Nội thất', 4500000, 60, 8, null],
+            ['Xe máy Honda Vision', 'Phương tiện vận tải', 32000000, 72, 18, 'VIS-D09'], ['Máy khoan Bosch GSB', 'Công cụ dụng cụ', 2900000, 24, 3, 'BOSCH-D10'],
+        ];
+        $created = [];
+        foreach ($list as $k => [$name, $category, $cost, $months, $age, $sn]) {
+            $a = $assets->create(['name' => $name.' (demo)', 'asset_category_id' => $catOf($category), 'purchase_cost' => $cost, 'salvage_value' => 0, 'depreciation_months' => $months,
+                'purchase_date' => now()->subMonths($age)->toDateString(), 'serial_number' => $sn, 'location' => $k % 2 ? 'Tầng 2' : 'Tầng 1',
+                'warranty_until' => $k === 3 ? now()->addDays(15)->toDateString() : now()->addMonths(12)->toDateString()], $admin);
+            $a->forceFill(['is_demo' => true])->saveQuietly();
+            $created[] = $a;
+        }
+        foreach ([0 => 'Sales Staff', 1 => 'Sales Manager', 2 => 'Sales Staff 2', 3 => 'Marketing Staff'] as $k => $who) {
+            $assets->act($created[$k], 'assign', ['target_user_id' => $users[$who]->id, 'condition' => 'good'], $admin);
+        }
+        $assets->act($created[5], 'borrow', ['target_user_id' => $users['Customer Support']->id, 'due_back_at' => now()->addDays(5)->toDateString(), 'condition' => 'good'], $admin);
+        $created[5]->refresh()->forceFill(['due_back_at' => now()->subDays(2)->toDateString()])->saveQuietly();    // mượn quá hạn để thử nhắc nhở
+        $assets->act($created[4], 'maintenance', ['note' => 'Kẹt giấy, chờ thay trục (demo)', 'cost' => 350000], $admin);
+
+        // Bản quyền phần mềm
+        $licenses = app(\App\Services\LicenseService::class);
+        foreach ([
+            ['Microsoft 365 Business Standard', 'Microsoft', 'subscription', 8, 300, 26400000, 'yearly', 4],
+            ['Adobe Creative Cloud', 'Adobe', 'subscription', 2, 20, 1300000, 'monthly', 1],
+            ['Windows 11 Pro', 'Microsoft', 'oem', 4, null, 0, 'one_time', 0],
+            ['Kaspersky Endpoint Security', 'Kaspersky', 'subscription', 10, -3, 9000000, 'yearly', 0],
+        ] as [$name, $vendor, $type, $seats, $days, $cost, $cycle, $assignUsers]) {
+            $l = \App\Models\SoftwareLicense::create(['name' => $name.' (demo)', 'vendor' => $vendor, 'license_type' => $type, 'seats' => $seats, 'cost' => $cost, 'billing_cycle' => $cycle,
+                'expires_at' => $days === null ? null : now()->addDays($days)->toDateString(), 'license_key' => 'DEMO-'.strtoupper(Str::random(5)).'-'.strtoupper(Str::random(5)), 'owner_id' => $admin->id]);
+            $l->forceFill(['is_demo' => true])->saveQuietly();
+            foreach ($staff->take($assignUsers) as $u) {
+                $licenses->assign($l, $u->id, null, null, $admin);
+            }
+            if ($type === 'oem') {
+                foreach (array_slice($created, 0, 3) as $device) {
+                    $licenses->assign($l, null, $device->id, null, $admin);
+                }
+            }
+        }
     }
 }
