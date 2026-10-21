@@ -24,6 +24,7 @@
                             <x-input name="hourly_rate" type="number" :label="__('Đơn giá riêng / giờ')" :value="$profile->hourly_rate !== null ? (float) $profile->hourly_rate : null" :min="config('crm.pay_rate_min')" :max="config('crm.pay_rate_max')" step="1000" append="₫" col="col-md-5 mb-3"
                                      :help="__('Để trống để dùng bậc lương.')" />
                         </div>
+                        <x-input name="dependents" type="number" :label="__('Số người phụ thuộc')" :value="$profile->dependents ?? 0" min="0" max="20" :help="__('Dùng để giảm trừ gia cảnh khi tính thuế TNCN.')" />
                     @endif
                     <div class="form-text">{{ __('Phòng ban và vai trò được chỉnh ở trang Người dùng.') }}</div>
                 </div></div>

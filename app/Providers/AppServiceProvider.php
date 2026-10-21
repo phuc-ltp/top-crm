@@ -70,6 +70,8 @@ class AppServiceProvider extends ServiceProvider
             'pay_grade' => \App\Models\PayGrade::class,
             'attendance_record' => \App\Models\AttendanceRecord::class,
             'overtime_request' => \App\Models\OvertimeRequest::class,
+            'payroll_period' => \App\Models\PayrollPeriod::class,
+            'payslip' => \App\Models\Payslip::class,
             'work_location' => \App\Models\WorkLocation::class,
             'team' => \App\Models\Team::class,
             'employee_profile' => \App\Models\EmployeeProfile::class,

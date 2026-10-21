@@ -250,6 +250,14 @@ Trên hóa đơn đã phát hành:
 - Quản lý trực tiếp (hoặc người quản lý lương) xem tab **Chờ tôi duyệt** để **Duyệt** / **Từ chối** (phải ghi lý do). Không ai tự duyệt đơn của mình.
 - Đơn đang chờ có thể **Hủy đơn**. Giờ tăng ca đã duyệt sẽ được tính vào bảng lương tháng.
 
+## 16i. Bảng lương (Phase 5)
+
+- Menu **Chấm công & lương → Bảng lương** → **Tạo kỳ lương**, chọn tháng: hệ thống tự lập phiếu từ bảng công và đơn tăng ca đã duyệt.
+- Bấm biểu tượng bút ở từng dòng để nhập **phụ cấp / thưởng / khấu trừ khác**; bấm **Tính lại** sau khi bổ sung công hoặc duyệt thêm tăng ca (khoản nhập tay được giữ nguyên).
+- **Gửi duyệt** → người có quyền **Duyệt** → số liệu bị khóa, nhân viên nhận thông báo; sau khi chuyển khoản bấm **Đánh dấu đã trả**. **Xuất Excel** để gửi kế toán / ngân hàng.
+- Khung bên phải: bật / tắt khấu trừ bảo hiểm và thuế TNCN, chỉnh trần đóng bảo hiểm, mức giảm trừ bản thân / người phụ thuộc. Số người phụ thuộc nhập trong hồ sơ nhân viên. **Nhờ kế toán kiểm tra các mức này trước khi trả lương thật.**
+- Nhân viên xem và tải PDF ở **Phiếu lương của tôi** (chỉ khi kỳ lương đã duyệt).
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

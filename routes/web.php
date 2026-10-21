@@ -301,6 +301,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/overtime/{overtime}/approve', [\App\Http\Controllers\OvertimeController::class, 'approve'])->name('overtime.approve');
     Route::post('/overtime/{overtime}/reject', [\App\Http\Controllers\OvertimeController::class, 'reject'])->name('overtime.reject');
     Route::post('/overtime/{overtime}/cancel', [\App\Http\Controllers\OvertimeController::class, 'cancel'])->name('overtime.cancel');
+    Route::get('/payroll', [\App\Http\Controllers\PayrollController::class, 'index'])->name('payroll.index');
+    Route::post('/payroll', [\App\Http\Controllers\PayrollController::class, 'store'])->name('payroll.store');
+    Route::put('/payroll/settings', [\App\Http\Controllers\PayrollController::class, 'settings'])->name('payroll.settings');
+    Route::get('/payroll/{payroll}', [\App\Http\Controllers\PayrollController::class, 'show'])->name('payroll.show');
+    Route::post('/payroll/{payroll}/recalculate', [\App\Http\Controllers\PayrollController::class, 'recalculate'])->name('payroll.recalculate');
+    Route::post('/payroll/{payroll}/{action}', [\App\Http\Controllers\PayrollController::class, 'transition'])->name('payroll.transition')->whereIn('action', ['submit', 'reopen', 'approve', 'pay']);
+    Route::get('/payroll/{payroll}/export', [\App\Http\Controllers\PayrollController::class, 'export'])->name('payroll.export');
+    Route::delete('/payroll/{payroll}', [\App\Http\Controllers\PayrollController::class, 'destroy'])->name('payroll.destroy');
+    Route::get('/payslips', [\App\Http\Controllers\PayslipController::class, 'mine'])->name('payslips.mine');
+    Route::get('/payslips/{payslip}', [\App\Http\Controllers\PayslipController::class, 'show'])->name('payslips.show');
+    Route::get('/payslips/{payslip}/pdf', [\App\Http\Controllers\PayslipController::class, 'pdf'])->name('payslips.pdf');
+    Route::put('/payslips/{payslip}', [\App\Http\Controllers\PayslipController::class, 'update'])->name('payslips.update');
     Route::post('/attendance/consent', [\App\Http\Controllers\AttendanceController::class, 'consent'])->name('attendance.consent');
     Route::post('/attendance/punch', [\App\Http\Controllers\AttendanceController::class, 'punch'])->name('attendance.punch')->middleware('throttle:10,1');
     Route::get('/attendance/board', [\App\Http\Controllers\AttendanceController::class, 'board'])->name('attendance.board');

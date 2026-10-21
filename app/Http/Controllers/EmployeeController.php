@@ -122,6 +122,7 @@ class EmployeeController extends Controller
             $rules += [
                 'pay_grade_id' => ['nullable', 'integer', TenantRule::exists('pay_grades')],
                 'hourly_rate' => ['nullable', 'numeric', 'min:'.config('crm.pay_rate_min'), 'max:'.config('crm.pay_rate_max')],
+                'dependents' => ['nullable', 'integer', 'between:0,20'],
             ];
         }
         if ($sensitive) {
@@ -140,6 +141,9 @@ class EmployeeController extends Controller
             'id_number' => __('Số CCCD / hộ chiếu'), 'date_of_birth' => __('Ngày sinh'),
         ]);
         $this->assertNoManagerLoop($user->id, $data['manager_id'] ?? null);
+        if (array_key_exists('dependents', $data)) {
+            $data['dependents'] = (int) $data['dependents'];
+        }
 
         DB::transaction(fn () => EmployeeProfile::updateOrCreate(['user_id' => $user->id], $data));
 

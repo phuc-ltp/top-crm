@@ -79,6 +79,8 @@ class Setting extends Model
         // Chấm công (bước 5.2) — trống = mặc định AttendanceService::DEFAULTS
         'work_morning_start', 'work_morning_end', 'work_afternoon_start', 'work_afternoon_end', 'work_ot_start', 'work_ot_end',
         'work_days', 'attendance_late_grace', 'attendance_selfie_days',
+        // Bảng lương (bước 5.4) — trống = mặc định PayrollService::DEFAULTS
+        'payroll_insurance_enabled', 'payroll_pit_enabled', 'payroll_personal_deduction', 'payroll_dependent_deduction', 'payroll_insurance_cap',
     ];
 
     private const CACHE_KEY = 'crm.settings';

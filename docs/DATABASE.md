@@ -159,6 +159,8 @@ erDiagram
 | `work_locations` | Văn phòng / địa điểm chấm công (bước 5.2): tọa độ, bán kính (m), đang dùng. |
 | `attendance_records` | Công một ngày / người (duy nhất theo tổ chức + người + ngày): giờ vào / ra (giờ máy chủ), tọa độ, sai số, khoảng cách, văn phòng gần nhất, trong / ngoài vùng, ảnh selfie (storage/app/private), IP; giờ công, phút trễ / về sớm, trạng thái; người / lý do điều chỉnh. `employee_profiles.attendance_consent_at`: thời điểm đồng ý thu thập ảnh & vị trí. |
 | `overtime_requests` | Đề nghị tăng ca (bước 5.3): ngày, giờ bắt đầu / kết thúc, số giờ, mức độ (high / medium / low), lý do, trạng thái (pending / approved / rejected / cancelled), người duyệt, thời điểm, ghi chú; `rate` = đơn giá / giờ chốt lúc duyệt. |
+| `payroll_periods` | Kỳ lương tháng (bước 5.4, duy nhất theo tổ chức + tháng): trạng thái draft / submitted / approved / paid, người tạo / duyệt, thời điểm tính / gửi / duyệt / trả. |
+| `payslips` | Phiếu lương (duy nhất theo kỳ + người): ảnh chụp đơn giá giờ, ngày / phút công, phút trễ, lương giờ làm, giờ & tiền tăng ca, phần tăng ca miễn thuế, phụ cấp / thưởng / khấu trừ khác (nhập tay), tổng thu nhập, mức đóng & 3 khoản bảo hiểm, người phụ thuộc, thu nhập tính thuế, thuế TNCN, thực nhận, `meta` (tham số đã dùng). `employee_profiles.dependents`: số người phụ thuộc. |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

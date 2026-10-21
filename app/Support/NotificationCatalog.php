@@ -31,6 +31,7 @@ class NotificationCatalog
         'project_member' => ['work', 'Được thêm vào dự án'],
         'overtime_request' => ['work', 'Đề nghị tăng ca cần duyệt'],
         'overtime_decision' => ['work', 'Kết quả duyệt tăng ca'],
+        'payslip_ready' => ['work', 'Phiếu lương đã sẵn sàng'],
         'order_approved' => ['sales', 'Đơn hàng được duyệt'],
         'quotation_approval' => ['sales', 'Duyệt báo giá (chờ duyệt, kết quả duyệt)'],
         'quotation_expired' => ['sales', 'Báo giá hết hạn'],
