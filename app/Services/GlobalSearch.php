@@ -46,6 +46,8 @@ class GlobalSearch
             'suppliers' => ['label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'permission' => 'suppliers.view'],
             'tickets' => ['label' => 'Ticket hỗ trợ', 'icon' => 'bi-headset', 'permission' => 'tickets.view'],
             'tasks' => ['label' => 'Công việc', 'icon' => 'bi-check2-square', 'permission' => 'tasks.view'],
+            'projects' => ['label' => 'Dự án', 'icon' => 'bi-kanban', 'permission' => 'projects.view'],
+            'documents' => ['label' => 'Tài liệu', 'icon' => 'bi-folder2-open', 'permission' => 'documents.view'],
             'employees' => ['label' => 'Nhân viên', 'icon' => 'bi-person-badge', 'permission' => 'users.view'],
         ];
     }
@@ -129,6 +131,9 @@ class GlobalSearch
             'tickets' => SupportTicket::visibleTo($user)->with('customer:id,name')->where($text(['subject', 'code']))->latest(),
             'tasks' => Task::visibleTo($user)->with('assignee:id,name')->where($text(['title']))->orderByRaw('due_date IS NULL, due_date'),
             'employees' => User::inOrganization()->where($text(['name', 'email', 'phone', 'position']))->orderBy('name'),
+            // Dự án / tài liệu: chỉ những gì người dùng được xem (thành viên dự án; phạm vi xem tài liệu)
+            'projects' => \App\Models\Project::visibleTo($user)->with('customer:id,name')->where($text(['name', 'code']))->latest(),
+            'documents' => \App\Models\Document::visibleTo($user)->where($text(['title', 'description']))->latest('updated_at'),
             default => throw new \InvalidArgumentException('Unknown search type'),
         };
     }
@@ -148,6 +153,8 @@ class GlobalSearch
             'suppliers' => ['title' => $m->name, 'subtitle' => trim($m->code.' · '.($m->contact_name ?? $m->phone ?? ''), ' ·'), 'url' => route('suppliers.show', $m)],
             'tickets' => ['title' => $m->subject, 'subtitle' => $m->code.' · '.label_of(SupportTicket::STATUSES, $m->status), 'url' => route('tickets.show', $m)],
             'tasks' => ['title' => $m->title, 'subtitle' => vn_date($m->due_date, true).($m->assignee ? ' · '.$m->assignee->name : ''), 'url' => route('tasks.show', $m)],
+            'projects' => ['title' => $m->name, 'subtitle' => $m->code.' · '.label_of(\App\Models\Project::STATUSES, $m->status).($m->customer ? ' · '.$m->customer->name : ''), 'url' => route('projects.show', $m)],
+            'documents' => ['title' => $m->title, 'subtitle' => label_of(\App\Models\Document::CATEGORIES, $m->category).' · '.label_of(\App\Models\Document::VISIBILITIES, $m->visibility), 'url' => route('documents.show', $m)],
             'employees' => ['title' => $m->name, 'subtitle' => trim(($m->position ? $m->position.' · ' : '').$m->email), 'url' => route('users.show', $m)],
         };
     }
