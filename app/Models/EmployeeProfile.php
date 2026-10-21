@@ -28,7 +28,7 @@ class EmployeeProfile extends Model
     }
 
     protected $fillable = [
-        'user_id', 'employee_code', 'job_title', 'manager_id', 'branch_id', 'pay_grade_id', 'hourly_rate', 'hire_date', 'employment_status', 'work_phone',
+        'user_id', 'employee_code', 'job_title', 'manager_id', 'branch_id', 'pay_grade_id', 'hourly_rate', 'attendance_consent_at', 'hire_date', 'employment_status', 'work_phone',
         'date_of_birth', 'personal_phone', 'personal_email', 'home_address', 'id_number', 'emergency_contact', 'hr_notes',
     ];
 
@@ -38,6 +38,7 @@ class EmployeeProfile extends Model
     protected $casts = [
         'hire_date' => 'date',
         'hourly_rate' => 'decimal:2',
+        'attendance_consent_at' => 'datetime',
         'date_of_birth' => 'encrypted', 'personal_phone' => 'encrypted', 'personal_email' => 'encrypted', 'home_address' => 'encrypted',
         'id_number' => 'encrypted', 'emergency_contact' => 'encrypted', 'hr_notes' => 'encrypted',
     ];

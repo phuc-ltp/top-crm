@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Header bảo mật cho mọi phản hồi web.
- *  - Luôn bật: chống nhúng iframe từ trang khác, chống đoán MIME, giới hạn Referrer, tắt camera / micro / vị trí.
+ *  - Luôn bật: chống nhúng iframe từ trang khác, chống đoán MIME, giới hạn Referrer, tắt micro; camera / vị trí chỉ cho chính tên miền (chấm công).
  *  - Chỉ ở production (APP_ENV=production):
  *    + Content-Security-Policy: chỉ tải tài nguyên từ chính tên miền (+ Google Fonts); không plugin, không nhúng từ trang khác.
  *      'unsafe-inline' cho script/style vì các trang có script nội tuyến nhỏ (đã escape dữ liệu ở Blade).
@@ -23,7 +23,8 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        // Camera và định vị chỉ cho chính tên miền của hệ thống (trang chấm công selfie + GPS); trang nhúng từ nơi khác không dùng được
+        $response->headers->set('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(self)');
 
         if (app()->isProduction()) {
             $response->headers->set('Content-Security-Policy', implode('; ', [

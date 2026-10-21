@@ -233,6 +233,16 @@ Trên hóa đơn đã phát hành:
 - **Bậc lương** (Quản trị › Nhân sự › Bậc lương): đơn giá theo giờ từ 35.000 đến 200.000 đ. Mỗi vai trò có một bậc mặc định; chỉnh bậc hoặc đơn giá riêng trong hồ sơ từng nhân viên.
 - Lương theo giờ chỉ hiện cho chính nhân viên đó và người có quyền lương.
 
+## 16g. Chấm công (Phase 5)
+
+- **Chấm công của tôi** (menu Chấm công), mở trên điện thoại:
+  - lần đầu tích đồng ý cho hệ thống chụp ảnh và lấy vị trí;
+  - bấm **Chấm công vào** khi đến và **Chấm công ra** khi về.
+  - Cần mở bằng địa chỉ **https** và cho phép camera, vị trí. Nếu camera không mở được, dùng nút chụp ảnh bằng máy.
+- **Giờ công** chỉ tính trong giờ làm (mặc định 7:30–11:30 và 13:30–17:30). Trễ trong số phút cho phép không bị tính trễ.
+- **Bảng công tháng** (quản lý / kế toán): ký hiệu từng ngày. Dấu ! là chấm công ngoài khu vực văn phòng; bấm vào ô để xem ảnh, vị trí, điều chỉnh (bắt buộc ghi lý do).
+- **Cài đặt chấm công:** giờ làm, khung tăng ca, ngày làm việc, phút cho phép trễ, số ngày lưu ảnh, văn phòng (tọa độ lấy từ Google Maps, bán kính 100–200 m).
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

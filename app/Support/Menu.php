@@ -61,6 +61,11 @@ class Menu
                     ['Khối lượng công việc', null, 'tasks.workload', 'tasks.view', 'tasks.workload'],
                     ['Hoạt động & lịch hẹn', null, 'activities.index', 'dashboard.view', 'activities.*'],
                 ]],
+                ['Chấm công', 'bi-fingerprint', null, null, null, [
+                    ['Chấm công của tôi', null, 'attendance.index', 'dashboard.view', 'attendance.index'],
+                    ['Bảng công tháng', null, 'attendance.board', 'payroll.view_all', ['attendance.board', 'attendance.records.*']],
+                    ['Cài đặt chấm công', null, 'attendance.settings', 'payroll.manage', 'attendance.settings'],
+                ]],
                 ['Tài liệu', 'bi-folder2-open', 'documents.index', 'documents.view', 'documents.*'],
                 ['Marketing', 'bi-megaphone-fill', 'campaigns.index', 'campaigns.view', 'campaigns.*'],
                 ['Hỗ trợ khách hàng', 'bi-headset', null, null, null, [
