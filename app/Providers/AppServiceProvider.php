@@ -69,6 +69,7 @@ class AppServiceProvider extends ServiceProvider
             'branch' => \App\Models\Branch::class,
             'pay_grade' => \App\Models\PayGrade::class,
             'attendance_record' => \App\Models\AttendanceRecord::class,
+            'overtime_request' => \App\Models\OvertimeRequest::class,
             'work_location' => \App\Models\WorkLocation::class,
             'team' => \App\Models\Team::class,
             'employee_profile' => \App\Models\EmployeeProfile::class,

@@ -296,6 +296,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/employees/accounts', [EmployeeController::class, 'storeAccount'])->name('employees.accounts.store')->middleware('throttle:20,1');
     Route::resource('pay-grades', \App\Http\Controllers\PayGradeController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/attendance', [\App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/overtime', [\App\Http\Controllers\OvertimeController::class, 'index'])->name('overtime.index');
+    Route::post('/overtime', [\App\Http\Controllers\OvertimeController::class, 'store'])->name('overtime.store')->middleware('throttle:20,1');
+    Route::post('/overtime/{overtime}/approve', [\App\Http\Controllers\OvertimeController::class, 'approve'])->name('overtime.approve');
+    Route::post('/overtime/{overtime}/reject', [\App\Http\Controllers\OvertimeController::class, 'reject'])->name('overtime.reject');
+    Route::post('/overtime/{overtime}/cancel', [\App\Http\Controllers\OvertimeController::class, 'cancel'])->name('overtime.cancel');
     Route::post('/attendance/consent', [\App\Http\Controllers\AttendanceController::class, 'consent'])->name('attendance.consent');
     Route::post('/attendance/punch', [\App\Http\Controllers\AttendanceController::class, 'punch'])->name('attendance.punch')->middleware('throttle:10,1');
     Route::get('/attendance/board', [\App\Http\Controllers\AttendanceController::class, 'board'])->name('attendance.board');
