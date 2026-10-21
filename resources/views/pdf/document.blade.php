@@ -17,7 +17,7 @@
     .totals td { padding: 4px 6px; }
     .grand td { font-size: 14px; font-weight: bold; color: #E65C00; border-top: 2px solid #FF6B00; padding-top: 8px; }
     .box { background: #F8FAFC; padding: 10px; border-radius: 4px; }
-    .sign td { text-align: center; padding-top: 40px; }
+    .sign td { width: 50%; text-align: center; vertical-align: top; padding-top: 40px; }
     .demo { color: #B45309; font-weight: bold; text-align: center; border: 1px dashed #F59E0B; padding: 4px; margin-bottom: 10px; }
 </style>
 </head>
