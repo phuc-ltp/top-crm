@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.0.1] — 21/10/2026
+
+### Cải thiện
+- **PDF nhẹ hơn ~25–30 lần:** mọi PDF (hóa đơn, báo giá, đơn hàng, báo cáo, phiếu lương, tem QR) chỉ nhúng các ký tự font thực sự dùng thay vì cả bộ font tiếng Việt — VD phiếu lương 858 KB → 26 KB, tem QR 8 tài sản 870 KB → 33 KB; hiển thị và dấu tiếng Việt giữ nguyên.
+
 ## [5.0.0] — Phase 5 Nhân sự & tài sản — 21/10/2026
 
 ### Thêm mới
