@@ -301,6 +301,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/overtime/{overtime}/approve', [\App\Http\Controllers\OvertimeController::class, 'approve'])->name('overtime.approve');
     Route::post('/overtime/{overtime}/reject', [\App\Http\Controllers\OvertimeController::class, 'reject'])->name('overtime.reject');
     Route::post('/overtime/{overtime}/cancel', [\App\Http\Controllers\OvertimeController::class, 'cancel'])->name('overtime.cancel');
+    Route::get('/leave', [\App\Http\Controllers\LeaveController::class, 'index'])->name('leave.index');
+    Route::post('/leave', [\App\Http\Controllers\LeaveController::class, 'store'])->name('leave.store')->middleware('throttle:20,1');
+    Route::post('/leave/{leave}/approve', [\App\Http\Controllers\LeaveController::class, 'approve'])->name('leave.approve');
+    Route::post('/leave/{leave}/reject', [\App\Http\Controllers\LeaveController::class, 'reject'])->name('leave.reject');
+    Route::post('/leave/{leave}/cancel', [\App\Http\Controllers\LeaveController::class, 'cancel'])->name('leave.cancel');
+    Route::get('/holidays', [\App\Http\Controllers\HolidayController::class, 'index'])->name('holidays.index');
+    Route::post('/holidays', [\App\Http\Controllers\HolidayController::class, 'store'])->name('holidays.store');
+    Route::post('/holidays/fixed', [\App\Http\Controllers\HolidayController::class, 'addFixed'])->name('holidays.fixed');
+    Route::put('/holidays/settings', [\App\Http\Controllers\HolidayController::class, 'settings'])->name('holidays.settings');
+    Route::delete('/holidays/{holiday}', [\App\Http\Controllers\HolidayController::class, 'destroy'])->name('holidays.destroy');
     Route::get('/payroll', [\App\Http\Controllers\PayrollController::class, 'index'])->name('payroll.index');
     Route::post('/payroll', [\App\Http\Controllers\PayrollController::class, 'store'])->name('payroll.store');
     Route::put('/payroll/settings', [\App\Http\Controllers\PayrollController::class, 'settings'])->name('payroll.settings');

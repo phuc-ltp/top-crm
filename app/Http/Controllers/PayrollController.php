@@ -104,10 +104,10 @@ class PayrollController extends Controller
     {
         abort_unless($request->user()->can('payroll.view_all'), 403);
         $slips = $payroll->payslips()->with('user:id,name,email')->get()->sortBy(fn ($s) => $s->user?->name);
-        $headings = [__('Nhân viên'), __('Email'), __('Ngày công'), __('Giờ công'), __('Đơn giá giờ'), __('Lương giờ làm'), __('Giờ tăng ca'), __('Tiền tăng ca'),
+        $headings = [__('Nhân viên'), __('Email'), __('Ngày công'), __('Giờ công'), __('Đơn giá giờ'), __('Lương giờ làm'), __('Nghỉ phép / lễ có lương'), __('Giờ tăng ca'), __('Tiền tăng ca'),
             __('Phụ cấp'), __('Thưởng'), __('Tổng thu nhập'), __('BHXH'), __('BHYT'), __('BHTN'), __('Người phụ thuộc'), __('Thu nhập tính thuế'), __('Thuế TNCN'),
             __('Khấu trừ khác'), __('Thực nhận'), __('Ghi chú')];
-        $rows = $slips->map(fn ($s) => [$s->user?->name, $s->user?->email, $s->work_days, $s->worked_hours, (float) $s->hourly_rate, (float) $s->base_pay, (float) $s->ot_hours,
+        $rows = $slips->map(fn ($s) => [$s->user?->name, $s->user?->email, $s->work_days, $s->worked_hours, (float) $s->hourly_rate, (float) $s->base_pay, (float) $s->paid_leave_pay, (float) $s->ot_hours,
             (float) $s->ot_pay, (float) $s->allowance, (float) $s->bonus, (float) $s->gross_pay, (float) $s->social_insurance, (float) $s->health_insurance,
             (float) $s->unemployment_insurance, $s->dependents, (float) $s->taxable_income, (float) $s->personal_income_tax, (float) $s->other_deduction, (float) $s->net_pay, $s->note]);
 

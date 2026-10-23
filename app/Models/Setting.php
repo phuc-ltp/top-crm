@@ -81,6 +81,8 @@ class Setting extends Model
         'work_days', 'attendance_late_grace', 'attendance_selfie_days',
         // Bảng lương (bước 5.4) — trống = mặc định PayrollService::DEFAULTS
         'payroll_insurance_enabled', 'payroll_pit_enabled', 'payroll_personal_deduction', 'payroll_dependent_deduction', 'payroll_insurance_cap',
+        // Nghỉ phép — trống = mặc định LeaveService::DEFAULTS
+        'leave_annual_days',
     ];
 
     private const CACHE_KEY = 'crm.settings';

@@ -31,6 +31,8 @@ class NotificationCatalog
         'project_member' => ['work', 'Được thêm vào dự án'],
         'overtime_request' => ['work', 'Đề nghị tăng ca cần duyệt'],
         'overtime_decision' => ['work', 'Kết quả duyệt tăng ca'],
+        'leave_request' => ['work', 'Đơn nghỉ phép cần duyệt'],
+        'leave_decision' => ['work', 'Kết quả duyệt nghỉ phép'],
         'payslip_ready' => ['work', 'Phiếu lương đã sẵn sàng'],
         'asset_assigned' => ['work', 'Được bàn giao tài sản'],
         'asset_overdue' => ['work', 'Tài sản mượn quá hạn'],

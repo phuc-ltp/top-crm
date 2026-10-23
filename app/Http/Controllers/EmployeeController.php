@@ -123,6 +123,7 @@ class EmployeeController extends Controller
                 'pay_grade_id' => ['nullable', 'integer', TenantRule::exists('pay_grades')],
                 'hourly_rate' => ['nullable', 'numeric', 'min:'.config('crm.pay_rate_min'), 'max:'.config('crm.pay_rate_max')],
                 'dependents' => ['nullable', 'integer', 'between:0,20'],
+                'annual_leave_days' => ['nullable', 'numeric', 'between:0,60'],
             ];
         }
         if ($sensitive) {
