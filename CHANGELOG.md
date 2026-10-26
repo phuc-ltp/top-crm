@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.4.0] — 26/10/2026
+
+### Thêm mới
+- **Cài CRM lên điện thoại / máy tính như ứng dụng (PWA):** icon theo logo TOP (kèm bản cho iPhone, Android), mở toàn màn hình, lối tắt Chấm công / Công việc, nút **“Cài ứng dụng lên máy”** trong menu tài khoản (chỉ hiện khi trình duyệt cho phép), trang “Không có kết nối mạng” khi mất mạng. Vì bảo mật, không lưu bất kỳ dữ liệu CRM nào trên thiết bị. Cần HTTPS khi dùng trên điện thoại (sau go-live).
+
 ## [5.3.0] — 26/10/2026
 
 ### Thêm mới
