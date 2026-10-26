@@ -2,6 +2,16 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.4.0] — 26/10/2026
+
+### Thêm mới
+- **Cài CRM lên điện thoại / máy tính như ứng dụng (PWA):** icon theo logo TOP (kèm bản cho iPhone, Android), mở toàn màn hình, lối tắt Chấm công / Công việc, nút **“Cài ứng dụng lên máy”** trong menu tài khoản (chỉ hiện khi trình duyệt cho phép), trang “Không có kết nối mạng” khi mất mạng. Vì bảo mật, không lưu bất kỳ dữ liệu CRM nào trên thiết bị. Cần HTTPS khi dùng trên điện thoại (sau go-live).
+
+## [5.3.0] — 26/10/2026
+
+### Thêm mới
+- **Quản lý hợp đồng:** hợp đồng khách hàng (mã HDG tự sinh; khách hàng, người đại diện, cơ hội; loại, giá trị, ngày ký – hiệu lực – hết hạn, tự gia hạn, điều khoản), tình trạng hiệu lực tự tính (nháp / chưa hiệu lực / đang hiệu lực / sắp hết hạn / đã hết hạn / chấm dứt), **gia hạn** tạo hợp đồng nối tiếp, **chấm dứt** có lý do, tệp hợp đồng đính kèm qua module Tài liệu (bảo mật, phiên bản), nhắc hết hạn 30 / 7 / 0 ngày (`crm:contract-reminders` 08:05), tab Hợp đồng ở trang khách hàng, nút “Tạo hợp đồng” từ cơ hội, xuất Excel, thùng rác, quyền `contracts.*` theo vai trò.
+
 ## [5.2.0] — 26/10/2026
 
 ### Thêm mới

@@ -286,6 +286,19 @@ Trên hóa đơn đã phát hành:
 - Cơ hội được tính cho chiến dịch khi: lead của chiến dịch được chuyển đổi thành cơ hội (tự động), hoặc chọn **Chiến dịch nguồn** trên form cơ hội.
 - **Link theo dõi chiến dịch** (cần bật Form thu lead trong Cài đặt → Lead): dán link vào quảng cáo / bài đăng; người đăng ký qua link được tạo lead và gắn vào chiến dịch kèm nguồn (UTM).
 
+## 16n. Hợp đồng
+
+- Menu **Bán hàng → Hợp đồng → Thêm hợp đồng** (hoặc nút **Tạo hợp đồng** trên trang cơ hội, tab **Hợp đồng** ở trang khách hàng): chọn khách hàng, giá trị, ngày ký, hiệu lực – hết hạn; trạng thái Nháp hoặc Đã ký.
+- Trang hợp đồng: **Tải lên bản hợp đồng** (PDF / ảnh scan), **Gia hạn** (tạo bản nháp nối tiếp cùng thời lượng), **Chấm dứt** (ghi ngày và lý do).
+- Người phụ trách được nhắc trước 30 ngày, 7 ngày và đúng ngày hết hạn.
+
+## 16o. Cài CRM lên điện thoại như ứng dụng
+
+- **Android (Chrome):** mở CRM → menu tài khoản → **Cài ứng dụng lên máy** (hoặc menu ⋮ của Chrome → *Cài đặt ứng dụng*). Biểu tượng TOP xuất hiện trên màn hình chính.
+- **iPhone (Safari):** mở CRM → nút Chia sẻ → **Thêm vào Màn hình chính**.
+- **Máy tính (Chrome / Edge):** biểu tượng cài đặt trên thanh địa chỉ, hoặc menu tài khoản → Cài ứng dụng lên máy.
+- Cần kết nối mạng để dùng; dữ liệu không được lưu trên máy. Trên điện thoại cần hệ thống chạy HTTPS (sau khi đưa lên mạng).
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

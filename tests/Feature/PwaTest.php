@@ -33,8 +33,9 @@ class PwaTest extends TestCase
 
     public function test_layouts_link_manifest_and_install_button(): void
     {
+        $admin = $this->admin();                       // chưa có quản trị viên thì /login chuyển sang /setup
         $this->get(route('login'))->assertOk()->assertSee(route('pwa.manifest'), false)->assertSee('apple-touch-icon.png', false);
-        $this->actingAs($this->admin())->get(route('dashboard'))->assertOk()
+        $this->actingAs($admin)->get(route('dashboard'))->assertOk()
             ->assertSee(route('pwa.manifest'), false)->assertSee('data-pwa-install', false)->assertSee(__('Cài ứng dụng lên máy'));
     }
 }
