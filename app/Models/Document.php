@@ -40,6 +40,7 @@ class Document extends Model
             'customer' => [Customer::class, 'customers.show'],
             'opportunity' => [Opportunity::class, 'opportunities.show'],
             'project' => [Project::class, 'projects.show'],
+            'contract' => [Contract::class, 'contracts.show'],
         ];
     }
 

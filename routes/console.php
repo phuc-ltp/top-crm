@@ -102,7 +102,7 @@ Artisan::command('crm:purge-demo {--force}', function () {
         DB::table('price_list_items')->whereIn('product_id', $demoProducts)->delete();
         DB::table('credit_notes')->where('is_demo', true)->delete();
 
-        $tables = ['payments', 'invoices', 'sales_orders', 'quotations', 'support_tickets', 'tasks', 'projects', 'opportunities',
+        $tables = ['contracts', 'payments', 'invoices', 'sales_orders', 'quotations', 'support_tickets', 'tasks', 'projects', 'opportunities',
             'leads', 'contacts', 'campaigns', 'customers', 'products', 'suppliers',
             // Phase 5 (lịch sử luân chuyển, kết quả kiểm kê, lần gán giấy phép, phiếu lương tự xóa theo khóa ngoại)
             'software_licenses', 'asset_audits', 'assets', 'payroll_periods'];
@@ -195,6 +195,13 @@ Artisan::command('crm:asset-reminders', function (\App\Services\LicenseService $
     $r = $service->runReminders();
     $this->info('Nhắc giấy phép: '.$r['licenses'].' · Nhắc mượn quá hạn: '.$r['loans']);
 })->purpose('Nhắc giấy phép sắp hết hạn và tài sản mượn quá hạn');
+
+/*
+| Nhắc hợp đồng sắp / đã hết hạn (mốc 30 / 7 / 0 ngày). Chạy 08:05 mỗi ngày, hoặc: php artisan crm:contract-reminders
+*/
+Artisan::command('crm:contract-reminders', function (\App\Services\ContractService $service) {
+    $this->info('Nhắc hợp đồng: '.$service->runReminders());
+})->purpose('Nhắc hợp đồng sắp hết hạn');
 
 Artisan::command('crm:task-reminders', function (TaskReminderService $service) {
     $result = $service->run();
@@ -339,5 +346,6 @@ Schedule::command('crm:prune-notifications')->dailyAt('02:30');
 Schedule::command('crm:ticket-sla')->everyTenMinutes()->withoutOverlapping();
 Schedule::command('crm:prune-attendance-selfies')->dailyAt('03:00');
 Schedule::command('crm:asset-reminders')->dailyAt('08:00')->withoutOverlapping();
+Schedule::command('crm:contract-reminders')->dailyAt('08:05')->withoutOverlapping();
 // Xóa lịch sử đăng nhập quá thời hạn lưu (LoginEvent::RETENTION_DAYS)
 Schedule::command('model:prune', ['--model' => [\App\Models\LoginEvent::class]])->daily();

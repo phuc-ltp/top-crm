@@ -510,6 +510,15 @@ class DemoDataSeeder extends Seeder
         $created[5]->refresh()->forceFill(['due_back_at' => now()->subDays(2)->toDateString()])->saveQuietly();    // mượn quá hạn để thử nhắc nhở
         $assets->act($created[4], 'maintenance', ['note' => 'Kẹt giấy, chờ thay trục (demo)', 'cost' => 350000], $admin);
 
+        // Hợp đồng: đang hiệu lực, sắp hết hạn, đã hết hạn, nháp
+        foreach ([[0, 120000000, -200, 165, 'signed'], [1, 36000000, -340, 25, 'signed'], [2, 18000000, -400, -35, 'signed'], [3, 54000000, 10, 375, 'draft']] as [$k, $value, $startOffset, $endOffset, $status]) {
+            $cust = $customers->get($k * 4);
+            \App\Models\Contract::create(['title' => 'Hợp đồng cung cấp & triển khai CRM (demo)', 'customer_id' => $cust->id, 'type' => $k === 1 ? 'maintenance' : 'sale', 'value' => $value,
+                'signed_date' => $status === 'signed' ? now()->addDays($startOffset - 5)->toDateString() : null, 'start_date' => now()->addDays($startOffset)->toDateString(),
+                'end_date' => now()->addDays($endOffset)->toDateString(), 'status' => $status, 'auto_renew' => $k === 1, 'terms' => 'Thanh toán 50% khi ký, 50% khi nghiệm thu (demo).',
+                'assigned_to' => $cust->assigned_to ?? $manager->id, 'created_by' => $manager->id, 'is_demo' => true]);
+        }
+
         // Bản quyền phần mềm
         $licenses = app(\App\Services\LicenseService::class);
         foreach ([

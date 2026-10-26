@@ -3,6 +3,7 @@
 @section('content')
     <x-page-header :title="$opportunity->title" :breadcrumbs="['Pipeline' => route('opportunities.index'), $opportunity->code => null]">
         @can('create', App\Models\Quotation::class)<a href="{{ route('quotations.create', ['customer_id' => $opportunity->customer_id, 'opportunity_id' => $opportunity->id]) }}" class="btn btn-light"><i class="bi bi-file-earmark-text me-1"></i>{{ __('Tạo báo giá') }}</a>@endcan
+        @can('create', App\Models\Contract::class)<a href="{{ route('contracts.create', ['opportunity_id' => $opportunity->id]) }}" class="btn btn-light"><i class="bi bi-file-earmark-check me-1"></i>{{ __('Tạo hợp đồng') }}</a>@endcan
         @can('create', App\Models\Task::class)<a href="{{ route('tasks.create', ['related_type' => 'opportunity', 'related_id' => $opportunity->id]) }}" class="btn btn-light"><i class="bi bi-check2-square me-1"></i>{{ __('Tạo công việc') }}</a>@endcan
         @can('update', $opportunity)<a href="{{ route('opportunities.edit', $opportunity) }}" class="btn btn-primary"><i class="bi bi-pencil me-1"></i>{{ __('Chỉnh sửa') }}</a>@endcan
         @can('delete', $opportunity)<x-delete-button :action="route('opportunities.destroy', $opportunity)" class="btn btn-light text-danger" :label="__('Xóa')" />@endcan

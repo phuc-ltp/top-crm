@@ -81,6 +81,7 @@ class AppServiceProvider extends ServiceProvider
             'asset_category' => \App\Models\AssetCategory::class,
             'asset_audit' => \App\Models\AssetAudit::class,
             'software_license' => \App\Models\SoftwareLicense::class,
+            'contract' => \App\Models\Contract::class,
             'work_location' => \App\Models\WorkLocation::class,
             'team' => \App\Models\Team::class,
             'employee_profile' => \App\Models\EmployeeProfile::class,

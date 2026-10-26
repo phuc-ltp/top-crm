@@ -335,6 +335,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/assets/audits/{audit}/check', [\App\Http\Controllers\AssetAuditController::class, 'check'])->name('assets.audits.check');
     Route::post('/assets/audits/{audit}/close', [\App\Http\Controllers\AssetAuditController::class, 'close'])->name('assets.audits.close');
     Route::resource('assets', \App\Http\Controllers\AssetController::class);
+    Route::get('/contracts/export', [\App\Http\Controllers\ContractController::class, 'export'])->name('contracts.export');
+    Route::resource('contracts', \App\Http\Controllers\ContractController::class);
+    Route::post('/contracts/{contract}/terminate', [\App\Http\Controllers\ContractController::class, 'terminate'])->name('contracts.terminate');
+    Route::post('/contracts/{contract}/renew', [\App\Http\Controllers\ContractController::class, 'renew'])->name('contracts.renew');
     Route::resource('licenses', \App\Http\Controllers\SoftwareLicenseController::class)->parameters(['licenses' => 'license']);
     Route::post('/licenses/{license}/reveal-key', [\App\Http\Controllers\SoftwareLicenseController::class, 'revealKey'])->name('licenses.reveal')->middleware('throttle:10,1');
     Route::post('/licenses/{license}/assign', [\App\Http\Controllers\SoftwareLicenseController::class, 'assign'])->name('licenses.assign');

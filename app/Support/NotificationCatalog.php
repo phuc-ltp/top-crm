@@ -37,6 +37,7 @@ class NotificationCatalog
         'asset_assigned' => ['work', 'Được bàn giao tài sản'],
         'asset_overdue' => ['work', 'Tài sản mượn quá hạn'],
         'license_expiring' => ['work', 'Giấy phép phần mềm sắp hết hạn'],
+        'contract_expiring' => ['work', 'Hợp đồng sắp hết hạn'],
         'order_approved' => ['sales', 'Đơn hàng được duyệt'],
         'quotation_approval' => ['sales', 'Duyệt báo giá (chờ duyệt, kết quả duyệt)'],
         'quotation_expired' => ['sales', 'Báo giá hết hạn'],
