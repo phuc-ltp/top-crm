@@ -169,6 +169,7 @@ erDiagram
 | `license_assignments` | Lịch sử gán giấy phép cho người dùng hoặc thiết bị (`asset_id`): người gán, thời điểm, người / thời điểm thu hồi (`released_at` trống = đang dùng chỗ). `assets.overdue_reminded_on`: ngày đã nhắc mượn quá hạn. |
 | `holidays` | Ngày lễ của tổ chức (duy nhất theo tổ chức + ngày): tên, có lương. |
 | `leave_requests` | Đơn nghỉ phép: loại (annual / personal / sick / unpaid), từ ngày – đến ngày, buổi (full / am / pm), số ngày làm việc nghỉ, lý do, trạng thái, người duyệt, ghi chú. `employee_profiles.annual_leave_days`: quỹ phép riêng; `payslips.paid_leave_minutes` / `paid_leave_pay`: giờ & tiền nghỉ phép + lễ có lương. |
+| `campaign_expenses` | Khoản chi thực tế của chiến dịch: ngày, hạng mục, số tiền, ghi chú, người ghi. `campaigns.tracking_code`: mã link theo dõi (duy nhất theo tổ chức); `opportunities.campaign_id`: chiến dịch nguồn (tính doanh thu / ROI); `leads.utm_source` / `utm_medium` / `utm_campaign`. |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

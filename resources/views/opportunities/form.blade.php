@@ -74,6 +74,7 @@
                         <x-select name="lost_reason_id" :label="__('Lý do thất bại')" :options="$lostReasons->all()" :value="$opportunity->lost_reason_id" :translate="false" :placeholder="__('— Chọn lý do —')" />
                         <x-input name="lost_reason" :label="__('Ghi chú lý do')" :value="$opportunity->lost_reason" maxlength="500" />
                     </div>
+                    <x-select name="campaign_id" :label="__('Chiến dịch nguồn')" :options="$campaigns" :value="$opportunity->campaign_id" :translate="false" :placeholder="__('— Không thuộc chiến dịch —')" :help="__('Dùng để tính doanh thu và ROI của chiến dịch marketing.')" />
                     @can('opportunities.assign')
                         <x-select name="assigned_to" :label="__('Nhân viên phụ trách')" :options="$users" :value="$opportunity->assigned_to" :placeholder="__('— Chưa phân công —')" />
                     @endcan

@@ -13,7 +13,7 @@ class CampaignController extends Controller
 {
     private function filtered(Request $request)
     {
-        return Campaign::visibleTo($request->user())->with('owner:id,name')
+        return Campaign::visibleTo($request->user())->with('owner:id,name')->withSum('expenses', 'amount')
             ->withCount(['leads', 'leads as converted_leads_count' => fn ($q) => $q->where('status', 'converted')])
             ->when($request->filled('q'), fn ($q) => $q->where('name', 'like', $this->like($request->q)))
             ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
@@ -29,6 +29,7 @@ class CampaignController extends Controller
         $all = $this->filtered($request)->get();
         $summary = [
             'budget' => $all->sum('budget'),
+            'cost' => (float) $all->sum('expenses_sum_amount'),
             'leads' => $all->sum('leads_count'),
             'converted' => $all->sum('converted_leads_count'),
             'active' => $all->where('status', 'active')->count(),
@@ -56,13 +57,17 @@ class CampaignController extends Controller
     public function show(Request $request, Campaign $campaign)
     {
         $this->authorize('view', $campaign);
-        $campaign->loadCount(['leads', 'leads as converted_leads_count' => fn ($q) => $q->where('status', 'converted')]);
+        $campaign->loadCount(['leads', 'leads as converted_leads_count' => fn ($q) => $q->where('status', 'converted')])->loadSum('expenses', 'amount');
+        $expenses = $campaign->expenses()->with('creator:id,name')->orderByDesc('spent_on')->orderByDesc('id')->get();
+        $opportunities = \App\Models\Opportunity::visibleTo($request->user())->where('campaign_id', $campaign->id)->with(['stage', 'customer:id,name'])->latest()->limit(50)->get();
+        $formToken = \App\Models\Setting::get('lead_form_enabled') === '1' ? \App\Models\Setting::get('lead_form_token') : null;
+        $trackingUrl = $formToken ? route('lead-form.show', ['token' => $formToken, 'c' => $campaign->tracking_code, 'utm_source' => $campaign->type, 'utm_campaign' => \Illuminate\Support\Str::slug($campaign->name)]) : null;
         $leads = $campaign->leads()->with('assignee:id,name')->latest('campaign_leads.created_at')->paginate(15);
         $byStatus = $campaign->leads()->selectRaw('leads.status, COUNT(*) as cnt')->groupBy('leads.status')->pluck('cnt', 'status');
         $available = Lead::visibleTo($request->user())->whereDoesntHave('campaigns', fn ($q) => $q->where('campaigns.id', $campaign->id))
             ->orderByDesc('id')->limit(300)->get(['id', 'code', 'name']);
 
-        return view('campaigns.show', compact('campaign', 'leads', 'byStatus', 'available'));
+        return view('campaigns.show', compact('campaign', 'leads', 'byStatus', 'available', 'expenses', 'opportunities', 'trackingUrl') + ['perf' => $campaign->performance()]);
     }
 
     public function edit(Campaign $campaign)
@@ -106,16 +111,39 @@ class CampaignController extends Controller
         return back()->with('success', __('Đã gỡ lead khỏi chiến dịch.'));
     }
 
+    public function storeExpense(Request $request, Campaign $campaign)
+    {
+        $this->authorize('update', $campaign);
+        $data = $request->validate([
+            'spent_on' => ['required', 'date', 'before_or_equal:'.now()->addDays(31)->toDateString()],
+            'category' => ['required', Rule::in(array_keys(\App\Models\CampaignExpense::CATEGORIES))],
+            'amount' => ['required', 'numeric', 'min:1', 'max:999999999999'],
+            'note' => ['nullable', 'string', 'max:500'],
+        ], [], ['spent_on' => __('Ngày chi'), 'category' => __('Hạng mục'), 'amount' => __('Số tiền')]);
+        $campaign->expenses()->create($data + ['created_by' => $request->user()->id]);
+
+        return back()->with('success', __('Đã ghi nhận khoản chi.'));
+    }
+
+    public function destroyExpense(Campaign $campaign, \App\Models\CampaignExpense $expense)
+    {
+        $this->authorize('update', $campaign);
+        abort_unless($expense->campaign_id === $campaign->id, 404);
+        $expense->delete();
+
+        return back()->with('success', __('Đã xóa khoản chi.'));
+    }
+
     public function export(Request $request, ExportService $exporter)
     {
         $this->authorize('export', Campaign::class);
         $rows = $this->filtered($request)->orderBy('start_date')->get()->map(fn (Campaign $c) => [
-            $c->name, Campaign::TYPES[$c->type] ?? $c->type, vn_date($c->start_date), vn_date($c->end_date), (float) $c->budget,
-            $c->target_leads, $c->actual_leads, $c->converted_leads, $c->conversion_rate.'%', $c->cost_per_lead, label_of(Campaign::STATUSES, $c->status),
+            $c->name, Campaign::TYPES[$c->type] ?? $c->type, vn_date($c->start_date), vn_date($c->end_date), (float) $c->budget, ($p = $c->performance())['cost'],
+            $c->target_leads, $c->actual_leads, $c->converted_leads, $c->conversion_rate.'%', $c->cost_per_lead, $p['won'], $p['roi'] === null ? '' : $p['roi'].'%', label_of(Campaign::STATUSES, $c->status),
         ]);
 
-        return $exporter->download('chien_dich', [__('Chiến dịch'), __('Loại'), __('Bắt đầu'), __('Kết thúc'), __('Ngân sách'), __('Lead mục tiêu'), __('Lead thực tế'),
-            __('Đã chuyển đổi'), __('Tỷ lệ chuyển đổi'), __('Chi phí/lead'), __('Trạng thái')], $rows, $request->input('format', 'xlsx'));
+        return $exporter->download('chien_dich', [__('Chiến dịch'), __('Loại'), __('Bắt đầu'), __('Kết thúc'), __('Ngân sách'), __('Chi phí thực tế'), __('Lead mục tiêu'), __('Lead thực tế'),
+            __('Đã chuyển đổi'), __('Tỷ lệ chuyển đổi'), __('Chi phí/lead'), __('Doanh thu (cơ hội thắng)'), __('ROI'), __('Trạng thái')], $rows, $request->input('format', 'xlsx'));
     }
 
     private function validated(Request $request): array

@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.2.0] — 26/10/2026
+
+### Thêm mới
+- **Marketing nâng cao:** ghi nhận chi phí thực tế theo hạng mục (so với ngân sách); cơ hội gắn chiến dịch nguồn (tự động khi lead của chiến dịch chuyển đổi, hoặc chọn trên form cơ hội) → doanh thu đã thắng, giá trị đang theo đuổi, **ROI**; chi phí / lead tính theo chi phí thực tế. Mỗi chiến dịch có **link theo dõi** (form thu lead công khai + mã chiến dịch + UTM): lead đăng ký qua link tự gắn vào chiến dịch, lưu nguồn / kênh. Báo cáo và xuất Excel chiến dịch thêm chi phí thực tế, doanh thu, ROI.
+
 ## [5.1.0] — 23/10/2026
 
 ### Thêm mới

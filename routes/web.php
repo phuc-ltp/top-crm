@@ -266,6 +266,8 @@ Route::middleware('auth')->group(function () {
     // Marketing
     Route::get('/campaigns/export', [CampaignController::class, 'export'])->name('campaigns.export');
     Route::post('/campaigns/{campaign}/leads', [CampaignController::class, 'attachLeads'])->name('campaigns.leads.attach');
+    Route::post('/campaigns/{campaign}/expenses', [CampaignController::class, 'storeExpense'])->name('campaigns.expenses.store');
+    Route::delete('/campaigns/{campaign}/expenses/{expense}', [CampaignController::class, 'destroyExpense'])->name('campaigns.expenses.destroy');
     Route::delete('/campaigns/{campaign}/leads/{lead}', [CampaignController::class, 'detachLead'])->name('campaigns.leads.detach');
     Route::resource('campaigns', CampaignController::class);
 

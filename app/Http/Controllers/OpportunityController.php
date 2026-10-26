@@ -265,6 +265,7 @@ class OpportunityController extends Controller
             'assigned_to' => ['nullable', Rule::exists('users', 'id')->whereNull('deleted_at'), \App\Support\Tenancy\TenantRule::member()],
             'lost_reason_id' => ['nullable', 'integer'],
             'lost_reason' => ['nullable', 'string', 'max:500'],
+            'campaign_id' => ['nullable', 'integer', \App\Support\Tenancy\TenantRule::exists('campaigns')],
             'notes' => ['nullable', 'string', 'max:5000'],
             'follow_up_at' => ['nullable', 'date', 'after:now'],
             'items' => ['nullable', 'array', 'max:50'],
@@ -309,6 +310,7 @@ class OpportunityController extends Controller
             'users' => Lookup::users(),
             'products' => Product::where('status', 'active')->orderBy('name')->get(['id', 'name', 'sku', 'price']),
             'lostReasons' => LostReason::where('is_active', true)->whereIn('applies_to', ['both', 'opportunity'])->orderBy('position')->pluck('name', 'id'),
+            'campaigns' => \App\Models\Campaign::orderByDesc('start_date')->limit(200)->pluck('name', 'id')->all(),
         ];
     }
 }
