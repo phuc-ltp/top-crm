@@ -11,7 +11,7 @@
                 <dl class="detail-list">
                     <dt>{{ __('Chức vụ') }}</dt><dd>{{ $contact->position ?? '—' }}</dd>
                     <dt>Email</dt><dd>{{ $contact->email ?? '—' }}</dd>
-                    <dt>{{ __('Điện thoại') }}</dt><dd>{{ $contact->phone ?? '—' }}</dd>
+                    <dt>{{ __('Điện thoại') }}</dt><dd>{{ $contact->phone ?? '—' }}<x-contact-qr type="contact" :id="$contact->id" :phone="$contact->phone" /></dd>
                     <dt>{{ __('Công ty') }}</dt><dd>{{ $contact->company ?? '—' }}</dd>
                     <dt>{{ __('labels.customer') }}</dt><dd>@if ($contact->customer)<a href="{{ route('customers.show', $contact->customer) }}">{{ $contact->customer->name }}</a>@else — @endif</dd>
                     <dt>{{ __('Người tạo') }}</dt><dd>{{ $contact->creator?->name ?? '—' }}</dd>

@@ -108,7 +108,7 @@
                                 <div class="mt-1">@foreach ($c->tags as $tag)<span class="tag-chip me-1" style="background: {{ $tag->color }}">{{ $tag->name }}</span>@endforeach</div>
                             </td>
                             <td class="small">
-                                @if ($c->phone)<div><i class="bi bi-telephone text-muted me-1"></i>{{ $c->phone }}</div>@endif
+                                @if ($c->phone)<div><i class="bi bi-telephone text-muted me-1"></i>{{ $c->phone }}<x-contact-qr type="customer" :id="$c->id" :phone="$c->phone" /></div>@endif
                                 @if ($c->email)<div class="text-truncate" style="max-width:200px"><i class="bi bi-envelope text-muted me-1"></i>{{ $c->email }}</div>@endif
                             </td>
                             <td class="small">{{ __(App\Models\Customer::TYPES[$c->type]?? '') }}<div class="text-muted">{{ $c->source?->label }}</div></td>

@@ -75,9 +75,12 @@
 </td></tr></table>
 
 @if ($cfg['route'] === 'invoices' && ($settings['bank_account_number'] ?? null) && (float) $doc->balance > 0)
-    <div class="box" style="margin-top:16px"><strong>{{ __('Thông tin chuyển khoản') }}</strong><br>
+    @php($vietQr = ($settings['bank_bin'] ?? null) && ($settings['currency'] ?? 'VND') === 'VND' && $doc->status === 'issued'
+        ? App\Support\QrImage::dataUri(App\Support\VietQr::payload($settings['bank_bin'], $settings['bank_account_number'], (int) round((float) $doc->balance), $doc->number), 4) : null)
+    <table class="box" style="margin-top:16px"><tr><td style="vertical-align: top"><strong>{{ __('Thông tin chuyển khoản') }}</strong><br>
         {{ __('Ngân hàng') }}: {{ $settings['bank_name'] }} · {{ __('Số tài khoản') }}: <strong>{{ $settings['bank_account_number'] }}</strong> · {{ __('Chủ tài khoản') }}: {{ $settings['bank_account_name'] }}<br>
-        {{ __('Nội dung chuyển khoản') }}: <strong>{{ $doc->number }}</strong></div>
+        {{ __('Nội dung chuyển khoản') }}: <strong>{{ $doc->number }}</strong></td>
+        @if ($vietQr)<td style="width: 110px; text-align: center; vertical-align: top"><img src="{{ $vietQr }}" style="width: 100px; height: 100px" alt=""><br><span class="muted" style="font-size: 8px">{{ __('Quét bằng app ngân hàng') }}</span></td>@endif</tr></table>
 @endif
 @if ($doc->notes)<div style="margin-top:16px"><strong>{{ __('Ghi chú / điều khoản:') }}</strong><br>{!! nl2br(e($doc->notes)) !!}</div>@endif
 @if ($cfg['route'] === 'invoices' && ($settings['invoice_terms'] ?? null))<div style="margin-top:10px" class="muted">{!! nl2br(e($settings['invoice_terms'])) !!}</div>@endif

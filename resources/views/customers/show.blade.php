@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <dl class="detail-list">
-                        <dt>{{ __('Điện thoại') }}</dt><dd>{{ $customer->phone ?? '—' }}</dd>
+                        <dt>{{ __('Điện thoại') }}</dt><dd>{{ $customer->phone ?? '—' }}<x-contact-qr type="customer" :id="$customer->id" :phone="$customer->phone" /></dd>
                         <dt>Email</dt><dd>@if ($customer->email)<a href="mailto:{{ $customer->email }}">{{ $customer->email }}</a>@else — @endif</dd>
                         <dt>{{ __('Công ty') }}</dt><dd>{{ $customer->company ?? '—' }}</dd>
                         <dt>{{ __('Địa chỉ') }}</dt><dd>{{ $customer->address ?? '—' }}</dd>
@@ -88,7 +88,7 @@
                     @forelse ($customer->contacts as $ct)
                         <a href="{{ route('contacts.show', $ct) }}" class="list-group-item list-group-item-action">
                             <div class="fw-semibold small">{{ $ct->full_name }}</div>
-                            <div class="small text-muted">{{ $ct->position }} · {{ $ct->phone }}</div>
+                            <div class="small text-muted">{{ $ct->position }} · {{ $ct->phone }}<x-contact-qr type="contact" :id="$ct->id" :phone="$ct->phone" /></div>
                         </a>
                     @empty
                         <div class="p-3 small text-muted">{{ __('Chưa có người liên hệ.') }}</div>
