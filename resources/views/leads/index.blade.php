@@ -68,11 +68,11 @@
                     <thead><tr>
                         <th><x-sort-link column="code" :label="__('Mã')" /></th>
                         <th><x-sort-link column="name" label="Lead" /></th>
+                        <th>{{ __('Liên lạc') }}</th>
                         <th>{{ __('Nguồn') }}</th>
                         <th><x-sort-link column="score" :label="__('Điểm')" /></th>
                         <th class="text-end"><x-sort-link column="estimated_value" :label="__('Giá trị ước tính')" /></th>
                         <th><x-sort-link column="status" :label="__('Giai đoạn')" /></th>
-                        <th>{{ __('Theo dõi tiếp') }}</th>
                         <th>{{ __('Phụ trách') }}</th>
                         <th class="text-end">{{ __('Thao tác') }}</th>
                     </tr></thead>
@@ -80,7 +80,12 @@
                     @foreach ($leads as $l)
                         <tr>
                             <td class="small text-muted">{{ $l->code }}</td>
-                            <td><a href="{{ route('leads.show', $l) }}" class="row-link">{{ $l->name }}</a><x-contact-qr type="lead" :id="$l->id" :phone="$l->phone" /><div class="small text-muted">{{ $l->company }}</div></td>
+                            <td style="min-width: 200px"><a href="{{ route('leads.show', $l) }}" class="row-link">{{ $l->name }}</a><div class="small text-muted">{{ $l->company }}</div></td>
+                            <td class="small text-nowrap">
+                                @if ($l->phone)<div><i class="bi bi-telephone text-muted me-1"></i><a href="tel:{{ preg_replace('/[^0-9+]/', '', $l->phone) }}" class="text-reset">{{ $l->phone }}</a><x-contact-qr type="lead" :id="$l->id" :phone="$l->phone" /></div>@endif
+                                @if ($l->email)<div class="text-muted"><i class="bi bi-envelope me-1"></i><a href="mailto:{{ $l->email }}" class="text-reset">{{ \Illuminate\Support\Str::limit($l->email, 28) }}</a></div>@endif
+                                @if (! $l->phone && ! $l->email)<span class="text-muted">—</span>@endif
+                            </td>
                             <td class="small">{{ $l->source?->label ?? '—' }}</td>
                             <td style="min-width:110px">
                                 <div class="d-flex align-items-center gap-2">
@@ -90,9 +95,9 @@
                                 <span class="badge badge-soft-{{ $l->score_level[1] }} mt-1">{{ $l->score_level[0] }}</span>
                             </td>
                             <td class="text-end small fw-semibold">{{ money($l->estimated_value) }}</td>
-                            <td>{!! badge(App\Models\Lead::statuses(), $l->status) !!}</td>
                             @php($next = $l->next_follow_up ? \Illuminate\Support\Carbon::parse($l->next_follow_up) : null)
-                            <td class="small text-nowrap {{ $next?->isPast() ? 'text-danger fw-semibold' : '' }}">{{ $next ? vn_date($next, true) : '—' }}</td>
+                            <td>{!! badge(App\Models\Lead::statuses(), $l->status) !!}
+                                @if ($next)<div class="small text-nowrap mt-1 {{ $next->isPast() ? 'text-danger fw-semibold' : 'text-muted' }}" title="{{ __('Theo dõi tiếp') }}"><i class="bi bi-alarm me-1"></i>{{ vn_date($next, true) }}</div>@endif</td>
                             <td class="small">{{ $l->assignee?->name ?? '—' }}</td>
                             <td class="table-actions">
                                 @if (! $l->isConverted())
