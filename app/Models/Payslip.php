@@ -17,7 +17,7 @@ class Payslip extends Model
     protected $fillable = ['payroll_period_id', 'user_id', 'allowance', 'bonus', 'other_deduction', 'note'];
 
     protected $casts = [
-        'hourly_rate' => 'decimal:2', 'base_pay' => 'decimal:2', 'ot_hours' => 'decimal:2', 'ot_pay' => 'decimal:2', 'ot_exempt' => 'decimal:2',
+        'hourly_rate' => 'decimal:2', 'base_pay' => 'decimal:2', 'paid_leave_pay' => 'decimal:2', 'ot_hours' => 'decimal:2', 'ot_pay' => 'decimal:2', 'ot_exempt' => 'decimal:2',
         'allowance' => 'decimal:2', 'bonus' => 'decimal:2', 'other_deduction' => 'decimal:2', 'gross_pay' => 'decimal:2',
         'insurance_base' => 'decimal:2', 'social_insurance' => 'decimal:2', 'health_insurance' => 'decimal:2', 'unemployment_insurance' => 'decimal:2',
         'taxable_income' => 'decimal:2', 'personal_income_tax' => 'decimal:2', 'net_pay' => 'decimal:2', 'meta' => 'array',

@@ -89,7 +89,10 @@ class AttendanceController extends Controller
             $days->push(['date' => $d->copy(), 'work' => $this->attendance->isWorkDay($d)]);
         }
 
-        return view('attendance.board', compact('month', 'users', 'records', 'days'));
+        $leaves = \App\Models\LeaveRequest::where('status', 'approved')->where('start_date', '<=', $end->toDateString())->where('end_date', '>=', $start->toDateString())->get()->groupBy('user_id');
+        $holidays = app(\App\Services\LeaveService::class)->holidays($start->toDateString(), $end->toDateString());
+
+        return view('attendance.board', compact('month', 'users', 'records', 'days', 'leaves', 'holidays'));
     }
 
     public function show(Request $request, AttendanceRecord $record)

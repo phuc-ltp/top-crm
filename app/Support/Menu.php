@@ -64,9 +64,11 @@ class Menu
                 ['Chấm công & lương', 'bi-fingerprint', null, null, null, [
                     ['Chấm công của tôi', null, 'attendance.index', 'dashboard.view', 'attendance.index'],
                     ['Tăng ca', null, 'overtime.index', 'dashboard.view', 'overtime.*'],
+                    ['Nghỉ phép', null, 'leave.index', 'dashboard.view', 'leave.*'],
                     ['Bảng công tháng', null, 'attendance.board', 'payroll.view_all', ['attendance.board', 'attendance.records.*']],
                     ['Phiếu lương của tôi', null, 'payslips.mine', 'dashboard.view', ['payslips.mine', 'payslips.show']],
                     ['Bảng lương', null, 'payroll.index', 'payroll.view_all', 'payroll.*'],
+                    ['Ngày lễ & quỹ phép', null, 'holidays.index', 'payroll.manage', 'holidays.*'],
                     ['Cài đặt chấm công', null, 'attendance.settings', 'payroll.manage', 'attendance.settings'],
                 ]],
                 ['Tài sản', 'bi-pc-display', null, null, null, [

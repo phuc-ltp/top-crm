@@ -461,6 +461,18 @@ class DemoDataSeeder extends Seeder
             }
         }
 
+        // Nghỉ phép: đã duyệt (tháng trước), đang chờ (tuần sau)
+        $leaveSvc = app(\App\Services\LeaveService::class);
+        foreach ([[$users['Sales Staff'], now()->subMonthNoOverflow()->startOfMonth()->addWeekdays(10), 'annual', 'full', 'approved'], [$users['Customer Support'], now()->subMonthNoOverflow()->startOfMonth()->addWeekdays(12), 'personal', 'pm', 'approved'],
+            [$users['Marketing Staff'], now()->addWeek()->startOfWeek()->addDay(), 'annual', 'full', 'pending']] as [$u, $d, $type, $part, $status]) {
+            $l = \App\Models\LeaveRequest::create(['user_id' => $u->id, 'type' => $type, 'start_date' => $d->toDateString(), 'end_date' => $d->toDateString(), 'part' => $part,
+                'days' => $leaveSvc->workingDays($d->toDateString(), $d->toDateString(), $part), 'reason' => 'Việc gia đình (demo)', 'status' => $status]);
+            if ($status === 'approved') {
+                $l->forceFill(['approver_id' => $manager->id, 'decided_at' => $d->copy()->subDays(3)])->save();
+                \App\Models\AttendanceRecord::where('user_id', $u->id)->whereDate('work_date', $d)->when($part === 'full', fn ($q) => $q->delete());
+            }
+        }
+
         // Bảng lương tháng trước — đã tính và đã duyệt
         $period = \App\Models\PayrollPeriod::create(['period' => now()->subMonthNoOverflow()->startOfMonth()->toDateString(), 'status' => 'draft']);
         $period->forceFill(['created_by' => $admin->id, 'is_demo' => true])->save();

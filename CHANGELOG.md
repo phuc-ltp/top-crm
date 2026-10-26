@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.1.0] — 23/10/2026
+
+### Thêm mới
+- **Nghỉ phép & ngày lễ:** đơn nghỉ phép (phép năm, việc riêng có lương, nghỉ ốm, không lương; cả ngày hoặc nửa ngày) tự trừ cuối tuần và ngày lễ, chặn trùng và vượt quỹ phép; quản lý trực tiếp / người quản lý lương duyệt hoặc từ chối có lý do, thông báo hai chiều. Quỹ phép năm mặc định 12 ngày (chỉnh chung và riêng từng người). Ngày lễ theo tổ chức, thêm nhanh ngày lễ dương lịch cố định. Bảng công hiện **P** (nghỉ phép) / **L** (ngày lễ); bảng lương trả giờ nghỉ phép có lương và ngày lễ theo giờ chuẩn (dòng riêng trên phiếu lương, tính vào bảo hiểm và thuế).
+
 ## [5.0.3] — 21/10/2026
 
 ### Sửa lỗi

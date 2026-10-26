@@ -273,6 +273,13 @@ Trên hóa đơn đã phát hành:
 - Trên trang giấy phép: **Gán** cho người dùng hoặc thiết bị (không vượt số chỗ), **Thu hồi** khi nghỉ việc / đổi máy. **Hiện khóa** chỉ dành cho người quản lý bản quyền và được ghi nhật ký.
 - Hệ thống nhắc người phụ trách trước 30 ngày, 7 ngày và đúng ngày hết hạn; gia hạn bằng **Sửa / gia hạn** → nhập ngày hết hạn mới. Tài sản mượn quá hạn cũng được nhắc mỗi sáng (cần chạy START_CRM.bat để bộ lập lịch hoạt động).
 
+## 16l. Nghỉ phép & ngày lễ
+
+- Menu **Chấm công & lương → Nghỉ phép → Xin nghỉ phép**: chọn loại, từ ngày – đến ngày (hoặc nửa ngày), lý do. Số ngày tự trừ cuối tuần và ngày lễ; phép năm không được vượt quỹ còn lại.
+- Quản lý trực tiếp (hoặc người quản lý lương) duyệt ở tab **Chờ tôi duyệt**; từ chối phải ghi lý do.
+- **Ngày lễ & quỹ phép** (người quản lý lương): thêm ngày lễ của năm (nút thêm nhanh ngày lễ dương lịch; Tết Âm lịch, Giỗ Tổ, ngày liền kề Quốc khánh nhập tay), quỹ phép năm mặc định. Quỹ phép riêng (thâm niên…) chỉnh trong hồ sơ nhân viên.
+- Bảng công hiện **P** / **L**; bảng lương tự trả ngày phép có lương và ngày lễ.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

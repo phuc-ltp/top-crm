@@ -102,6 +102,9 @@ class PayrollService
         $ots = OvertimeRequest::where('user_id', $user->id)->whereBetween('work_date', [$from, $to])->where('status', 'approved')->get(['hours', 'rate']);
 
         $slip->hourly_rate = $this->rates->rateFor($user);
+        $paid = app(LeaveService::class)->paidMinutes($user, $from, $to);
+        $slip->paid_leave_minutes = $paid['leave_minutes'] + $paid['holiday_minutes'];
+        $slip->meta = array_merge($slip->meta ?? [], ['paid_leave_days' => $paid['leave_days'], 'holiday_days' => $paid['holiday_days']]);
         $slip->worked_minutes = (int) $records->sum('worked_minutes');
         $slip->work_days = $records->where('worked_minutes', '>', 0)->count();
         $slip->late_minutes = (int) $records->sum('late_minutes');
@@ -123,11 +126,12 @@ class PayrollService
         $perDependent = self::setting('payroll_dependent_deduction');
 
         $slip->base_pay = Decimal::round(Decimal::div(Decimal::mul((string) $slip->worked_minutes, $slip->hourly_rate), '60'), 0);
+        $slip->paid_leave_pay = Decimal::round(Decimal::div(Decimal::mul((string) (int) $slip->paid_leave_minutes, $slip->hourly_rate), '60'), 0);
         $otNormal = Decimal::mul($slip->ot_hours, $slip->hourly_rate);
         $slip->ot_exempt = Decimal::round(Decimal::clamp(Decimal::sub($slip->ot_pay, $otNormal), '0'), 0);
-        $slip->gross_pay = Decimal::sum([$slip->base_pay, $slip->ot_pay, $slip->allowance, $slip->bonus]);
+        $slip->gross_pay = Decimal::sum([$slip->base_pay, $slip->paid_leave_pay, $slip->ot_pay, $slip->allowance, $slip->bonus]);
 
-        $slip->insurance_base = $insuranceOn ? Decimal::clamp($slip->base_pay, '0', $cap) : '0';
+        $slip->insurance_base = $insuranceOn ? Decimal::clamp(Decimal::add($slip->base_pay, $slip->paid_leave_pay), '0', $cap) : '0';
         $pct = fn ($rate) => Decimal::round(Decimal::div(Decimal::mul($slip->insurance_base, (string) $rate), '100'), 0);
         $slip->social_insurance = $pct($rates['social']);
         $slip->health_insurance = $pct($rates['health']);
@@ -140,10 +144,10 @@ class PayrollService
             : '0';
         $slip->personal_income_tax = $pitOn ? self::progressiveTax($slip->taxable_income) : '0';
         $slip->net_pay = Decimal::sub(Decimal::sub(Decimal::sub($slip->gross_pay, $insurance), $slip->personal_income_tax), $slip->other_deduction);
-        $slip->meta = [
+        $slip->meta = array_merge($slip->meta ?? [], [
             'insurance_enabled' => $insuranceOn, 'pit_enabled' => $pitOn, 'insurance_rates' => $rates, 'insurance_cap' => $cap,
             'personal_deduction' => $personal, 'dependent_deduction' => $perDependent, 'family_deduction' => $family,
-        ];
+        ]);
 
         return $slip;
     }
@@ -155,6 +159,8 @@ class PayrollService
         $r = $m['insurance_rates'] ?? config('crm.payroll.insurance');
         $lines = [
             [__('Lương giờ làm'), $s->base_pay, __(':h giờ × :r', ['h' => $s->worked_hours, 'r' => money($s->hourly_rate)]), 'income'],
+            ...((float) $s->paid_leave_pay ? [[__('Nghỉ phép / lễ có lương'), $s->paid_leave_pay, __(':h giờ (phép :p ngày, lễ :l ngày)', ['h' => round($s->paid_leave_minutes / 60, 2),
+                'p' => $m['paid_leave_days'] ?? 0, 'l' => $m['holiday_days'] ?? 0]), 'income']] : []),
             [__('Tăng ca'), $s->ot_pay, __(':h giờ (đơn giá đã duyệt)', ['h' => (float) $s->ot_hours]), 'income'],
             [__('Phụ cấp'), $s->allowance, null, 'income'],
             [__('Thưởng'), $s->bonus, null, 'income'],
