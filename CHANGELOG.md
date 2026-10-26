@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.6.1] — 26/10/2026
+
+### Cải thiện
+- Danh sách Leads có cột **Liên lạc** (số điện thoại bấm để gọi + biểu tượng mã QR, email bấm để soạn thư) như mẫu; ngày theo dõi tiếp hiển thị gọn dưới giai đoạn.
+
 ## [5.6.0] — 26/10/2026
 
 ### Cải thiện
