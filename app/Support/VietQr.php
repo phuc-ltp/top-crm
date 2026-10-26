@@ -51,6 +51,25 @@ final class VietQr
         return strtoupper(str_pad(dechex($crc), 4, '0', STR_PAD_LEFT));
     }
 
+    /**
+     * Dữ liệu thanh toán QR của một hóa đơn (chỉ khi đã chọn ngân hàng, tiền VND, hóa đơn đã phát hành và còn nợ).
+     * @return array{image: string, amount: int, memo: string, bank: string, account: string, holder: string}|null
+     */
+    public static function forInvoice(\App\Models\Invoice $doc, int $moduleSize = 8): ?array
+    {
+        $s = \App\Models\Setting::allCached();
+        if (empty($s['bank_bin']) || empty($s['bank_account_number']) || ($s['currency'] ?? 'VND') !== 'VND' || $doc->status !== 'issued' || (float) $doc->balance <= 0) {
+            return null;
+        }
+        $amount = (int) round((float) $doc->balance);
+
+        return [
+            'image' => QrImage::dataUri(self::payload($s['bank_bin'], $s['bank_account_number'], $amount, $doc->number), $moduleSize),
+            'amount' => $amount, 'memo' => self::memo($doc->number), 'bank' => $s['bank_name'] ?: (self::bankName($s['bank_bin']) ?? ''),
+            'account' => $s['bank_account_number'], 'holder' => (string) ($s['bank_account_name'] ?? ''),
+        ];
+    }
+
     public static function bankName(?string $bin): ?string
     {
         return $bin ? (config('vietqr.banks')[$bin] ?? null) : null;

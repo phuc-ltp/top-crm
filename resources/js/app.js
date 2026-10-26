@@ -1,6 +1,8 @@
 import * as bootstrap from 'bootstrap';
 import Chart from 'chart.js/auto';
 import Sortable from 'sortablejs';
+import '../css/motion.css';
+import './motion';
 
 window.bootstrap = bootstrap;
 window.Chart = Chart;

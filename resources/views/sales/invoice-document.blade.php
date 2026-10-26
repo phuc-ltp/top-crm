@@ -81,8 +81,7 @@
 
         <div class="row g-4 mt-1">
             <div class="col-md-6 order-2 order-md-1">
-                @php($vietQr = ($s['bank_bin'] ?? null) && ($s['bank_account_number'] ?? null) && ($s['currency'] ?? 'VND') === 'VND' && $doc->status === 'issued' && (float) $doc->balance > 0
-                    ? App\Support\QrImage::dataUri(App\Support\VietQr::payload($s['bank_bin'], $s['bank_account_number'], (int) round((float) $doc->balance), $doc->number), 5) : null)
+                @php($payQr ??= App\Support\VietQr::forInvoice($doc))
                 @if (($s['bank_account_number'] ?? null) && $doc->status === 'issued' && (float) $doc->balance > 0)
                     <div class="invoice-bank d-flex gap-3 align-items-start">
                         <div class="flex-grow-1">
@@ -92,7 +91,9 @@
                         <div class="small">{{ __('Chủ tài khoản') }}: <strong>{{ $s['bank_account_name'] }}</strong></div>
                         <div class="small">{{ __('Nội dung') }}: <strong>{{ $doc->number }}</strong></div>
                         </div>
-                        @if ($vietQr)<div class="text-center"><img src="{{ $vietQr }}" alt="{{ __('Mã VietQR thanh toán') }}" width="130" height="130" class="bg-white p-1 rounded border"><div class="small text-muted mt-1">{{ __('Quét bằng app ngân hàng') }}</div></div>@endif
+                        @if ($payQr)<div class="text-center"><button type="button" class="btn p-0 border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#payQrModal" aria-label="{{ __('Thanh toán bằng QR') }}">
+                            <img src="{{ $payQr['image'] }}" alt="{{ __('Mã VietQR thanh toán') }}" width="130" height="130" class="bg-white p-1 rounded border pay-qr-thumb"></button>
+                            <div class="small text-muted mt-1"><i class="bi bi-zoom-in me-1"></i>{{ __('Bấm để phóng to') }}</div></div>@endif
                     </div>
                 @endif
                 @if ($doc->notes)<div class="small mt-3" style="white-space: pre-line"><span class="text-muted">{{ __('Ghi chú:') }}</span> {{ $doc->notes }}</div>@endif
