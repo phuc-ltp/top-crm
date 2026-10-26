@@ -2,6 +2,12 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.5.0] — 26/10/2026
+
+### Thêm mới
+- **Mã QR liên hệ:** biểu tượng QR cạnh số điện thoại (danh sách & chi tiết lead, khách hàng, người liên hệ) mở cửa sổ có mã **Gọi điện** (tel:) hoặc **Lưu danh bạ** (vCard: tên, công ty, số, email), nút Gọi và Sao chép số. Mã tạo trên máy chủ, chỉ người được xem bản ghi mới lấy được.
+- **VietQR chuyển khoản trên hóa đơn:** chọn ngân hàng nhận tiền trong Cài đặt → hóa đơn chưa thanh toán (web + PDF) có mã VietQR (chuẩn NAPAS 247 / EMVCo, tạo cục bộ) chứa tài khoản, **số tiền còn phải thu** và nội dung là số hóa đơn — khách quét bằng app ngân hàng, tiền vào thẳng tài khoản công ty.
+
 ## [5.4.0] — 26/10/2026
 
 ### Thêm mới

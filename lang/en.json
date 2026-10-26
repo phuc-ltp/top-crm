@@ -3109,5 +3109,21 @@
     "Chưa đến ngày hiệu lực": "Not yet effective",
     "Hợp đồng sắp hết hạn": "Contract expiring",
     "Phần mềm quản lý khách hàng, bán hàng, nhân sự và tài sản.": "Customer, sales, HR and asset management software.",
-    "Cài ứng dụng lên máy": "Install app on this device"
+    "Cài ứng dụng lên máy": "Install app on this device",
+    "Mã QR liên hệ": "Contact QR code",
+    "Quét mã QR để gọi hoặc lưu số điện thoại vào danh bạ": "Scan the QR code to call or save the number to contacts",
+    "Loại mã QR": "QR code type",
+    "Lưu danh bạ": "Save contact",
+    "Mở camera trên điện thoại và quét mã QR để gọi số này": "Open your phone camera and scan the QR code to call this number",
+    "Quét mã để lưu tên, công ty, số điện thoại và email vào danh bạ": "Scan to save name, company, phone and email to contacts",
+    "Không lấy được mã QR. Vui lòng thử lại.": "Could not load the QR code. Please try again.",
+    "Gọi": "Call",
+    "Sao chép số": "Copy number",
+    "Ngân hàng nhận tiền (mã VietQR)": "Receiving bank (VietQR code)",
+    "— Không dùng mã QR —": "— No QR code —",
+    "Chọn để hóa đơn có mã VietQR: khách quét bằng app ngân hàng, tiền vào thẳng tài khoản này.": "Select to add a VietQR code to invoices: customers scan with their banking app and pay straight into this account.",
+    "Tên ngân hàng (hiển thị)": "Bank name (displayed)",
+    "VD: Vietcombank — CN Hà Nội": "E.g. Vietcombank — Hanoi branch",
+    "Mã VietQR thanh toán": "VietQR payment code",
+    "Quét bằng app ngân hàng": "Scan with your banking app"
 }

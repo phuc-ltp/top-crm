@@ -234,6 +234,7 @@
 </div>
 
 @include('partials.flash')
+@include('partials.contact-qr-modal')
 @stack('scripts')
 </body>
 </html>

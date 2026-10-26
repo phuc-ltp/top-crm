@@ -35,7 +35,7 @@
                         <dt>{{ __('Marketing') }}</dt><dd>@if ($lead->marketing_consent)<span class="badge badge-soft-success">{{ __('Đã đồng ý') }}</span><div class="small-xs text-muted">{{ $lead->marketing_consent_source }}</div>@else<span class="badge badge-soft-secondary">{{ __('Chưa đồng ý') }}</span>@endif</dd>
                         <dt>{{ __('Công ty') }}</dt><dd>{{ $lead->company ?? '—' }}</dd>
                         <dt>Email</dt><dd>{{ $lead->email ?? '—' }}</dd>
-                        <dt>{{ __('Điện thoại') }}</dt><dd>{{ $lead->phone ?? '—' }}</dd>
+                        <dt>{{ __('Điện thoại') }}</dt><dd>{{ $lead->phone ?? '—' }}<x-contact-qr type="lead" :id="$lead->id" :phone="$lead->phone" /></dd>
                         <dt>{{ __('Nguồn') }}</dt><dd>{{ $lead->source?->label ?? "—" }}</dd>
                         <dt>{{ __('Giá trị ước tính') }}</dt><dd>{{ money($lead->estimated_value) }}</dd>
                         <dt>{{ __('Chiến dịch') }}</dt><dd>@forelse ($lead->campaigns as $c)<a href="{{ route('campaigns.show', $c) }}" class="d-block">{{ $c->name }}</a>@empty — @endforelse</dd>

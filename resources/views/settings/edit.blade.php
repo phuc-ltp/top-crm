@@ -16,7 +16,10 @@
                     <x-input name="company_address" :label="__('Địa chỉ')" :value="$s['company_address']" maxlength="300" col="col-md-8 mb-3" />
                     <x-input name="company_tax_code" :label="__('Mã số thuế công ty')" :value="$s['company_tax_code'] ?? ''" maxlength="50" col="col-md-4 mb-3" />
                     <div class="col-12"><div class="small fw-semibold mb-2">{{ __('Thông tin trên chứng từ (hóa đơn / PDF)') }}</div></div>
-                    <x-input name="bank_name" :label="__('Ngân hàng')" :value="$s['bank_name'] ?? ''" maxlength="150" col="col-md-4 mb-3" />
+                    <x-select name="bank_bin" :label="__('Ngân hàng nhận tiền (mã VietQR)')" :options="config('vietqr.banks')" :value="$s['bank_bin'] ?? ''" :translate="false" :placeholder="__('— Không dùng mã QR —')" col="col-md-4 mb-3"
+                              :help="__('Chọn để hóa đơn có mã VietQR: khách quét bằng app ngân hàng, tiền vào thẳng tài khoản này.')" />
+                    <x-input name="bank_name" :label="__('Tên ngân hàng (hiển thị)')" :value="$s['bank_name'] ?? ''" maxlength="150" col="col-md-4 mb-3" :help="__('VD: Vietcombank — CN Hà Nội')" />
+                    <div class="col-md-4"></div>
                     <x-input name="bank_account_number" :label="__('Số tài khoản')" :value="$s['bank_account_number'] ?? ''" maxlength="50" col="col-md-4 mb-3" />
                     <x-input name="bank_account_name" :label="__('Chủ tài khoản')" :value="$s['bank_account_name'] ?? ''" maxlength="150" col="col-md-4 mb-3" />
                     <x-textarea name="invoice_terms" :label="__('Điều khoản thanh toán in trên hóa đơn')" :value="$s['invoice_terms'] ?? ''" rows="2" maxlength="1000" col="col-12 mb-0" />

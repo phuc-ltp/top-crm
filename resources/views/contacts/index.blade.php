@@ -31,7 +31,7 @@
                         <tr>
                             <td><a href="{{ route('contacts.show', $c) }}" class="row-link">{{ $c->full_name }}</a><div class="small text-muted">{{ $c->company }}</div></td>
                             <td class="small">{{ $c->position ?? '—' }}</td>
-                            <td class="small">@if ($c->phone)<div>{{ $c->phone }}</div>@endif<div class="text-muted">{{ $c->email }}</div></td>
+                            <td class="small">@if ($c->phone)<div>{{ $c->phone }}<x-contact-qr type="contact" :id="$c->id" :phone="$c->phone" /></div>@endif<div class="text-muted">{{ $c->email }}</div></td>
                             <td class="small">@if ($c->customer)<a href="{{ route('customers.show', $c->customer) }}">{{ $c->customer->name }}</a>@else — @endif</td>
                             <td class="small text-muted">{{ vn_date($c->created_at) }}</td>
                             <td class="table-actions">

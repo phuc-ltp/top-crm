@@ -304,6 +304,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/overtime/{overtime}/approve', [\App\Http\Controllers\OvertimeController::class, 'approve'])->name('overtime.approve');
     Route::post('/overtime/{overtime}/reject', [\App\Http\Controllers\OvertimeController::class, 'reject'])->name('overtime.reject');
     Route::post('/overtime/{overtime}/cancel', [\App\Http\Controllers\OvertimeController::class, 'cancel'])->name('overtime.cancel');
+    Route::get('/contact-qr/{type}/{id}', [\App\Http\Controllers\ContactQrController::class, 'show'])->name('contact-qr')->whereIn('type', ['lead', 'customer', 'contact'])->whereNumber('id')->middleware('throttle:60,1');
     Route::get('/leave', [\App\Http\Controllers\LeaveController::class, 'index'])->name('leave.index');
     Route::post('/leave', [\App\Http\Controllers\LeaveController::class, 'store'])->name('leave.store')->middleware('throttle:20,1');
     Route::post('/leave/{leave}/approve', [\App\Http\Controllers\LeaveController::class, 'approve'])->name('leave.approve');

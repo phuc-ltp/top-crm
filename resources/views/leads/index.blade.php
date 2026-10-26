@@ -80,7 +80,7 @@
                     @foreach ($leads as $l)
                         <tr>
                             <td class="small text-muted">{{ $l->code }}</td>
-                            <td><a href="{{ route('leads.show', $l) }}" class="row-link">{{ $l->name }}</a><div class="small text-muted">{{ $l->company }}</div></td>
+                            <td><a href="{{ route('leads.show', $l) }}" class="row-link">{{ $l->name }}</a><x-contact-qr type="lead" :id="$l->id" :phone="$l->phone" /><div class="small text-muted">{{ $l->company }}</div></td>
                             <td class="small">{{ $l->source?->label ?? '—' }}</td>
                             <td style="min-width:110px">
                                 <div class="d-flex align-items-center gap-2">

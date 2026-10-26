@@ -32,6 +32,7 @@ class SettingController extends Controller
             'company_address' => ['nullable', 'string', 'max:300'],
             'company_tax_code' => ['nullable', 'string', 'max:50', 'regex:/^[0-9A-Za-z\-]+$/'],
             'bank_name' => ['nullable', 'string', 'max:150'],
+            'bank_bin' => ['nullable', 'in:'.implode(',', array_keys(config('vietqr.banks')))],
             'bank_account_number' => ['nullable', 'string', 'max:50', 'regex:/^[0-9A-Za-z\- ]+$/'],
             'bank_account_name' => ['nullable', 'string', 'max:150'],
             'invoice_terms' => ['nullable', 'string', 'max:1000'],
