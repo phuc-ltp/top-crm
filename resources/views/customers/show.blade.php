@@ -102,6 +102,10 @@
                 <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-activity" type="button">{{ __('Hoạt động') }}</button></li>
                 @can('opportunities.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-deals" type="button">{{ __('Cơ hội (:count)', ['count' => $customer->opportunities->count()]) }}</button></li>@endcan
                 @can('invoices.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-invoices" type="button">{{ __('Hóa đơn (:count)', ['count' => $customer->invoices->count()]) }}</button></li>@endcan
+                @can('contracts.view')
+                    @php($customerContracts = App\Models\Contract::visibleTo(auth()->user())->where('customer_id', $customer->id)->latest()->get())
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-contracts" type="button">{{ __('Hợp đồng (:count)', ['count' => $customerContracts->count()]) }}</button></li>
+                @endcan
                 @can('tickets.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tickets" type="button">{{ __('Hỗ trợ (:count)', ['count' => $customer->tickets->count()]) }}</button></li>@endcan
                 @can('tasks.view')<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tasks" type="button">{{ __('Công việc (:count)', ['count' => $customer->tasks->count()]) }}</button></li>@endcan
             </ul>
@@ -134,6 +138,22 @@
                         @endforelse
                         </tbody></table></div></div>
                 </div>
+                @can('contracts.view')
+                <div class="tab-pane fade" id="tab-contracts">
+                    <div class="card">
+                        @can('create', App\Models\Contract::class)<div class="card-body border-bottom py-2 text-end"><a href="{{ route('contracts.create', ['customer_id' => $customer->id]) }}" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>{{ __('Thêm hợp đồng') }}</a></div>@endcan
+                        <div class="table-responsive"><table class="table table-hover mb-0">
+                        <thead><tr><th>{{ __('Mã') }}</th><th>{{ __('Hợp đồng') }}</th><th class="text-end">{{ __('Giá trị') }}</th><th>{{ __('Hết hạn') }}</th><th>{{ __('Tình trạng') }}</th></tr></thead>
+                        <tbody>
+                        @forelse ($customerContracts as $ct)
+                            <tr><td><a href="{{ route('contracts.show', $ct) }}" class="row-link">{{ $ct->code }}</a></td><td>{{ $ct->title }}</td><td class="text-end">{{ money($ct->value) }}</td>
+                                <td>{{ $ct->end_date ? vn_date($ct->end_date) : __('Không thời hạn') }}</td><td>{!! badge(App\Models\Contract::STATES, $ct->state) !!}</td></tr>
+                        @empty
+                            <tr><td colspan="5"><x-empty-state icon="bi-file-earmark-text" :title="__('Chưa có hợp đồng')" /></td></tr>
+                        @endforelse
+                        </tbody></table></div></div>
+                </div>
+                @endcan
                 <div class="tab-pane fade" id="tab-tickets">
                     <div class="card"><div class="table-responsive"><table class="table table-hover">
                         <thead><tr><th>{{ __('Mã') }}</th><th>{{ __('Chủ đề') }}</th><th>{{ __('Trạng thái') }}</th><th>{{ __('Ngày tạo') }}</th></tr></thead>

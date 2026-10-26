@@ -42,6 +42,7 @@ class TrashController extends Controller
             'suppliers' => ['class' => \App\Models\Supplier::class, 'label' => 'Nhà cung cấp', 'icon' => 'bi-truck', 'module' => 'suppliers', 'show' => 'suppliers.show'],
             'projects' => ['class' => \App\Models\Project::class, 'label' => 'Dự án', 'icon' => 'bi-kanban', 'module' => 'projects', 'show' => 'projects.show'],
             'assets' => ['class' => \App\Models\Asset::class, 'label' => 'Tài sản', 'icon' => 'bi-pc-display', 'module' => 'assets', 'permission' => 'assets.manage', 'show' => 'assets.show'],
+            'contracts' => ['class' => \App\Models\Contract::class, 'label' => 'Hợp đồng', 'icon' => 'bi-file-earmark-text', 'module' => 'contracts', 'show' => 'contracts.show'],
             'licenses' => ['class' => \App\Models\SoftwareLicense::class, 'label' => 'Bản quyền phần mềm', 'icon' => 'bi-key', 'module' => 'licenses', 'permission' => 'licenses.manage', 'show' => 'licenses.show'],
             'documents' => ['class' => \App\Models\Document::class, 'label' => 'Tài liệu', 'icon' => 'bi-folder2-open', 'module' => 'documents', 'permission' => 'documents.manage', 'show' => 'documents.show'],
             'tasks' => ['class' => Task::class, 'label' => 'Công việc', 'icon' => 'bi-check2-square', 'module' => 'tasks', 'show' => 'tasks.show'],
