@@ -23,6 +23,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    @include('partials.pwa-head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @php($brandColor = strtoupper($crmSettings['brand_color'] ?? '#D9823B'))
     @if (! in_array($brandColor, ['#D9823B', '#FF6B00'], true) && preg_match('/^#[0-9A-F]{6}$/', $brandColor))
@@ -115,6 +116,7 @@
                 <li><a class="dropdown-item" href="{{ route('profile.edit') }}#password"><i class="bi bi-key me-2"></i>{{ __('Đổi mật khẩu') }}</a></li>
                 <li><a class="dropdown-item" href="{{ route('profile.security') }}"><i class="bi bi-shield-lock me-2"></i>{{ __('Bảo mật tài khoản') }}</a></li>
                 <li><a class="dropdown-item" href="{{ route('pages.support') }}"><i class="bi bi-question-circle me-2"></i>{{ __('Hướng dẫn & hỗ trợ') }}</a></li>
+                <li class="d-none" data-pwa-install><button class="dropdown-item" type="button"><i class="bi bi-phone me-2"></i>{{ __('Cài ứng dụng lên máy') }}</button></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>{{ __('Đăng xuất') }}</button></form></li>
             </ul>
@@ -196,6 +198,7 @@
                     <li><a class="dropdown-item" href="{{ route('profile.security') }}"><i class="bi bi-shield-lock me-2"></i>{{ __('Bảo mật tài khoản') }}</a></li>
                     <li><a class="dropdown-item" href="{{ route('profile.sessions') }}"><i class="bi bi-laptop me-2"></i>{{ __('Phiên đăng nhập') }}</a></li>
                     @can('api.use')<li><a class="dropdown-item" href="{{ route('api-tokens.index') }}"><i class="bi bi-key me-2"></i>{{ __('Khóa API') }}</a></li>@endcan
+                    <li class="d-none" data-pwa-install><button class="dropdown-item" type="button"><i class="bi bi-phone me-2"></i>{{ __('Cài ứng dụng lên máy') }}</button></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><form method="POST" action="{{ route('logout') }}">@csrf<button class="dropdown-item text-danger" type="submit"><i class="bi bi-box-arrow-right me-2"></i>{{ __('Đăng xuất') }}</button></form></li>
                 </ul>

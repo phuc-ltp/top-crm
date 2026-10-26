@@ -292,6 +292,13 @@ Trên hóa đơn đã phát hành:
 - Trang hợp đồng: **Tải lên bản hợp đồng** (PDF / ảnh scan), **Gia hạn** (tạo bản nháp nối tiếp cùng thời lượng), **Chấm dứt** (ghi ngày và lý do).
 - Người phụ trách được nhắc trước 30 ngày, 7 ngày và đúng ngày hết hạn.
 
+## 16o. Cài CRM lên điện thoại như ứng dụng
+
+- **Android (Chrome):** mở CRM → menu tài khoản → **Cài ứng dụng lên máy** (hoặc menu ⋮ của Chrome → *Cài đặt ứng dụng*). Biểu tượng TOP xuất hiện trên màn hình chính.
+- **iPhone (Safari):** mở CRM → nút Chia sẻ → **Thêm vào Màn hình chính**.
+- **Máy tính (Chrome / Edge):** biểu tượng cài đặt trên thanh địa chỉ, hoặc menu tài khoản → Cài ứng dụng lên máy.
+- Cần kết nối mạng để dùng; dữ liệu không được lưu trên máy. Trên điện thoại cần hệ thống chạy HTTPS (sau khi đưa lên mạng).
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

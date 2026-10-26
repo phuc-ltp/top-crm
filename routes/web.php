@@ -42,6 +42,7 @@ Route::get('/chinh-sach-bao-mat', [PageController::class, 'show'])->defaults('sl
 Route::get('/ho-tro', [PageController::class, 'show'])->defaults('slug', 'support')->name('pages.support');
 
 // Form thu lead công khai của từng tổ chức (không cần đăng nhập; chống spam: token, honeypot, thời gian điền, giới hạn tần suất)
+Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('pwa.manifest');
 Route::get('/f/{token}', [\App\Http\Controllers\WebLeadFormController::class, 'show'])->name('lead-form.show')->middleware('throttle:60,1');
 Route::post('/f/{token}', [\App\Http\Controllers\WebLeadFormController::class, 'submit'])->name('lead-form.submit')->middleware('throttle:5,1');
 
