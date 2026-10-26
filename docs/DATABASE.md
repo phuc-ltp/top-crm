@@ -171,6 +171,7 @@ erDiagram
 | `leave_requests` | Đơn nghỉ phép: loại (annual / personal / sick / unpaid), từ ngày – đến ngày, buổi (full / am / pm), số ngày làm việc nghỉ, lý do, trạng thái, người duyệt, ghi chú. `employee_profiles.annual_leave_days`: quỹ phép riêng; `payslips.paid_leave_minutes` / `paid_leave_pay`: giờ & tiền nghỉ phép + lễ có lương. |
 | `campaign_expenses` | Khoản chi thực tế của chiến dịch: ngày, hạng mục, số tiền, ghi chú, người ghi. `campaigns.tracking_code`: mã link theo dõi (duy nhất theo tổ chức); `opportunities.campaign_id`: chiến dịch nguồn (tính doanh thu / ROI); `leads.utm_source` / `utm_medium` / `utm_campaign`. |
 | `contracts` | Hợp đồng khách hàng: mã (HDG + id), tên, khách hàng (chặn xóa), người liên hệ, cơ hội, loại, giá trị, ngày ký / hiệu lực / hết hạn, trạng thái (draft / signed / terminated), tự gia hạn, hợp đồng gốc (`renewed_from_id`), mốc nhắc đã gửi, ngày & lý do chấm dứt, điều khoản, phụ trách; xóa mềm. Tệp hợp đồng lưu ở `documents` (`related_type = contract`). |
+| `organization_settings` (khóa `bank_bin`) | Mã BIN ngân hàng nhận tiền cho VietQR (danh sách trong `config/vietqr.php`). |
 | `project_members` | Thành viên dự án (duy nhất theo dự án + người dùng). Thành viên xem được mọi công việc của dự án. |
 | `task_dependencies` | Phụ thuộc "việc `depends_on_id` phải xong trước việc `task_id`"; chặn vòng lặp ở `TaskService`. |
 | `support_tickets`, `ticket_replies` | Hỗ trợ khách hàng. |

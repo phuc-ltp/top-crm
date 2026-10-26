@@ -299,6 +299,12 @@ Trên hóa đơn đã phát hành:
 - **Máy tính (Chrome / Edge):** biểu tượng cài đặt trên thanh địa chỉ, hoặc menu tài khoản → Cài ứng dụng lên máy.
 - Cần kết nối mạng để dùng; dữ liệu không được lưu trên máy. Trên điện thoại cần hệ thống chạy HTTPS (sau khi đưa lên mạng).
 
+## 16p. Mã QR liên hệ & VietQR thanh toán
+
+- Bấm biểu tượng **QR** cạnh số điện thoại (lead, khách hàng, người liên hệ): chọn **Gọi điện** (quét là gọi) hoặc **Lưu danh bạ** (quét để lưu tên, công ty, số, email); hoặc bấm **Gọi** / **Sao chép số**.
+- **Cài đặt → Thông tin công ty → Ngân hàng nhận tiền (mã VietQR)**: chọn ngân hàng, nhập số tài khoản và chủ tài khoản. Hóa đơn chưa thanh toán sẽ có mã VietQR; khách quét bằng app ngân hàng → hiện sẵn người nhận, số tiền còn phải thu, nội dung là số hóa đơn. Hóa đơn trả đủ thì mã tự ẩn.
+- Lần đầu: quét thử bằng app ngân hàng của chính bạn để thấy đúng tên chủ tài khoản (không cần chuyển tiền). Sau khi nhận tiền, ghi nhận thanh toán trên hóa đơn như thường.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.
