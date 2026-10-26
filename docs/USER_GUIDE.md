@@ -280,6 +280,12 @@ Trên hóa đơn đã phát hành:
 - **Ngày lễ & quỹ phép** (người quản lý lương): thêm ngày lễ của năm (nút thêm nhanh ngày lễ dương lịch; Tết Âm lịch, Giỗ Tổ, ngày liền kề Quốc khánh nhập tay), quỹ phép năm mặc định. Quỹ phép riêng (thâm niên…) chỉnh trong hồ sơ nhân viên.
 - Bảng công hiện **P** / **L**; bảng lương tự trả ngày phép có lương và ngày lễ.
 
+## 16m. Marketing: chi phí, doanh thu, ROI, link theo dõi
+
+- Trang chiến dịch → **Chi phí thực tế**: ghi từng khoản chi (quảng cáo, nội dung, sự kiện…). Thẻ trên cùng hiện chi phí / ngân sách, doanh thu từ cơ hội đã thắng, giá trị đang theo đuổi và **ROI**.
+- Cơ hội được tính cho chiến dịch khi: lead của chiến dịch được chuyển đổi thành cơ hội (tự động), hoặc chọn **Chiến dịch nguồn** trên form cơ hội.
+- **Link theo dõi chiến dịch** (cần bật Form thu lead trong Cài đặt → Lead): dán link vào quảng cáo / bài đăng; người đăng ký qua link được tạo lead và gắn vào chiến dịch kèm nguồn (UTM).
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

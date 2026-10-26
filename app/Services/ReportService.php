@@ -343,21 +343,22 @@ class ReportService
                 ->orWhere(fn ($w) => $w->where('start_date', '<=', $this->from)->where('end_date', '>=', $this->to)))
             ->when($this->userId, fn ($q) => $q->where('owner_id', $this->userId))
             ->when($this->status, fn ($q) => $q->where('status', $this->status))
-            ->withCount(['leads', 'leads as converted_leads_count' => fn ($q) => $q->where('status', 'converted')])
+            ->withCount(['leads', 'leads as converted_leads_count' => fn ($q) => $q->where('status', 'converted')])->withSum('expenses', 'amount')
             ->orderBy('start_date')->get();
+        $perf = $items->mapWithKeys(fn ($c) => [$c->id => $c->performance()]);
 
         return [
-            'definition' => __('Chiến dịch diễn ra trong kỳ. Lead thực tế = số lead gắn với chiến dịch. Chi phí/lead = ngân sách / lead thực tế.'),
+            'definition' => __('Chiến dịch diễn ra trong kỳ. Lead thực tế = số lead gắn với chiến dịch. Chi phí/lead = chi phí thực tế (nếu đã ghi nhận, ngược lại ngân sách) / lead thực tế. Doanh thu = giá trị cơ hội đã thắng gắn chiến dịch; ROI = (doanh thu − chi phí thực tế) / chi phí thực tế.'),
             'statuses' => Campaign::STATUSES,
-            'headings' => [__('Chiến dịch'), __('Loại'), __('Thời gian'), __('Ngân sách'), __('Lead mục tiêu'), __('Lead thực tế'), __('Chuyển đổi'), __('Tỷ lệ'), __('Chi phí/lead')],
-            'money_cols' => [3, 8],
+            'headings' => [__('Chiến dịch'), __('Loại'), __('Thời gian'), __('Ngân sách'), __('Chi phí thực tế'), __('Lead thực tế'), __('Chuyển đổi'), __('Chi phí/lead'), __('Doanh thu'), __('ROI')],
+            'money_cols' => [3, 4, 7, 8],
             'rows' => $items->map(fn ($c) => [$c->name, __(Campaign::TYPES[$c->type] ?? ''), vn_date($c->start_date).' - '.vn_date($c->end_date), (float) $c->budget,
-                $c->target_leads, $c->actual_leads, $c->converted_leads, $c->conversion_rate.'%', $c->cost_per_lead])->all(),
+                $perf[$c->id]['cost'], $c->actual_leads, $c->converted_leads, $c->cost_per_lead, $perf[$c->id]['won'], $perf[$c->id]['roi'] === null ? '—' : $perf[$c->id]['roi'].'%'])->all(),
             'summary' => [
                 [__('Số chiến dịch'), $items->count(), 'bi-megaphone'],
-                [__('Tổng ngân sách'), money($items->sum('budget')), 'bi-wallet2'],
+                [__('Ngân sách / chi phí thực tế'), money($items->sum('budget')).' / '.money($perf->sum('cost')), 'bi-wallet2'],
                 [__('Lead thu được'), $items->sum('leads_count'), 'bi-funnel'],
-                [__('Lead chuyển đổi'), $items->sum('converted_leads_count'), 'bi-arrow-repeat'],
+                [__('Doanh thu từ chiến dịch'), money($perf->sum('won')), 'bi-graph-up-arrow'],
             ],
             'chart' => ['type' => 'bar', 'label' => __('Lead thực tế theo chiến dịch'), 'labels' => $items->pluck('name')->all(), 'values' => $items->pluck('leads_count')->all()],
         ];

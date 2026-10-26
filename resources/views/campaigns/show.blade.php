@@ -12,6 +12,12 @@
         <div class="col-6 col-lg-3"><x-stat-card icon="bi-arrow-repeat" tone="green" :label="__('Tỷ lệ chuyển đổi')" :value="$campaign->conversion_rate.'%'" :sub="__(':count lead đã chuyển đổi', ['count' => $campaign->converted_leads])" /></div>
         <div class="col-6 col-lg-3"><x-stat-card icon="bi-coin" tone="blue" :label="__('Chi phí / lead')" :value="money($campaign->cost_per_lead)" /></div>
     </div>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-receipt" tone="orange" :label="__('Chi phí thực tế')" :value="money($perf['cost'])" :sub="$perf['budget_used'] !== null ? __(':p% ngân sách', ['p' => $perf['budget_used']]) : null" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-graph-up-arrow" tone="green" :label="__('Doanh thu (cơ hội đã thắng)')" :value="money($perf['won'])" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-kanban" tone="purple" :label="__('Đang theo đuổi')" :value="money($perf['open'])" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-percent" :tone="$perf['roi'] !== null && $perf['roi'] < 0 ? 'red' : 'blue'" :label="__('ROI')" :value="$perf['roi'] === null ? '—' : $perf['roi'].'%'" :sub="$perf['roi'] === null ? __('Ghi nhận chi phí để tính ROI') : __('(doanh thu − chi phí) / chi phí')" /></div>
+    </div>
 
     <div class="row g-4">
         <div class="col-lg-4">
@@ -23,6 +29,15 @@
                     <dt>{{ __('Phụ trách') }}</dt><dd>{{ $campaign->owner?->name ?? '—' }}</dd>
                 </dl>
                 @if ($campaign->description)<hr><div class="small" style="white-space: pre-line">{{ $campaign->description }}</div>@endif
+            </div></div>
+            <div class="card mb-4"><div class="card-header">{{ __('Link theo dõi chiến dịch') }}</div><div class="card-body">
+                @if ($trackingUrl)
+                    <div class="input-group input-group-sm mb-2"><input type="text" class="form-control font-monospace" value="{{ $trackingUrl }}" readonly id="trackingUrl" aria-label="{{ __('Link theo dõi chiến dịch') }}">
+                        <button class="btn btn-light" type="button" data-copy="#trackingUrl" title="{{ __('Sao chép') }}" aria-label="{{ __('Sao chép') }}"><i class="bi bi-clipboard"></i></button></div>
+                    <div class="small text-muted">{{ __('Dùng link này trong quảng cáo / bài đăng: lead đăng ký qua link được gắn tự động vào chiến dịch kèm nguồn (UTM).') }}</div>
+                @else
+                    <div class="small text-muted">{{ __('Bật “Form thu lead” trong Cài đặt → Lead để có link theo dõi tự gắn lead vào chiến dịch.') }}</div>
+                @endif
             </div></div>
             <div class="card"><div class="card-header">{{ __('Lead theo trạng thái') }}</div><div class="card-body">
                 @if ($byStatus->isEmpty())<div class="text-muted small">{{ __('Chưa có lead.') }}</div>@else
@@ -37,6 +52,45 @@
             </div></div>
         </div>
         <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header"><span>{{ __('Chi phí thực tế (:n khoản)', ['n' => $expenses->count()]) }}</span></div>
+                @can('update', $campaign)
+                    <form method="POST" action="{{ route('campaigns.expenses.store', $campaign) }}" class="p-3 border-bottom row g-2 align-items-end needs-validation" novalidate>@csrf
+                        <x-input name="spent_on" type="date" :label="__('Ngày chi')" required :value="now()->toDateString()" col="col-6 col-md-3" />
+                        <x-select name="category" :label="__('Hạng mục')" :options="App\Models\CampaignExpense::CATEGORIES" required value="ads" col="col-6 col-md-3" />
+                        <x-input name="amount" type="number" :label="__('Số tiền')" required min="1" step="1000" append="₫" col="col-6 col-md-2" />
+                        <x-input name="note" :label="__('Ghi chú')" maxlength="500" col="col-6 col-md-3" />
+                        <div class="col-12 col-md-1"><button class="btn btn-primary btn-sm w-100" title="{{ __('Ghi nhận khoản chi') }}" aria-label="{{ __('Ghi nhận khoản chi') }}"><i class="bi bi-plus-lg"></i></button></div>
+                    </form>
+                @endcan
+                <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+                    <tbody>
+                    @forelse ($expenses as $x)
+                        <tr><td class="text-nowrap small">{{ vn_date($x->spent_on) }}</td><td>{!! badge(App\Models\CampaignExpense::CATEGORIES, $x->category) !!}</td>
+                            <td class="small">{{ $x->note }}<div class="text-muted">{{ $x->creator?->name }}</div></td><td class="text-end text-nowrap">{{ money($x->amount) }}</td>
+                            <td class="text-end">@can('update', $campaign)<x-delete-button :action="route('campaigns.expenses.destroy', [$campaign, $x])" :message="__('Xóa khoản chi này?')" />@endcan</td></tr>
+                    @empty
+                        <tr><td colspan="5" class="text-center text-muted small py-3">{{ __('Chưa ghi nhận khoản chi nào — chi phí / lead đang tính theo ngân sách.') }}</td></tr>
+                    @endforelse
+                    </tbody>
+                </table></div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header"><span>{{ __('Cơ hội từ chiến dịch (:n)', ['n' => $opportunities->count()]) }}</span></div>
+                <div class="table-responsive"><table class="table table-sm align-middle mb-0">
+                    <tbody>
+                    @forelse ($opportunities as $o)
+                        <tr><td><a href="{{ route('opportunities.show', $o) }}">{{ $o->title }}</a><div class="small text-muted">{{ $o->customer?->name }}</div></td>
+                            <td><span class="badge" style="background: {{ $o->stage?->color ?? '#6B7280' }}">{{ $o->stage?->label }}</span></td>
+                            <td class="text-end text-nowrap">{{ money($o->value) }}</td></tr>
+                    @empty
+                        <tr><td colspan="3" class="text-center text-muted small py-3">{{ __('Chưa có cơ hội nào gắn chiến dịch. Lead của chiến dịch khi chuyển đổi thành cơ hội sẽ tự gắn; hoặc chọn “Chiến dịch nguồn” trên form cơ hội.') }}</td></tr>
+                    @endforelse
+                    </tbody>
+                </table></div>
+            </div>
+
             <div class="card">
                 <div class="card-header"><span>{{ __('Lead của chiến dịch (:count)', ['count' => $leads->total()]) }}</span></div>
                 @can('update', $campaign)
@@ -66,3 +120,14 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('[data-copy]').forEach((btn) => btn.addEventListener('click', async () => {
+    const input = document.querySelector(btn.dataset.copy);
+    if (!input) return;
+    const done = () => { const i = btn.querySelector('i'); i.className = 'bi bi-check2'; setTimeout(() => { i.className = 'bi bi-clipboard'; }, 1500); };
+    try { await navigator.clipboard.writeText(input.value); done(); } catch (e) { input.focus(); input.select(); }   // trình duyệt chặn clipboard (HTTP): bôi đen để tự sao chép
+}));
+</script>
+@endpush

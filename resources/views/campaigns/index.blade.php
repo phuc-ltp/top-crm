@@ -8,7 +8,7 @@
 
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3"><x-stat-card icon="bi-megaphone" :label="__('Đang chạy')" :value="$summary['active']" /></div>
-        <div class="col-6 col-lg-3"><x-stat-card icon="bi-wallet2" tone="blue" :label="__('Tổng ngân sách')" :value="money($summary['budget'])" /></div>
+        <div class="col-6 col-lg-3"><x-stat-card icon="bi-wallet2" tone="blue" :label="__('Ngân sách / chi phí thực tế')" :value="money($summary['budget'])" :sub="__('Đã chi: :a', ['a' => money($summary['cost'])])" /></div>
         <div class="col-6 col-lg-3"><x-stat-card icon="bi-funnel" tone="purple" :label="__('Lead thu được')" :value="$summary['leads']" /></div>
         <div class="col-6 col-lg-3"><x-stat-card icon="bi-arrow-repeat" tone="green" :label="__('Lead chuyển đổi')" :value="$summary['converted']" :sub="$summary['leads'] ? __(':rate% tỷ lệ chuyển đổi', ['rate' => round($summary['converted'] / $summary['leads'] * 100, 1)]) : null" /></div>
     </div>

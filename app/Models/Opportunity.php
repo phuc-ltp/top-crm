@@ -18,7 +18,7 @@ class Opportunity extends Model
     protected static string $codePrefix = 'CH';
 
     protected $fillable = [
-        'code', 'title', 'customer_id', 'contact_id', 'lead_id', 'pipeline_id', 'pipeline_stage_id', 'value', 'probability',
+        'code', 'title', 'customer_id', 'contact_id', 'lead_id', 'campaign_id', 'pipeline_id', 'pipeline_stage_id', 'value', 'probability',
         'expected_close_date', 'closed_at', 'lost_reason', 'lost_reason_id', 'position', 'assigned_to', 'created_by', 'notes', 'is_demo',
     ];
 
@@ -56,6 +56,11 @@ class Opportunity extends Model
     protected $casts = [
         'value' => 'decimal:2', 'expected_close_date' => 'date', 'closed_at' => 'datetime', 'is_demo' => 'boolean',
     ];
+
+    public function campaign()
+    {
+        return $this->belongsTo(Campaign::class)->withTrashed();
+    }
 
     public function stage()
     {

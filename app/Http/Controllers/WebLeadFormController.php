@@ -34,7 +34,7 @@ class WebLeadFormController extends Controller
         return $org;
     }
 
-    public function show(string $token)
+    public function show(Request $request, string $token)
     {
         $org = $this->resolve($token);
 
@@ -44,6 +44,7 @@ class WebLeadFormController extends Controller
             'logo' => app(CurrentOrganization::class)->run($org->id, fn () => Setting::get('company_logo')),
             'stamp' => Crypt::encryptString((string) now()->getTimestamp()),
             'thanks' => Setting::allCached($org->id)['lead_form_thanks'],
+            'tracking' => collect($request->only(['c', 'utm_source', 'utm_medium', 'utm_campaign']))->map(fn ($v) => is_string($v) ? mb_substr($v, 0, 100) : null)->filter()->all(),
         ])->header('X-Robots-Tag', 'noindex');
     }
 
@@ -65,6 +66,10 @@ class WebLeadFormController extends Controller
             'company' => ['nullable', 'string', 'max:255'],
             'message' => ['nullable', 'string', 'max:2000'],
             'consent' => ['nullable', 'boolean'],
+            'c' => ['nullable', 'string', 'max:16', 'regex:/^[a-z0-9]+$/'],
+            'utm_source' => ['nullable', 'string', 'max:100'],
+            'utm_medium' => ['nullable', 'string', 'max:100'],
+            'utm_campaign' => ['nullable', 'string', 'max:100'],
         ], [], ['name' => __('Họ tên'), 'email' => 'Email', 'phone' => __('Số điện thoại'), 'company' => __('Công ty'), 'message' => __('Nội dung')]);
 
         app(CurrentOrganization::class)->run($org->id, function () use ($org, $data, $request, $leads) {
@@ -82,9 +87,14 @@ class WebLeadFormController extends Controller
                     'notes' => trim(__('Gửi từ form website').(! empty($data['message']) ? ":\n".$data['message'] : '')),
                     'marketing_consent' => (bool) ($data['consent'] ?? false),
                     'marketing_consent_source' => ($data['consent'] ?? false) ? __('Form website') : null,
+                    'utm_source' => $data['utm_source'] ?? null, 'utm_medium' => $data['utm_medium'] ?? null, 'utm_campaign' => $data['utm_campaign'] ?? null,
                 ]);
                 $lead->score = $leads->score($lead);
                 $lead->save();
+                // Link theo dõi của chiến dịch (?c=mã): gắn lead vào đúng chiến dịch của tổ chức này
+                if (! empty($data['c']) && ($campaign = \App\Models\Campaign::where('tracking_code', $data['c'])->first())) {
+                    $campaign->leads()->syncWithoutDetaching([$lead->id => ['created_at' => now()]]);
+                }
 
                 return $lead;
             });

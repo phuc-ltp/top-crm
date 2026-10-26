@@ -30,7 +30,7 @@ class Lead extends Model
     protected $fillable = [
         'code', 'name', 'company', 'email', 'phone', 'lead_source_id', 'status', 'score', 'estimated_value',
         'assigned_to', 'created_by', 'converted_customer_id', 'converted_opportunity_id', 'converted_at',
-        'lost_reason_id', 'lost_note', 'marketing_consent', 'marketing_consent_source', 'notes', 'is_demo',
+        'lost_reason_id', 'lost_note', 'marketing_consent', 'marketing_consent_source', 'notes', 'is_demo', 'utm_source', 'utm_medium', 'utm_campaign',
     ];
 
     protected $casts = [

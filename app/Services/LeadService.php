@@ -163,6 +163,7 @@ class LeadService
                     'title' => $options['opportunity_title'] ?? __('Cơ hội từ :name', ['name' => $lead->name]),
                     'customer_id' => $customer->id,
                     'lead_id' => $lead->id,
+                    'campaign_id' => $lead->campaigns()->orderByDesc('campaign_leads.created_at')->value('campaigns.id'),   // quy doanh thu về chiến dịch gần nhất của lead
                     'pipeline_stage_id' => $stage->id,
                     'value' => $options['opportunity_value'] ?? $lead->estimated_value,
                     'probability' => $stage->probability,

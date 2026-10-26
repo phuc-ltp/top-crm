@@ -40,6 +40,7 @@
             <form method="POST" action="{{ route('lead-form.submit', $token) }}" class="needs-validation" novalidate>
                 @csrf
                 <input type="hidden" name="stamp" value="{{ $stamp }}">
+                @foreach ($tracking ?? [] as $k => $v)<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endforeach
                 <div class="lf-hp" aria-hidden="true"><label for="website">Website</label><input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></div>
                 <x-input name="name" :label="__('Họ tên')" required maxlength="255" autocomplete="name" />
                 <div class="row">
