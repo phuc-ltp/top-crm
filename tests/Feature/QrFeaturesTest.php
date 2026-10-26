@@ -57,11 +57,12 @@ class QrFeaturesTest extends TestCase
             'bank_name' => 'Vietcombank', 'bank_account_number' => '0071000123456', 'bank_account_name' => 'CONG TY TOP'];
         $this->put(route('settings.update'), $base + ['bank_bin' => '999999'])->assertSessionHasErrors('bank_bin');
         $this->put(route('settings.update'), $base + ['bank_bin' => '970436'])->assertSessionHasNoErrors();
-        $this->get(route('invoices.show', $inv))->assertSee(__('Mã VietQR thanh toán'))->assertSee('data:image/png;base64', false);
+        $this->get(route('invoices.show', $inv))->assertSee(__('Mã VietQR thanh toán'))->assertSee('data:image/png;base64', false)
+            ->assertSee('id="payQrModal"', false)->assertSee(__('Thanh toán bằng QR'))->assertSee('data-countup="2000000"', false)->assertSee('download="VietQR-', false);
         $this->get(route('invoices.pdf', $inv))->assertOk()->assertHeader('content-type', 'application/pdf');
 
         app(PaymentService::class)->record($inv, ['amount' => 2000000], $admin);
-        $this->get(route('invoices.show', $inv))->assertDontSee(__('Mã VietQR thanh toán'));                // đã thanh toán đủ
+        $this->get(route('invoices.show', $inv))->assertDontSee(__('Mã VietQR thanh toán'))->assertDontSee('id="payQrModal"', false);   // đã thanh toán đủ
     }
 
     public function test_contact_qr_returns_call_and_vcard_codes_with_permission_checks(): void

@@ -3,6 +3,8 @@
 @section('content')
     @php($r = $cfg['route'])
     <x-page-header :title="$cfg['doc'].' '.$doc->number" :breadcrumbs="[$cfg['label'] => route($r.'.index'), $doc->number => null]">
+        @php($payQr = $r === 'invoices' ? App\Support\VietQr::forInvoice($doc) : null)
+        @if ($payQr)<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#payQrModal"><i class="bi bi-qr-code-scan me-1"></i>{{ __('Thanh toán bằng QR') }}</button>@endif
         @include('sales.actions.'.$r)
         <a href="{{ route($r.'.pdf', $doc) }}" class="btn btn-light"><i class="bi bi-file-earmark-pdf me-1"></i>{{ __('Tải PDF') }}</a>
         @if ($editable)
@@ -96,4 +98,5 @@
             </div></div>
         </div>
     </div>
+    @if ($payQr ?? null)@include('sales.pay-qr-modal')@endif
 @endsection

@@ -1,0 +1,103 @@
+/* =====================================================================
+   TOP CRM — Chuyển động (motion)
+   Chỉ dùng transform / opacity (mượt cả máy yếu). Tắt toàn bộ khi người dùng bật
+   "Giảm chuyển động" (prefers-reduced-motion) — xem cuối tệp.
+   ===================================================================== */
+:root {
+    --motion-fast: .16s;
+    --motion-base: .28s;
+    --motion-slow: .5s;
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+    --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* ---------- Vào trang: nội dung trượt lên, thẻ hiện lần lượt ---------- */
+.crm-content.fade-in { animation: page-in var(--motion-slow) var(--ease-out) backwards; }   /* backwards: không để lại transform sau khi chạy (tránh kẹt modal) */
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.crm-content .row > [class*="col"] > .card,
+.crm-content .row > [class*="col"] > .card-hover,
+.crm-content > .card,
+.crm-content > .row > [class*="col"] > a > .card { animation: rise-in var(--motion-slow) var(--ease-out) backwards; }
+.crm-content .row > [class*="col"]:nth-child(1) > * { animation-delay: .04s; }
+.crm-content .row > [class*="col"]:nth-child(2) > * { animation-delay: .09s; }
+.crm-content .row > [class*="col"]:nth-child(3) > * { animation-delay: .14s; }
+.crm-content .row > [class*="col"]:nth-child(4) > * { animation-delay: .19s; }
+.crm-content .row > [class*="col"]:nth-child(n+5) > * { animation-delay: .24s; }
+@keyframes rise-in { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+
+/* ---------- Thẻ, dòng bảng: phản hồi khi rê chuột ---------- */
+.card-hover, .kpi-card { transition: transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out); }
+.card-hover:hover, .kpi-card:hover { transform: translateY(-3px); }
+.table-hover > tbody > tr { transition: background-color var(--motion-fast) ease; }
+.badge { transition: transform var(--motion-fast) var(--ease-out); }
+tr:hover .badge, .card:hover .badge { transform: scale(1.04); }
+
+/* ---------- Nút: nhấn lún + gợn sóng (motion.js thêm .ripple) ---------- */
+.btn { position: relative; overflow: hidden; transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast), transform var(--motion-fast) var(--ease-out); }
+.btn:active:not(:disabled) { transform: scale(.965); }
+.btn .ripple { position: absolute; border-radius: 50%; pointer-events: none; background: currentColor; opacity: .22; transform: scale(0); animation: ripple .55s var(--ease-out) forwards; }
+@keyframes ripple { to { transform: scale(2.6); opacity: 0; } }
+
+/* ---------- Cửa sổ (modal): phóng mượt, nền mờ dần ---------- */
+.modal.fade .modal-dialog { transform: translateY(18px) scale(.94); opacity: 0; transition: transform .38s var(--ease-spring), opacity var(--motion-base) ease; }
+.modal.show .modal-dialog { transform: none; opacity: 1; }
+.modal-backdrop.fade { transition: opacity var(--motion-base) ease; }
+.modal-backdrop.show { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+
+/* ---------- Menu thả xuống: trượt nhẹ ---------- */
+.dropdown-menu.show { animation: drop-in .2s var(--ease-out); transform-origin: top; }
+@keyframes drop-in { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* ---------- Thanh tiến độ: chạy từ 0 (motion.js gắn .is-ready) ---------- */
+.progress-bar { transition: width .9s var(--ease-out); }
+
+/* ---------- Thông báo nổi ---------- */
+@keyframes toast-in { from { opacity: 0; transform: translateX(30px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* ---------- Chuông thông báo khi có tin mới ---------- */
+.topbar-icon .badge { animation: badge-pop .45s var(--ease-spring); }
+@keyframes badge-pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+/* =====================================================================
+   Thanh toán bằng QR (hóa đơn)
+   ===================================================================== */
+.pay-qr-thumb { cursor: zoom-in; transition: transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base); }
+.pay-qr-thumb:hover { transform: scale(1.06) rotate(-1deg); box-shadow: var(--crm-shadow-lg); }
+
+.pay-qr-stage { position: relative; display: inline-block; padding: 18px; }
+.pay-qr-stage img { display: block; width: 240px; height: 240px; background: #fff; border-radius: 12px; padding: 8px;
+                    animation: qr-reveal .7s var(--ease-out) .15s both; }
+@keyframes qr-reveal { from { opacity: 0; transform: scale(.82); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
+
+/* Khung quét 4 góc */
+.pay-qr-stage .corner { position: absolute; width: 34px; height: 34px; border: 4px solid var(--crm-primary); animation: corner-pulse 1.8s ease-in-out infinite; }
+.pay-qr-stage .corner.tl { top: 0; left: 0; border-right: 0; border-bottom: 0; border-radius: 12px 0 0 0; }
+.pay-qr-stage .corner.tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-radius: 0 12px 0 0; }
+.pay-qr-stage .corner.bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 12px; }
+.pay-qr-stage .corner.br { bottom: 0; right: 0; border-left: 0; border-top: 0; border-radius: 0 0 12px 0; }
+@keyframes corner-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.9); opacity: .65; } }
+.pay-qr-stage .corner.tl { transform-origin: top left; } .pay-qr-stage .corner.tr { transform-origin: top right; }
+.pay-qr-stage .corner.bl { transform-origin: bottom left; } .pay-qr-stage .corner.br { transform-origin: bottom right; }
+
+/* Tia quét chạy dọc */
+.pay-qr-stage .scan-line { position: absolute; left: 22px; right: 22px; top: 22px; height: 3px; border-radius: 3px;
+    background: linear-gradient(90deg, transparent, var(--crm-primary), transparent); box-shadow: 0 0 12px var(--crm-primary);
+    animation: scan 2.4s ease-in-out .8s infinite; opacity: 0; }
+@keyframes scan { 0% { transform: translateY(0); opacity: 0; } 10% { opacity: .9; } 50% { transform: translateY(234px); opacity: .9; } 60% { opacity: 0; } 100% { transform: translateY(234px); opacity: 0; } }
+
+.pay-amount { font-size: 2rem; font-weight: 800; letter-spacing: -.02em; color: var(--crm-primary); font-variant-numeric: tabular-nums; }
+.pay-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 10px; background: var(--crm-surface-2);
+           animation: rise-in .45s var(--ease-out) both; }
+.pay-row:nth-child(1) { animation-delay: .35s; } .pay-row:nth-child(2) { animation-delay: .42s; } .pay-row:nth-child(3) { animation-delay: .49s; } .pay-row:nth-child(4) { animation-delay: .56s; }
+.pay-row + .pay-row { margin-top: 8px; }
+.pay-row .btn-copy { flex-shrink: 0; }
+.pay-row .btn-copy.copied { color: var(--crm-success); }
+
+/* =====================================================================
+   Giảm chuyển động: tắt mọi hiệu ứng (trợ năng)
+   ===================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    .pay-qr-stage .scan-line { display: none; }
+}

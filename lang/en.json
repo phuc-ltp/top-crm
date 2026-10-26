@@ -3125,5 +3125,12 @@
     "Tên ngân hàng (hiển thị)": "Bank name (displayed)",
     "VD: Vietcombank — CN Hà Nội": "E.g. Vietcombank — Hanoi branch",
     "Mã VietQR thanh toán": "VietQR payment code",
-    "Quét bằng app ngân hàng": "Scan with your banking app"
+    "Quét bằng app ngân hàng": "Scan with your banking app",
+    "Thanh toán bằng QR": "Pay by QR",
+    "Mở app ngân hàng → Quét QR → kiểm tra thông tin → xác nhận chuyển khoản": "Open your banking app → Scan QR → check the details → confirm the transfer",
+    "Số tiền cần thanh toán": "Amount due",
+    "Sao chép số tài khoản": "Copy account number",
+    "Sao chép nội dung chuyển khoản": "Copy transfer note",
+    "Sao chép số tiền": "Copy amount",
+    "Bấm để phóng to": "Click to enlarge"
 }

@@ -12,7 +12,8 @@
             <input type="radio" class="btn-check" name="qrMode" id="qrModeTel" value="tel" checked><label class="btn btn-outline-primary" for="qrModeTel"><i class="bi bi-telephone me-1"></i>{{ __('Gọi điện') }}</label>
             <input type="radio" class="btn-check" name="qrMode" id="qrModeVcard" value="vcard"><label class="btn btn-outline-primary" for="qrModeVcard"><i class="bi bi-person-vcard me-1"></i>{{ __('Lưu danh bạ') }}</label>
         </div>
-        <div class="d-inline-block p-2 bg-white rounded-3 border mb-3"><img data-qr-img alt="{{ __('Mã QR liên hệ') }}" width="220" height="220"></div>
+        <div class="pay-qr-stage mb-2" data-qr-stage><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+            <img data-qr-img alt="{{ __('Mã QR liên hệ') }}" width="240" height="240"><span class="scan-line" aria-hidden="true"></span></div>
         <div class="rounded-3 bg-body-tertiary py-2 px-3 mb-2 fs-4 fw-bold text-primary"><i class="bi bi-telephone-fill me-2"></i><span data-qr-phone></span></div>
         <div class="small text-muted" data-qr-help="tel">{{ __('Mở camera trên điện thoại và quét mã QR để gọi số này') }}</div>
         <div class="small text-muted d-none" data-qr-help="vcard">{{ __('Quét mã để lưu tên, công ty, số điện thoại và email vào danh bạ') }}</div>
@@ -32,7 +33,9 @@
     const render = () => {
         if (!data) return;
         const mode = modalEl.querySelector('input[name="qrMode"]:checked').value;
-        $('[data-qr-img]').src = mode === 'vcard' ? data.vcard_qr : data.tel_qr;
+        const img = $('[data-qr-img]');
+        img.src = mode === 'vcard' ? data.vcard_qr : data.tel_qr;
+        img.style.animation = 'none'; void img.offsetWidth; img.style.animation = '';   // phát lại hiệu ứng hiện mã khi đổi chế độ
         modalEl.querySelectorAll('[data-qr-help]').forEach((el) => el.classList.toggle('d-none', el.dataset.qrHelp !== mode));
     };
     modalEl.querySelectorAll('input[name="qrMode"]').forEach((r) => r.addEventListener('change', render));

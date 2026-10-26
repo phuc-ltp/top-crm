@@ -2,6 +2,15 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.6.0] — 26/10/2026
+
+### Cải thiện
+- **Thanh toán bằng QR:** nút “Thanh toán bằng QR” trên hóa đơn còn nợ (và bấm vào mã thu nhỏ) mở cửa sổ có hiệu ứng: mã hiện dần, khung quét 4 góc nhấp nháy, tia quét chạy dọc, số tiền đếm tăng dần; sao chép số tài khoản / nội dung / số tiền, tải ảnh QR để gửi khách.
+- **Chuyển động toàn hệ thống:** nội dung trượt vào khi mở trang, thẻ hiện lần lượt, cửa sổ phóng mượt với nền mờ, menu thả xuống trượt nhẹ, nút nhấn lún + gợn sóng, thanh tiến độ chạy từ 0, thẻ nhấc nhẹ khi rê chuột. Tự tắt khi thiết bị bật “Giảm chuyển động”. Cửa sổ QR liên hệ có khung quét 4 góc.
+
+### Sửa lỗi
+- Cửa sổ (modal) nằm trong vùng có hiệu ứng có thể bị kẹt dưới lớp nền mờ — modal nay luôn được đưa ra lớp trên cùng khi mở.
+
 ## [5.5.0] — 26/10/2026
 
 ### Thêm mới
