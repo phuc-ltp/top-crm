@@ -106,6 +106,7 @@ class Menu
                     ['Cấu hình lead', null, 'settings.leads', 'settings.manage', 'settings.leads*'],
                     ['Cấu hình pipeline', null, 'settings.pipelines', 'settings.manage', 'settings.pipelines*'],
                     ['Đăng nhập & thương hiệu', null, 'settings.branding', 'platform', 'settings.branding'],
+                    ['Email gửi đi', null, 'settings.mail', 'platform', 'settings.mail'],
                     ['Nhật ký hoạt động', null, 'activity-logs.index', 'activity_logs.view', 'activity-logs.*'],
                     ['Thùng rác', null, 'trash.index', 'trash', 'trash.*'],
                     ['Design System', null, 'design-system', 'settings.manage', 'design-system'],
