@@ -377,6 +377,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/settings/branding', [SettingController::class, 'branding'])->name('settings.branding');
+    Route::get('/settings/mail', [\App\Http\Controllers\MailSettingsController::class, 'edit'])->name('settings.mail');
+    Route::put('/settings/mail', [\App\Http\Controllers\MailSettingsController::class, 'update'])->name('settings.mail.update');
+    Route::post('/settings/mail/test', [\App\Http\Controllers\MailSettingsController::class, 'test'])->name('settings.mail.test')->middleware('throttle:5,1');
     Route::get('/settings/custom-fields', [\App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');
     // Cấu hình pipeline & giai đoạn cơ hội
     Route::get('/settings/pipelines', [\App\Http\Controllers\PipelineSettingsController::class, 'index'])->name('settings.pipelines');

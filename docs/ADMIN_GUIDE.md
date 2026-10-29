@@ -118,6 +118,7 @@ Chạy trong Command Prompt tại `C:\phuc-crm`:
 | `php artisan crm:purge-demo` | Xóa dữ liệu demo |
 | `php artisan crm:task-reminders` | Chạy nhắc việc ngay (bình thường tự chạy mỗi 15 phút khi CRM đang mở) |
 | `php artisan crm:seed-demo 1` | Nạp dữ liệu DEMO vào tổ chức số 1 để thử nghiệm (không chạy ở production; xóa lại bằng `crm:purge-demo`) |
+| *(giao diện)* Hệ thống → Email gửi đi | Nhập SMTP (Gmail cần mật khẩu ứng dụng), gửi email thử — ghi đè MAIL_* trong .env khi bật |
 | `php artisan crm:contract-reminders` | Nhắc hợp đồng sắp / đã hết hạn (tự chạy 08:05 mỗi ngày) |
 | `php artisan crm:asset-reminders` | Nhắc giấy phép phần mềm sắp / đã hết hạn và tài sản mượn quá hạn (tự chạy 08:00 mỗi ngày) |
 | `php artisan crm:prune-attendance-selfies` | Xóa ảnh selfie chấm công quá hạn lưu (tự chạy 03:00 mỗi ngày; giờ công giữ nguyên) |

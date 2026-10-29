@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.7.0] — 29/10/2026
+
+### Thêm mới
+- **Cài đặt email ngay trên giao diện** (Hệ thống → Email gửi đi, chỉ quản trị nền tảng): chọn Gmail / Zoho / Outlook / SMTP khác (tự điền máy chủ, cổng, mã hóa + hướng dẫn), mật khẩu lưu mã hóa và không hiển thị lại, nút **Gửi email thử** báo lỗi dễ hiểu (sai mật khẩu, không kết nối, lỗi SSL/TLS). Cấu hình áp dụng ngay cho quên mật khẩu, thông báo, nhắc việc… mà không cần sửa file .env.
+
 ## [5.6.1] — 26/10/2026
 
 ### Cải thiện
