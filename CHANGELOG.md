@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.8.1] — 03/11/2026
+
+### Cải thiện
+- Chấm công → Cài đặt → Thêm/Sửa văn phòng: nút **Lấy vị trí hiện tại** điền sẵn vĩ độ/kinh độ từ GPS của điện thoại (đứng tại văn phòng rồi bấm; cần HTTPS và cho phép định vị).
+
 ## [5.8.0] — 03/11/2026
 
 ### Thêm mới
