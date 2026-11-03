@@ -99,6 +99,43 @@
                 </div>
             </div>
 
+            {{-- Mã xác thực qua email --}}
+            @php($otpRequired = App\Models\Setting::get('require_email_otp', '0') === '1')
+            <div class="card mb-4" id="email-otp">
+                <div class="card-header"><span><i class="bi bi-envelope-check me-2 text-orange"></i>{{ __('Mã xác thực qua email') }}</span>
+                    @if ($user->hasTwoFactorEnabled())<span class="badge badge-soft-secondary">{{ __('Đang dùng ứng dụng xác thực') }}</span>
+                    @elseif ($user->usesEmailOtp())<span class="badge badge-soft-success">{{ $otpRequired && ! $user->email_otp_enabled ? __('Quản trị bắt buộc') : __('Đang bật') }}</span>
+                    @else<span class="badge badge-soft-secondary">{{ __('Chưa bật') }}</span>@endif
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">{{ __('Sau khi nhập mật khẩu, hệ thống gửi mã 6 số tới :email — không cần cài ứng dụng. Phù hợp nếu bạn không muốn dùng ứng dụng xác thực.', ['email' => App\Services\Auth\EmailOtp::mask($user->email)]) }}</p>
+                    @if ($user->hasTwoFactorEnabled())
+                        <div class="small">{{ __('Bạn đang dùng ứng dụng xác thực (an toàn hơn) — mã qua email không áp dụng.') }}</div>
+                    @elseif ($user->usesEmailOtp())
+                        @unless ($otpRequired)
+                            <form method="POST" action="{{ route('email-otp.disable') }}" class="needs-validation row g-2 align-items-start" novalidate>@csrf @method('DELETE')
+                                <div class="col-sm-6"><x-input name="password" id="otp_off_password" type="password" :label="__('Mật khẩu hiện tại')" required col="mb-0" autocomplete="current-password" /></div>
+                                <div class="col-sm-6 pt-sm-4 mt-sm-2"><button class="btn btn-outline-danger w-100">{{ __('Tắt mã qua email') }}</button></div>
+                            </form>
+                        @else
+                            <div class="small">{{ __('Quản trị đang bắt buộc mã xác thực qua email cho mọi người.') }}</div>
+                        @endunless
+                    @elseif (session('email_otp_sent') || $errors->has('email_otp_code'))
+                        <form method="POST" action="{{ route('email-otp.confirm') }}" class="needs-validation row g-2 align-items-start" novalidate>@csrf
+                            <div class="col-sm-6"><label class="form-label" for="email_otp_code">{{ __('Mã 6 số trong email') }}</label>
+                                <input name="code" id="email_otp_code" class="form-control @error('email_otp_code') is-invalid @enderror" inputmode="numeric" maxlength="7" required autocomplete="one-time-code">
+                                @error('email_otp_code')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>
+                            <div class="col-sm-6 pt-sm-4 mt-sm-2"><button class="btn btn-primary w-100"><i class="bi bi-check2-circle me-1"></i>{{ __('Xác nhận & bật') }}</button></div>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('email-otp.start') }}" class="needs-validation row g-2 align-items-start" novalidate>@csrf
+                            <div class="col-sm-6"><x-input name="password" id="otp_on_password" type="password" :label="__('Mật khẩu hiện tại')" required col="mb-0" autocomplete="current-password" /></div>
+                            <div class="col-sm-6 pt-sm-4 mt-sm-2"><button class="btn btn-primary w-100"><i class="bi bi-envelope-paper me-1"></i>{{ __('Gửi mã để bật') }}</button></div>
+                        </form>
+                    @endif
+                </div>
+            </div>
+
             {{-- Lịch sử đăng nhập --}}
             <div class="card">
                 <div class="card-header">

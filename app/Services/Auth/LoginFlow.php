@@ -32,7 +32,7 @@ class LoginFlow
     /** Bước 1 đã qua (mật khẩu / OAuth đúng, tài khoản đang hoạt động). */
     public function begin(Request $request, User $user, string $method, bool $remember = false)
     {
-        if ($user->hasTwoFactorEnabled()) {
+        if ($user->needsSecondFactor()) {
             $request->session()->regenerate();
             $request->session()->put(self::PENDING_KEY, [
                 'id' => $user->getKey(), 'remember' => $remember, 'method' => $method, 'at' => now()->getTimestamp(),
@@ -54,7 +54,7 @@ class LoginFlow
             return null;
         }
         $user = User::find($pending['id'] ?? null);
-        if (! $user || ! $user->isActive() || ! $user->hasTwoFactorEnabled()) {
+        if (! $user || ! $user->isActive() || ! $user->needsSecondFactor()) {
             $request->session()->forget(self::PENDING_KEY);
 
             return null;

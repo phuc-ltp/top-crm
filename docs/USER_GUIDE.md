@@ -310,6 +310,13 @@ Trên hóa đơn đã phát hành:
 - **Hệ thống → Email gửi đi** → chọn *Dùng SMTP nhập tại đây* → chọn nhà cung cấp (Gmail…) → nhập tên đăng nhập, mật khẩu ứng dụng, email người gửi → **Lưu cấu hình** → **Gửi email thử**.
 - Gmail: bật Xác minh 2 bước, tạo *Mật khẩu ứng dụng* tại myaccount.google.com/apppasswords (không dùng mật khẩu Gmail thường).
 
+## 16r. Đăng ký qua link mời & mã xác thực email
+
+- **Người quản lý:** *Người dùng → Link mời đăng ký* → **Tạo link mời** (vai trò, số ngày hiệu lực, số người tối đa) → sao chép link hoặc cho nhân viên **quét mã QR** bằng điện thoại. Link chỉ hiện một lần; thu hồi được bất cứ lúc nào.
+- **Nhân viên:** mở link → điền họ tên, email, số điện thoại, mật khẩu → **Gửi mã xác thực** → mở email lấy mã 6 số → **Hoàn tất đăng ký** → vào thẳng hệ thống (chấm công, công việc…).
+- **Mã qua email khi đăng nhập:** *ảnh đại diện → Bảo mật tài khoản → Mã xác thực qua email* → nhập mật khẩu → **Gửi mã để bật** → nhập mã nhận được. Từ lần sau, sau mật khẩu sẽ nhập mã gửi tới email (hết hạn 10 phút; chưa thấy thư thì xem mục Spam hoặc bấm *Gửi lại*).
+- Cần quản trị cấu hình **Email gửi đi** (mục 16q) thì thư mới đến.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

@@ -38,6 +38,7 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
             'two_factor_recovery_codes' => 'encrypted:array',
             'two_factor_confirmed_at' => 'datetime',
             'two_factor_last_step' => 'integer',
+            'email_otp_enabled' => 'boolean',
             'must_change_password' => 'boolean',
             'notification_preferences' => 'array',
         ];
@@ -154,6 +155,19 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
     }
 
     /** Đã bật xác thực 2 lớp (đã quét mã và xác nhận thành công). */
+    /** Bước 2 bằng mã gửi qua email (khi không dùng ứng dụng xác thực): tự bật, hoặc quản trị bắt buộc toàn hệ thống. */
+    public function usesEmailOtp(): bool
+    {
+        return ! $this->hasTwoFactorEnabled() && filled($this->email)
+            && ($this->email_otp_enabled ||\App\Models\Setting::get('require_email_otp', '0') === '1');
+    }
+
+    /** Đăng nhập cần bước 2 (ứng dụng xác thực hoặc mã email). */
+    public function needsSecondFactor(): bool
+    {
+        return $this->hasTwoFactorEnabled() || $this->usesEmailOtp();
+    }
+
     public function hasTwoFactorEnabled(): bool
     {
         return $this->two_factor_confirmed_at !== null && ! empty($this->two_factor_secret);

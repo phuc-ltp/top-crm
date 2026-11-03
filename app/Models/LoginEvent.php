@@ -32,6 +32,8 @@ class LoginEvent extends Model
         'facebook' => 'Facebook',
         'totp' => 'Mã xác thực 2 lớp',
         'recovery_code' => 'Mã khôi phục',
+        'email_otp' => 'Mã xác thực qua email',
+        'invitation' => 'Đăng ký qua link mời',
     ];
 
     protected $fillable = ['user_id', 'event', 'method', 'ip_address', 'user_agent', 'device_hash', 'is_new_device'];
