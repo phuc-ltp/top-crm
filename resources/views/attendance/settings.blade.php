@@ -68,6 +68,10 @@
                 <x-input name="name" :label="__('Tên văn phòng')" required maxlength="150" />
                 <x-input name="address" :label="__('Địa chỉ')" maxlength="500" />
                 <div class="row"><x-input name="latitude" type="number" step="0.0000001" :label="__('Vĩ độ')" required col="col-6 mb-3" /><x-input name="longitude" type="number" step="0.0000001" :label="__('Kinh độ')" required col="col-6 mb-3" /></div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="locUseGps"><i class="bi bi-crosshair me-1"></i>{{ __('Lấy vị trí hiện tại') }}</button>
+                    <span class="small text-muted" id="locGpsStatus">{{ __('Đứng tại văn phòng rồi bấm — cần mở trang bằng HTTPS và cho phép định vị.') }}</span>
+                </div>
                 <x-input name="radius_m" type="number" :label="__('Bán kính (m)')" value="150" min="30" max="5000" required />
                 <div class="form-check"><input type="hidden" name="is_active" value="0"><input class="form-check-input" type="checkbox" name="is_active" value="1" id="loc_active" checked><label class="form-check-label" for="loc_active">{{ __('Đang dùng') }}</label></div>
             </div>
@@ -89,6 +93,26 @@ document.addEventListener('DOMContentLoaded', () => {
         form.querySelector('[name="radius_m"]').value = edit ? b.dataset.radius : 150;
         form.querySelector('#loc_active').checked = edit ? b.dataset.active === '1' : true;
         form.classList.remove('was-validated');
+    });
+    // Lấy tọa độ GPS của thiết bị đang dùng (điền sẵn vĩ độ / kinh độ, người dùng vẫn sửa được)
+    const gpsBtn = document.getElementById('locUseGps'), gpsStatus = document.getElementById('locGpsStatus');
+    gpsBtn.addEventListener('click', () => {
+        if (!navigator.geolocation || !window.isSecureContext) {
+            gpsStatus.textContent = t('Trình duyệt chỉ cho lấy vị trí khi mở trang bằng HTTPS.');
+            return;
+        }
+        gpsBtn.disabled = true;
+        gpsStatus.textContent = t('Đang lấy vị trí...');
+        navigator.geolocation.getCurrentPosition((p) => {
+            const form = document.getElementById('locForm');
+            form.querySelector('[name="latitude"]').value = p.coords.latitude.toFixed(7);
+            form.querySelector('[name="longitude"]').value = p.coords.longitude.toFixed(7);
+            gpsStatus.textContent = t('Đã lấy vị trí (sai số ~:m m)').replace(':m', Math.round(p.coords.accuracy));
+            gpsBtn.disabled = false;
+        }, () => {
+            gpsStatus.textContent = t('Không lấy được vị trí. Hãy bật định vị và cho phép trình duyệt truy cập.');
+            gpsBtn.disabled = false;
+        }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
     });
     @if ($errors->hasAny(['name', 'latitude', 'longitude', 'radius_m'])) bootstrap.Modal.getOrCreateInstance(modal).show(); @endif
 });

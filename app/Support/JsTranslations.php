@@ -52,6 +52,8 @@ class JsTranslations
         'Đã chép',
         'Đã lấy vị trí (sai số ~:m m)',
         'Không lấy được vị trí. Hãy bật định vị và cho phép trình duyệt truy cập.',
+        'Trình duyệt chỉ cho lấy vị trí khi mở trang bằng HTTPS.',
+        'Đang lấy vị trí...',
         'Trình duyệt không hỗ trợ định vị.',
         'Sửa văn phòng',
         'Thêm văn phòng',
