@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Đứng sau reverse proxy / Cloudflare: * hoặc danh sách IP (ngăn cách bởi dấu phẩy) để nhận đúng IP người dùng và HTTPS
+    'trusted_proxies' => env('TRUSTED_PROXIES'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
