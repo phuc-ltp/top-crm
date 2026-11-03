@@ -3258,5 +3258,8 @@
     "Bắt buộc mã xác thực gửi qua email khi đăng nhập (mọi người)": "Require an email verification code at sign-in (everyone)",
     "Người đã dùng ứng dụng xác thực vẫn dùng ứng dụng; những người khác nhập mã 6 số gửi tới email sau khi nhập mật khẩu. Cần email gửi đi hoạt động.": "People with an authenticator app keep using it; everyone else enters a 6-digit code sent to their email after their password. Requires working outgoing email.",
     "Đã sao chép link mời.": "Invitation link copied.",
-    "Đăng ký qua link mời": "Registered via invitation link"
+    "Đăng ký qua link mời": "Registered via invitation link",
+    "Lấy vị trí hiện tại": "Use current location",
+    "Đứng tại văn phòng rồi bấm — cần mở trang bằng HTTPS và cho phép định vị.": "Stand at the office and tap — the page must be opened over HTTPS with location allowed.",
+    "Trình duyệt chỉ cho lấy vị trí khi mở trang bằng HTTPS.": "Browsers only share location when the page is opened over HTTPS."
 }
