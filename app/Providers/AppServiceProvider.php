@@ -29,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
         // Email gửi đi cấu hình trên giao diện (Hệ thống → Email gửi đi) — ghi đè MAIL_* của .env khi đã bật
         \App\Support\MailSettings::apply();
 
+        // Proxy tin cậy (Cloudflare Tunnel, Nginx...): nhận X-Forwarded-Proto/Host/For từ các IP này
+        if ($proxies = config('app.trusted_proxies')) {
+            \Illuminate\Http\Middleware\TrustProxies::at($proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
+
         // Production chạy HTTPS (APP_URL https://...): mọi URL sinh ra đều là https, kể cả khi đứng sau proxy
         if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');

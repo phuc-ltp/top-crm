@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.8.2] — 03/11/2026
+
+### Sửa lỗi
+- `TRUSTED_PROXIES` trong .env không có tác dụng khi chạy qua Apache (được đọc trước khi .env nạp) → đứng sau Cloudflare Tunnel / reverse proxy, đường dẫn vẫn sinh ra `http://` làm camera / định vị trên điện thoại bị chặn. Nay đọc qua `config('app.trusted_proxies')` trong AppServiceProvider.
+
 ## [5.8.1] — 03/11/2026
 
 ### Cải thiện
