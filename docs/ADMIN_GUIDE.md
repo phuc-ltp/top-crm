@@ -54,6 +54,8 @@ Có hai tầng:
 - Mỗi người tự bật **xác thực 2 lớp** ở *ảnh đại diện → Bảo mật tài khoản* (quét QR bằng Google/Microsoft Authenticator, lưu 8 mã khôi phục). Ở đây cũng có **lịch sử đăng nhập** và **xác minh email**.
 - Nhân viên mất điện thoại và mã khôi phục: mở chi tiết nhân viên → **Tắt xác thực 2 lớp** (hãy xác minh đúng người trước).
 - Quản trị nền tảng có thể bật **Bắt buộc xác thực 2 lớp cho tài khoản quản trị** trong *Cài đặt hệ thống*.
+- **Mã xác thực qua email:** mỗi người tự bật ở *Bảo mật tài khoản*; quản trị nền tảng có thể **bắt buộc cho mọi người** (*Cài đặt → Bảo mật đăng nhập*) — chỉ bật được khi *Email gửi đi* đã hoạt động. Người dùng ứng dụng xác thực vẫn dùng ứng dụng. Nhân viên không vào được email: kiểm tra địa chỉ email trong hồ sơ nhân viên.
+- **Link mời đăng ký** (*Người dùng → Link mời đăng ký*): người đăng ký phải xác thực email bằng mã 6 số; tài khoản vào đúng tổ chức + vai trò của link. Không mời được Chủ sở hữu; chỉ chủ sở hữu / quản trị nền tảng mời được Quản trị viên. Gửi link qua kênh riêng (Zalo cá nhân…), không đăng công khai; thu hồi link khi đã đủ người.
 - Đăng nhập từ thiết bị lạ sẽ có cảnh báo trong chuông thông báo và email.
 - Khóa API cho phần mềm khác: *ảnh đại diện → Khóa API*; quản trị viên thấy và thu hồi được khóa của mọi thành viên. Xem [API.md](API.md).
 - Tổng hợp và danh sách việc trước khi đưa lên Internet: [SECURITY.md](SECURITY.md).

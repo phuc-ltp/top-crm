@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LoginEvent;
+use App\Models\Setting;
 use App\Services\ActivityLogger;
 use App\Support\Security\Totp;
 use App\Support\Security\TwoFactor;
@@ -116,6 +117,48 @@ class SecurityController extends Controller
         return redirect()->route('profile.security')
             ->with(self::CODES_FLASH, Crypt::encrypt($codes))
             ->with('success', __('Đã tạo bộ mã khôi phục mới. Các mã cũ không còn dùng được.'));
+    }
+
+    /** Bật mã xác thực qua email — bước 1: gửi mã tới email của chính mình (chứng minh email nhận được thư). */
+    public function emailOtpStart(Request $request)
+    {
+        $this->confirmPassword($request);
+        $user = $request->user();
+        abort_if($user->hasTwoFactorEnabled(), 422, __('Bạn đang dùng ứng dụng xác thực — không cần mã qua email.'));
+        $result = \App\Services\Auth\EmailOtp::send('enable', 'user:'.$user->getKey(), $user->email, $user->name);
+        if ($result === 'failed') {
+            return back()->with('error', __('Không gửi được email tới :email. Kiểm tra cấu hình email gửi đi (Hệ thống → Email gửi đi).', ['email' => $user->email]));
+        }
+
+        return redirect()->route('profile.security')->with('email_otp_sent', true)
+            ->with($result === 'sent' ? 'success' : 'warning', $result === 'sent'
+                ? __('Đã gửi mã 6 số tới :email. Nhập mã để hoàn tất.', ['email' => \App\Services\Auth\EmailOtp::mask($user->email)])
+                : __('Vui lòng đợi :s giây rồi gửi lại.', ['s' => \App\Services\Auth\EmailOtp::cooldown('enable', 'user:'.$user->getKey())]));
+    }
+
+    /** Bật mã xác thực qua email — bước 2: nhập đúng mã vừa nhận. */
+    public function emailOtpConfirm(Request $request)
+    {
+        $user = $request->user();
+        $data = $request->validate(['code' => ['required', 'string', 'max:20']], [], ['code' => __('Mã xác thực')]);
+        if (! \App\Services\Auth\EmailOtp::verify('enable', 'user:'.$user->getKey(), $data['code'])) {
+            return back()->with('email_otp_sent', true)->withErrors(['email_otp_code' => __('Mã xác thực không đúng hoặc đã hết hạn.')]);
+        }
+        $user->forceFill(['email_otp_enabled' => true, 'email_verified_at' => $user->email_verified_at ?? now()])->saveQuietly();
+        ActivityLogger::log('updated', $user, 'Bật mã xác thực qua email khi đăng nhập');
+
+        return redirect()->route('profile.security')->with('success', __('Đã bật mã xác thực qua email. Lần đăng nhập sau, nhập mã gửi tới email sau khi nhập mật khẩu.'));
+    }
+
+    public function emailOtpDisable(Request $request)
+    {
+        $this->confirmPassword($request);
+        $user = $request->user();
+        abort_if(Setting::get('require_email_otp', '0') === '1', 422, __('Quản trị đang bắt buộc mã xác thực qua email cho mọi người.'));
+        $user->forceFill(['email_otp_enabled' => false])->saveQuietly();
+        ActivityLogger::log('updated', $user, 'Tắt mã xác thực qua email khi đăng nhập');
+
+        return redirect()->route('profile.security')->with('success', __('Đã tắt mã xác thực qua email.'));
     }
 
     public function sendVerification(Request $request)

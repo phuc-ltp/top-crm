@@ -20,7 +20,7 @@ class RequireTwoFactor
 
     /** Các trang vẫn mở để người dùng tự thiết lập 2FA hoặc thoát ra. */
     private const ALLOWED_ROUTES = [
-        'profile.security', 'two-factor.enable', 'two-factor.confirm', 'two-factor.disable', 'two-factor.recovery-codes',
+        'profile.security', 'email-otp.start', 'email-otp.confirm', 'two-factor.enable', 'two-factor.confirm', 'two-factor.disable', 'two-factor.recovery-codes',
         'verification.send', 'verification.verify', 'logout', 'locale.update', 'preferences.theme', 'workspace.switch',
         'pages.terms', 'pages.privacy', 'pages.support',
     ];
@@ -28,7 +28,7 @@ class RequireTwoFactor
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if (! $user || $user->hasTwoFactorEnabled() || ! self::enabled() || ! self::appliesTo($user)
+        if (! $user || $user->needsSecondFactor() || ! self::enabled() || ! self::appliesTo($user)
             || $request->routeIs(...self::ALLOWED_ROUTES)) {
             return $next($request);
         }

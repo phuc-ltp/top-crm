@@ -87,6 +87,15 @@ class SettingController extends Controller
                 Setting::put([\App\Http\Middleware\RequireTwoFactor::SETTING => $require], 'security');
                 ActivityLogger::log('updated', null, $require === '1' ? 'Bật bắt buộc xác thực 2 lớp cho tài khoản quản trị' : 'Tắt bắt buộc xác thực 2 lớp cho tài khoản quản trị');
             }
+            // Bắt buộc mã email khi đăng nhập: chỉ bật được khi email gửi đi đã hoạt động (tránh khóa mọi người ngoài)
+            $requireOtp = $request->boolean('require_email_otp') ? '1' : '0';
+            if ($requireOtp === '1' && ! \App\Support\NotificationCatalog::mailEnabled()) {
+                return back()->withInput()->withErrors(['require_email_otp' => __('Cần cấu hình email gửi đi (Hệ thống → Email gửi đi) trước khi bắt buộc mã xác thực qua email.')]);
+            }
+            if ($requireOtp !== Setting::get('require_email_otp', '0')) {
+                Setting::put(['require_email_otp' => $requireOtp], 'security');
+                ActivityLogger::log('updated', null, $requireOtp === '1' ? 'Bật bắt buộc mã xác thực email khi đăng nhập' : 'Tắt bắt buộc mã xác thực email khi đăng nhập');
+            }
         }
         Setting::put(array_map(fn ($v) => (string) $v, $data));
         ActivityLogger::log('updated', null, 'Cập nhật cài đặt tổ chức');

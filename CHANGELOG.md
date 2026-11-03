@@ -2,6 +2,13 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.8.0] — 03/11/2026
+
+### Thêm mới
+- **Link mời đăng ký tài khoản** (Người dùng → Link mời đăng ký, cần quyền tạo người dùng): chọn vai trò, hiệu lực 1–30 ngày, số người tối đa 1–200, ghi chú. Link + mã QR chỉ hiện **một lần** lúc tạo (CSDL chỉ giữ bản băm), thu hồi được bất cứ lúc nào. Không mời được vai trò Chủ sở hữu; Quản trị viên chỉ do chủ sở hữu / quản trị nền tảng mời.
+- **Đăng ký bằng điện thoại qua link mời:** điền họ tên, email, số điện thoại, mật khẩu → nhận **mã 6 số qua email** → nhập mã → tài khoản được tạo trong đúng tổ chức, đúng vai trò, có hồ sơ nhân viên (thử việc) và tự đăng nhập. Email đã có tài khoản bị từ chối; link hết hạn / hết lượt / bị thu hồi báo rõ; chống spam (trường ẩn + giới hạn số lần). Người tạo link nhận thông báo khi có người đăng ký.
+- **Mã xác thực qua email khi đăng nhập:** mỗi người tự bật ở Hồ sơ → Bảo mật (phải nhập đúng mã gửi tới email mới bật được, tránh tự khóa mình); quản trị nền tảng có thể **bắt buộc cho mọi người** (Cài đặt → Bảo mật đăng nhập — chỉ bật được khi email gửi đi đã hoạt động). Mã hết hạn sau 10 phút, dùng một lần, sai 5 lần là hủy, gửi lại cách nhau 60 giây. Người đã dùng ứng dụng xác thực (TOTP) vẫn dùng ứng dụng.
+
 ## [5.7.0] — 29/10/2026
 
 ### Thêm mới

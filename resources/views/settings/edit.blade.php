@@ -85,6 +85,13 @@
                         <label class="form-check-label" for="require_2fa_admins">{{ __('Bắt buộc xác thực 2 lớp cho tài khoản quản trị') }}</label>
                     </div>
                     <div class="small text-muted">{{ __('Áp dụng cho quản trị nền tảng, chủ sở hữu và quản trị viên tổ chức. Người chưa bật sẽ được chuyển tới trang thiết lập sau khi đăng nhập (không bị khóa tài khoản).') }}</div>
+                    <hr>
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input @error('require_email_otp') is-invalid @enderror" type="checkbox" role="switch" name="require_email_otp" value="1" id="require_email_otp" @checked(old('require_email_otp', $s['require_email_otp'] ?? '0') === '1')>
+                        <label class="form-check-label" for="require_email_otp">{{ __('Bắt buộc mã xác thực gửi qua email khi đăng nhập (mọi người)') }}</label>
+                        @error('require_email_otp')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="small text-muted">{{ __('Người đã dùng ứng dụng xác thực vẫn dùng ứng dụng; những người khác nhập mã 6 số gửi tới email sau khi nhập mật khẩu. Cần email gửi đi hoạt động.') }}</div>
                 </div></div>
                 @endcan
             </div>

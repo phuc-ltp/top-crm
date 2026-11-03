@@ -79,5 +79,6 @@
     </footer>
 </div>
 @include('partials.flash')
+@stack('scripts')
 </body>
 </html>

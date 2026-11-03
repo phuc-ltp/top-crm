@@ -75,6 +75,19 @@ Route::middleware('guest')->group(function () {
     // Bước 2 đăng nhập: mã xác thực 2 lớp (người dùng CHƯA đăng nhập cho tới khi nhập đúng)
     Route::get('/two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'show'])->name('two-factor.challenge');
     Route::post('/two-factor-challenge', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'store'])->name('two-factor.verify')->middleware('throttle:10,1');
+    Route::post('/two-factor-challenge/resend', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'resend'])->name('two-factor.resend')->middleware('throttle:5,1');
+});
+
+// (prefix throttle riêng: các throttle không prefix dùng chung một bộ đếm theo IP)
+// Đăng ký qua link mời (công khai; token 40 ký tự, chỉ lưu bản băm). Trang "show" tự chuyển người đã đăng nhập về Tổng quan.
+Route::prefix('join/{token}')->where(['token' => '[A-Za-z0-9]{40}'])->group(function () {
+    Route::get('/', [\App\Http\Controllers\Auth\JoinController::class, 'show'])->name('join.show')->middleware('throttle:30,1,join-view');
+    Route::middleware('guest')->group(function () {
+        Route::post('/', [\App\Http\Controllers\Auth\JoinController::class, 'submit'])->name('join.submit')->middleware('throttle:6,1,join-submit');
+        Route::get('/verify', [\App\Http\Controllers\Auth\JoinController::class, 'verifyForm'])->name('join.verify')->middleware('throttle:30,1,join-view');
+        Route::post('/verify', [\App\Http\Controllers\Auth\JoinController::class, 'verify'])->name('join.verify.store')->middleware('throttle:10,1,join-verify');
+        Route::post('/resend', [\App\Http\Controllers\Auth\JoinController::class, 'resend'])->name('join.resend')->middleware('throttle:5,1,join-resend');
+    });
 });
 
 /*
@@ -122,6 +135,9 @@ Route::middleware('auth')->group(function () {
     // Bảo mật tài khoản: xác thực 2 lớp, lịch sử đăng nhập, xác minh email
     Route::get('/profile/security', [\App\Http\Controllers\SecurityController::class, 'show'])->name('profile.security');
     Route::middleware('throttle:10,1')->group(function () {
+        Route::post('/profile/email-otp', [\App\Http\Controllers\SecurityController::class, 'emailOtpStart'])->name('email-otp.start')->middleware('throttle:5,1');
+        Route::post('/profile/email-otp/confirm', [\App\Http\Controllers\SecurityController::class, 'emailOtpConfirm'])->name('email-otp.confirm')->middleware('throttle:10,1');
+        Route::delete('/profile/email-otp', [\App\Http\Controllers\SecurityController::class, 'emailOtpDisable'])->name('email-otp.disable');
         Route::post('/profile/two-factor', [\App\Http\Controllers\SecurityController::class, 'enable'])->name('two-factor.enable');
         Route::post('/profile/two-factor/confirm', [\App\Http\Controllers\SecurityController::class, 'confirm'])->name('two-factor.confirm');
         Route::delete('/profile/two-factor', [\App\Http\Controllers\SecurityController::class, 'disable'])->name('two-factor.disable');
@@ -291,6 +307,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{user}/send-reset', [UserController::class, 'sendReset'])->name('users.send-reset');
     Route::put('/users/{user}/password', [UserController::class, 'setPassword'])->name('users.password');
     Route::delete('/users/{user}/two-factor', [UserController::class, 'resetTwoFactor'])->name('users.two-factor.reset')->middleware('throttle:10,1');
+    Route::resource('invitations', \App\Http\Controllers\InvitationController::class)->only(['index', 'store', 'destroy']);
     Route::resource('users', UserController::class);
 
     Route::resource('roles', RoleController::class)->except(['show']);

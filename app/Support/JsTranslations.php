@@ -12,6 +12,7 @@ class JsTranslations
         'Đóng',
         'Đã sao chép mã khôi phục.',
         'Đã sao chép khóa API.',
+        'Đã sao chép link mời.',
         'Tìm gần đây',
         'giữ',
         'Xóa',
