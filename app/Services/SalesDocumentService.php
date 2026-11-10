@@ -28,7 +28,9 @@ class SalesDocumentService
         // Bảng giá của khách hàng (đang hoạt động): dùng khi dòng để trống đơn giá
         $listPrices = $customerId ? (\App\Models\Customer::find($customerId)?->priceList?->priceMap() ?? []) : [];
 
-        // Tính bằng số thập phân chính xác (bcmath); làm tròn 2 chữ số ở từng bước giống quy tắc cũ
+        // Tính bằng số thập phân chính xác (bcmath). Số lượng / đơn giá / % giữ 2 chữ số; TIỀN (thành tiền, chiết khấu,
+        // thuế, tổng) làm tròn theo đơn vị nhỏ nhất của tiền tệ — VND: tới đồng (không có xu, tránh "còn nợ 0,40 ₫").
+        $m = PaymentService::scale();
         $lines = [];
         $subtotal = '0';
 
@@ -42,7 +44,7 @@ class SalesDocumentService
                 ? Decimal::round(Decimal::clamp(self::number($item['unit_price']), 0))
                 : Decimal::round($product ? ($listPrices[$product->id] ?? $product->price) : 0);
             $discount = Decimal::round(Decimal::clamp(self::number($item['discount_percent'] ?? 0), 0, 100));
-            $lineTotal = Decimal::round(Decimal::div(Decimal::mul(Decimal::mul($quantity, $unitPrice), Decimal::sub(100, $discount)), 100));
+            $lineTotal = Decimal::round(Decimal::div(Decimal::mul(Decimal::mul($quantity, $unitPrice), Decimal::sub(100, $discount)), 100), $m);
 
             $lines[] = [
                 'product_id' => $product?->id,
@@ -55,10 +57,10 @@ class SalesDocumentService
             $subtotal = Decimal::add($subtotal, $lineTotal);
         }
 
-        $subtotal = Decimal::round($subtotal);
-        $discountAmount = Decimal::round(Decimal::clamp(self::number($discountAmount), 0, $subtotal));
+        $subtotal = Decimal::round($subtotal, $m);
+        $discountAmount = Decimal::round(Decimal::clamp(self::number($discountAmount), 0, $subtotal), $m);
         $taxRate = Decimal::round(Decimal::clamp(self::number($taxRate), 0, 100));
-        $taxAmount = Decimal::round(Decimal::div(Decimal::mul(Decimal::sub($subtotal, $discountAmount), $taxRate), 100));
+        $taxAmount = Decimal::round(Decimal::div(Decimal::mul(Decimal::sub($subtotal, $discountAmount), $taxRate), 100), $m);
 
         return [
             'items' => $lines,
@@ -66,7 +68,7 @@ class SalesDocumentService
             'discount_amount' => (float) $discountAmount,
             'tax_rate' => (float) $taxRate,
             'tax_amount' => (float) $taxAmount,
-            'total' => (float) Decimal::round(Decimal::add(Decimal::sub($subtotal, $discountAmount), $taxAmount)),
+            'total' => (float) Decimal::round(Decimal::add(Decimal::sub($subtotal, $discountAmount), $taxAmount), $m),
         ];
     }
 
