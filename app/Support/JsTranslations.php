@@ -13,6 +13,7 @@ class JsTranslations
         'Đã sao chép mã khôi phục.',
         'Đã sao chép khóa API.',
         'Đã sao chép link mời.',
+        'Đã sao chép địa chỉ webhook.',
         'Tìm gần đây',
         'giữ',
         'Xóa',

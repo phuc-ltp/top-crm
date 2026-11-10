@@ -317,6 +317,13 @@ Trên hóa đơn đã phát hành:
 - **Mã qua email khi đăng nhập:** *ảnh đại diện → Bảo mật tài khoản → Mã xác thực qua email* → nhập mật khẩu → **Gửi mã để bật** → nhập mã nhận được. Từ lần sau, sau mật khẩu sẽ nhập mã gửi tới email (hết hạn 10 phút; chưa thấy thư thì xem mục Spam hoặc bấm *Gửi lại*).
 - Cần quản trị cấu hình **Email gửi đi** (mục 16q) thì thư mới đến.
 
+## 16s. Tự ghi nhận chuyển khoản qua SePay
+
+- Cần: tài khoản SePay đã liên kết ngân hàng nhận tiền, CRM chạy trên hosting có tên miền https, đã khai báo *Ngân hàng nhận tiền* (mã VietQR trên hóa đơn).
+- **Trong CRM:** *Hệ thống → Liên kết SePay* → tự đặt một API Key dài (≥ 16 ký tự, VD tạo bằng trình quản lý mật khẩu) → bật → **Lưu** → sao chép **Địa chỉ webhook**.
+- **Trên my.sepay.vn:** *Tích hợp WebHooks → Thêm webhook* → sự kiện *Có tiền vào*, chọn tài khoản ngân hàng → *Gọi đến URL* = địa chỉ webhook → *Kiểu chứng thực* = API Key, dán cùng khóa → lưu. Nên bật *Cấu trúc mã thanh toán* tiền tố `HD`, hậu tố 5 chữ số.
+- Khách quét mã VietQR trên hóa đơn → vài giây sau hóa đơn tự chuyển *Đã thanh toán* / *Thanh toán một phần*, chủ sở hữu nhận thông báo. Giao dịch không khớp (sai nội dung, chuyển dư…) nằm ở danh sách *Chưa khớp* — ghi nhận tay trên hóa đơn.
+
 ## 16. Đổi mật khẩu và hồ sơ
 
 Bấm ảnh đại diện, chọn **Hồ sơ cá nhân** để đổi tên, số điện thoại, ảnh đại diện và mật khẩu (tối thiểu 10 ký tự, có chữ hoa, chữ thường và chữ số). Sau khi đổi mật khẩu, các thiết bị khác đang đăng nhập sẽ tự bị đăng xuất.

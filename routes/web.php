@@ -43,6 +43,10 @@ Route::get('/ho-tro', [PageController::class, 'show'])->defaults('slug', 'suppor
 
 // Form thu lead công khai của từng tổ chức (không cần đăng nhập; chống spam: token, honeypot, thời gian điền, giới hạn tần suất)
 Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('pwa.manifest');
+// Webhook SePay (máy chủ SePay gọi, không có phiên / CSRF): xác thực bằng token URL + header Authorization: Apikey
+Route::post('/webhooks/sepay/{token}', \App\Http\Controllers\SepayWebhookController::class)->name('webhooks.sepay')
+    ->where('token', '[A-Za-z0-9]{40}')->middleware('throttle:120,1,sepay')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class]);
 Route::get('/f/{token}', [\App\Http\Controllers\WebLeadFormController::class, 'show'])->name('lead-form.show')->middleware('throttle:60,1');
 Route::post('/f/{token}', [\App\Http\Controllers\WebLeadFormController::class, 'submit'])->name('lead-form.submit')->middleware('throttle:5,1');
 
@@ -394,6 +398,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/settings/branding', [SettingController::class, 'branding'])->name('settings.branding');
+    Route::get('/settings/sepay', [\App\Http\Controllers\SepaySettingsController::class, 'edit'])->name('settings.sepay');
+    Route::put('/settings/sepay', [\App\Http\Controllers\SepaySettingsController::class, 'update'])->name('settings.sepay.update');
+    Route::post('/settings/sepay/regenerate', [\App\Http\Controllers\SepaySettingsController::class, 'regenerate'])->name('settings.sepay.regenerate');
     Route::get('/settings/mail', [\App\Http\Controllers\MailSettingsController::class, 'edit'])->name('settings.mail');
     Route::put('/settings/mail', [\App\Http\Controllers\MailSettingsController::class, 'update'])->name('settings.mail.update');
     Route::post('/settings/mail/test', [\App\Http\Controllers\MailSettingsController::class, 'test'])->name('settings.mail.test')->middleware('throttle:5,1');
