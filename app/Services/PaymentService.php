@@ -113,14 +113,13 @@ class PaymentService
         }
     }
 
-    /** Còn phải thu = tổng − giảm trừ − đã thu (không âm). */
     /** Số chữ số thập phân của tiền: VND không có đơn vị nhỏ hơn đồng → 0; ngoại tệ → 2. */
     public static function scale(): int
     {
         return \App\Models\Setting::get('currency', 'VND') === 'VND' ? 0 : 2;
     }
 
-    /** Còn phải thu, làm tròn theo đơn vị tiền (VND: phần lẻ dưới 0,5 đồng của hóa đơn cũ coi như đã thu đủ). */
+    /** Còn phải thu = tổng − giảm trừ − đã thu (không âm), làm tròn theo đơn vị tiền (VND: phần lẻ dưới 0,5 đồng của hóa đơn cũ coi như đã thu đủ). */
     public static function due(Invoice $invoice): string
     {
         return Decimal::round(Decimal::clamp(Decimal::sub(Decimal::sub($invoice->total, $invoice->credited_amount), $invoice->amount_paid), 0), self::scale());
