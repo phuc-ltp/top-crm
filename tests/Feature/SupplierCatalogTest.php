@@ -99,6 +99,9 @@ class SupplierCatalogTest extends TestCase
 
     public function test_document_math_uses_exact_decimals(): void
     {
+        // Ngoại tệ có cent → kiểm tra phép tính thập phân chính xác (VND làm tròn tới đồng: xem VndRoundingTest)
+        $this->actingAs($this->admin());
+        \App\Models\Setting::put(['currency' => 'USD']);
         $r = app(SalesDocumentService::class)->calculate([
             ['description' => 'A', 'quantity' => '3', 'unit_price' => '0.1', 'discount_percent' => 0],
             ['description' => 'B', 'quantity' => '1.5', 'unit_price' => '33333.33', 'discount_percent' => '12.5'],

@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.8.3] — 10/11/2026
+
+### Sửa lỗi
+- Hóa đơn đã thu đủ vẫn hiện form "Ghi nhận thanh toán" và báo **"Số tiền vượt quá số còn phải thu (0 ₫)"**: tổng hóa đơn có phần lẻ xu (VD 102.599.897,40 ₫) nên sau khi thu đủ vẫn còn 0,40 ₫. Nay tiền VND (thành tiền, chiết khấu, thuế, tổng) làm tròn tới đồng; số còn phải thu / trạng thái thanh toán so theo đồng; migration chuyển các hóa đơn bị kẹt (còn lẻ < 0,5 ₫) sang "Đã thanh toán" — không đổi số tiền. Ngoại tệ vẫn giữ 2 chữ số thập phân.
+
 ## [5.8.2] — 03/11/2026
 
 ### Sửa lỗi

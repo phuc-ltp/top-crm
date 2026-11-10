@@ -113,10 +113,16 @@ class PaymentService
         }
     }
 
-    /** Còn phải thu = tổng − giảm trừ − đã thu (không âm). */
+    /** Số chữ số thập phân của tiền: VND không có đơn vị nhỏ hơn đồng → 0; ngoại tệ → 2. */
+    public static function scale(): int
+    {
+        return \App\Models\Setting::get('currency', 'VND') === 'VND' ? 0 : 2;
+    }
+
+    /** Còn phải thu = tổng − giảm trừ − đã thu (không âm), làm tròn theo đơn vị tiền (VND: phần lẻ dưới 0,5 đồng của hóa đơn cũ coi như đã thu đủ). */
     public static function due(Invoice $invoice): string
     {
-        return Decimal::round(Decimal::clamp(Decimal::sub(Decimal::sub($invoice->total, $invoice->credited_amount), $invoice->amount_paid), 0));
+        return Decimal::round(Decimal::clamp(Decimal::sub(Decimal::sub($invoice->total, $invoice->credited_amount), $invoice->amount_paid), 0), self::scale());
     }
 
     /** Tính lại đã thu, đã giảm trừ và trạng thái thanh toán từ dữ liệu gốc. */
@@ -124,7 +130,7 @@ class PaymentService
     {
         $paid = Decimal::round($invoice->payments()->sum('amount'));
         $credited = Decimal::round(CreditNote::where('invoice_id', $invoice->id)->sum('amount'));
-        $payable = Decimal::sub($invoice->total, $credited);
+        $payable = Decimal::round(Decimal::sub($invoice->total, $credited), self::scale());
 
         $status = match (true) {
             Decimal::cmp($payable, 0) <= 0 => 'paid',
