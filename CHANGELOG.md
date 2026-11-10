@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.9.0] — 10/11/2026
+
+### Thêm mới
+- **Liên kết SePay — tự ghi nhận thanh toán chuyển khoản** (Hệ thống → Liên kết SePay, quyền quản lý cài đặt): bật/tắt, API Key lưu mã hóa (không hiển thị lại), địa chỉ webhook riêng mỗi tổ chức (đổi được khi nghi lộ). Khách quét mã VietQR trên hóa đơn (nội dung = số hóa đơn) → SePay báo về → CRM tìm số hóa đơn (HDxxxxx) trong mã thanh toán / nội dung, tự ghi nhận thanh toán (cho phép trả nhiều lần) và báo chủ sở hữu. Chống trùng theo mã giao dịch SePay (gửi lại không ghi 2 lần); tiền ra bị bỏ qua; chuyển dư, sai số hóa đơn, hóa đơn nháp/đã thu đủ → để "Chưa khớp" trong danh sách giao dịch cho kế toán xử lý tay. Xác thực theo tài liệu SePay: header `Authorization: Apikey …`, trả `{"success": true}`.
+
 ## [5.8.3] — 10/11/2026
 
 ### Sửa lỗi
