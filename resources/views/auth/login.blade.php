@@ -37,5 +37,10 @@
         @endforeach
     </div>
 
-    <p class="ta-note">{{ __('Chưa có tài khoản? Liên hệ quản trị viên để được cấp tài khoản.') }}</p>
+    @if (\App\Http\Controllers\Auth\RegisterController::organization())
+        <a href="{{ route('register') }}" class="ta-btn ta-btn-outline mt-3 text-decoration-none"><i class="bi bi-person-plus"></i> {{ __('Tạo tài khoản mới') }}</a>
+        <p class="ta-note">{{ __('Người mới: tạo tài khoản rồi chờ quản trị viên duyệt. Đã có link mời thì mở link đó.') }}</p>
+    @else
+        <p class="ta-note">{{ __('Chưa có tài khoản? Xin quản lý của bạn tạo tài khoản hoặc gửi link mời.') }}</p>
+    @endif
 @endsection

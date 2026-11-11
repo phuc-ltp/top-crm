@@ -20,7 +20,7 @@ class EmailOtpNotification extends Notification
     {
         $company = Setting::get('company_name', 'TOP CRM');
         $what = match ($this->purpose) {
-            'join' => __('đăng ký tài khoản'),
+            'join', 'register' => __('đăng ký tài khoản'),
             'enable' => __('bật xác thực qua email'),
             default => __('đăng nhập'),
         };

@@ -92,6 +92,16 @@
                         @error('require_email_otp')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                     </div>
                     <div class="small text-muted">{{ __('Người đã dùng ứng dụng xác thực vẫn dùng ứng dụng; những người khác nhập mã 6 số gửi tới email sau khi nhập mật khẩu. Cần email gửi đi hoạt động.') }}</div>
+                    <hr>
+                    <label class="form-label" for="signup_organization_id">{{ __('Công ty nhận yêu cầu tạo tài khoản') }}</label>
+                    <select name="signup_organization_id" id="signup_organization_id" class="form-select @error('signup_organization_id') is-invalid @enderror">
+                        <option value="0">{{ __('— Tắt (chỉ tạo tài khoản / gửi link mời) —') }}</option>
+                        @foreach (\App\Models\Organization::where('status', 'active')->orderBy('name')->get(['id', 'name']) as $o)
+                            <option value="{{ $o->id }}" @selected((int) old('signup_organization_id', $s['signup_organization_id'] ?? '0') === $o->id)>{{ $o->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('signup_organization_id')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                    <div class="small text-muted mt-1">{{ __('Bật thì trang đăng nhập có nút “Tạo tài khoản mới”: người mới xác thực email bằng mã 6 số rồi chờ duyệt ở Người dùng → Yêu cầu tham gia. Cần email gửi đi hoạt động.') }}</div>
                 </div></div>
                 @endcan
             </div>

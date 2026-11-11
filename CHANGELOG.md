@@ -2,6 +2,15 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.10.0] — 11/11/2026
+
+### Thêm mới
+- **Tạo tài khoản ở trang đăng nhập (xin tham gia + duyệt):** nút **Tạo tài khoản mới** → điền họ tên, email, số điện thoại, mật khẩu, lời nhắn → nhập **mã 6 số gửi tới email** → yêu cầu chờ duyệt. Quản trị viên (quyền tạo người dùng) được báo, vào **Người dùng → Yêu cầu tham gia** chọn vai trò rồi **Duyệt & tạo tài khoản** hoặc **Từ chối** (kèm lý do); người đăng ký nhận email kết quả và đăng nhập bằng mật khẩu đã đặt. Chưa được duyệt mà đăng nhập → báo rõ "đang chờ duyệt" thay vì "sai mật khẩu". Chống spam (trường ẩn, giới hạn số lần), email đã có tài khoản bị từ chối, không thể tự cấp vai trò Chủ sở hữu / Quản trị viên.
+- Quản trị nền tảng chọn **Công ty nhận yêu cầu tạo tài khoản** ở Cài đặt tổ chức → Bảo mật đăng nhập (mặc định tắt; chỉ bật được khi Email gửi đi hoạt động, vì người đăng ký phải nhận được mã).
+
+### Cải thiện
+- Trang đăng nhập khi chưa mở đăng ký: hướng dẫn rõ "xin quản lý tạo tài khoản hoặc gửi link mời". Link mời và duyệt yêu cầu dùng chung một quy trình tạo tài khoản (AccountProvisioner).
+
 ## [5.9.0] — 10/11/2026
 
 ### Thêm mới

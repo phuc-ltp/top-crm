@@ -92,6 +92,18 @@ class SettingController extends Controller
             if ($requireOtp === '1' && ! \App\Support\NotificationCatalog::mailEnabled()) {
                 return back()->withInput()->withErrors(['require_email_otp' => __('Cần cấu hình email gửi đi (Hệ thống → Email gửi đi) trước khi bắt buộc mã xác thực qua email.')]);
             }
+            // Công ty nhận yêu cầu tạo tài khoản (trang đăng nhập) — 0 = tắt; bật cần email gửi đi (mã xác thực phải đến được)
+            $signupOrg = (string) (int) $request->input('signup_organization_id', Setting::get('signup_organization_id', '0'));
+            if ($signupOrg !== '0' && ! \App\Models\Organization::whereKey($signupOrg)->where('status', 'active')->exists()) {
+                return back()->withInput()->withErrors(['signup_organization_id' => __('Công ty không hợp lệ.')]);
+            }
+            if ($signupOrg !== '0' && ! \App\Support\NotificationCatalog::mailEnabled()) {
+                return back()->withInput()->withErrors(['signup_organization_id' => __('Cần cấu hình email gửi đi (Hệ thống → Email gửi đi) trước khi mở tạo tài khoản — người đăng ký phải nhận được mã xác thực.')]);
+            }
+            if ($signupOrg !== Setting::get('signup_organization_id', '0')) {
+                Setting::put(['signup_organization_id' => $signupOrg], 'security');
+                ActivityLogger::log('updated', null, $signupOrg === '0' ? 'Tắt tạo tài khoản ở trang đăng nhập' : 'Mở tạo tài khoản ở trang đăng nhập cho tổ chức #'.$signupOrg);
+            }
             if ($requireOtp !== Setting::get('require_email_otp', '0')) {
                 Setting::put(['require_email_otp' => $requireOtp], 'security');
                 ActivityLogger::log('updated', null, $requireOtp === '1' ? 'Bật bắt buộc mã xác thực email khi đăng nhập' : 'Tắt bắt buộc mã xác thực email khi đăng nhập');

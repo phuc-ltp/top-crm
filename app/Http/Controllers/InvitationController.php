@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Invitation;
 use App\Models\User;
-use App\Support\PermissionCatalog;
 use App\Support\QrImage;
 use App\Support\Tenancy\CurrentOrganization;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 
 /**
  * Link mời đăng ký tài khoản (quyền tạo người dùng). Link đầy đủ + mã QR chỉ hiện MỘT lần lúc tạo;
@@ -57,18 +55,8 @@ class InvitationController extends Controller
         return back()->with('success', __('Đã thu hồi link mời — link không dùng được nữa.'));
     }
 
-    private function orgId(): int
-    {
-        return (int) app(CurrentOrganization::class)->id();
-    }
-
-    /** Vai trò được mời: không bao giờ là Chủ sở hữu; Quản trị viên chỉ khi người mời là chủ sở hữu / quản trị nền tảng. */
     private function roles(Request $request): array
     {
-        $canInviteAdmin = $request->user()->isPlatformAdmin() || $request->user()->isOrganizationOwner();
-
-        return Role::where('organization_id', $this->orgId())->orderBy('id')->get()
-            ->reject(fn ($r) => $r->name === PermissionCatalog::OWNER || ($r->name === 'Organization Administrator' && ! $canInviteAdmin))
-            ->mapWithKeys(fn ($r) => [$r->name => __($r->name)])->all();
+        return \App\Services\Auth\AccountProvisioner::assignableRoles($request->user(), (int) app(CurrentOrganization::class)->id());
     }
 }
