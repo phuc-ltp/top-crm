@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\EmployeeProfile;
 use App\Models\Invitation;
 use App\Models\User;
 use App\Notifications\CrmNotification;
@@ -117,10 +116,8 @@ class JoinController extends Controller
             $locked = Invitation::withoutGlobalScopes()->whereKey($inv->id)->lockForUpdate()->first();
             abort_unless($locked && $locked->isUsable(), 410, __('Link mời đã hết hạn hoặc hết lượt đăng ký.'));
             abort_if(User::withTrashed()->where('email', $pending['email'])->exists(), 409, __('Email này đã có tài khoản.'));
-            $user = User::create(['name' => $pending['name'], 'email' => $pending['email'], 'phone' => $pending['phone'], 'password' => 'x', 'status' => 'active']);
-            $user->forceFill(['password' => $pending['password'], 'email_verified_at' => now(), 'invited_via_id' => $locked->id])->save();   // mật khẩu đã băm sẵn
-            $user->syncRoles([$locked->role]);
-            EmployeeProfile::firstOrCreate(['user_id' => $user->id], ['employment_status' => 'probation', 'hire_date' => today()]);
+            $user = app(\App\Services\Auth\AccountProvisioner::class)->create($locked->organization_id, ['name' => $pending['name'], 'email' => $pending['email'],
+                'phone' => $pending['phone'], 'password_hash' => $pending['password'], 'role' => $locked->role, 'invited_via_id' => $locked->id]);
             $locked->increment('uses');
             ActivityLogger::log('created', $user, 'Đăng ký tài khoản qua link mời '.$user->email.' (vai trò: '.$locked->role.')');
 

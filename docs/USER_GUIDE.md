@@ -317,6 +317,13 @@ Trên hóa đơn đã phát hành:
 - **Mã qua email khi đăng nhập:** *ảnh đại diện → Bảo mật tài khoản → Mã xác thực qua email* → nhập mật khẩu → **Gửi mã để bật** → nhập mã nhận được. Từ lần sau, sau mật khẩu sẽ nhập mã gửi tới email (hết hạn 10 phút; chưa thấy thư thì xem mục Spam hoặc bấm *Gửi lại*).
 - Cần quản trị cấu hình **Email gửi đi** (mục 16q) thì thư mới đến.
 
+## 16t. Tạo tài khoản cho người mới
+
+- **Người mới:** trang đăng nhập → **Tạo tài khoản mới** → điền thông tin (dùng email thật) → nhập mã 6 số trong email → chờ duyệt. Được duyệt sẽ có email báo, đăng nhập bằng email + mật khẩu vừa đặt.
+- **Quản trị viên:** chuông báo "xin tham gia công ty" → **Người dùng → Yêu cầu tham gia** → chọn vai trò → **Duyệt & tạo tài khoản** (hoặc **Từ chối**, có thể ghi lý do).
+- **Bật tính năng (quản trị nền tảng):** Cài đặt tổ chức → Bảo mật đăng nhập → *Công ty nhận yêu cầu tạo tài khoản* → chọn công ty → Lưu. Cần Email gửi đi hoạt động.
+- Vẫn dùng được: quản trị tự tạo tài khoản, hoặc gửi **link mời** (vào thẳng không cần duyệt).
+
 ## 16s. Tự ghi nhận chuyển khoản qua SePay
 
 - Cần: tài khoản SePay đã liên kết ngân hàng nhận tiền, CRM chạy trên hosting có tên miền https, đã khai báo *Ngân hàng nhận tiền* (mã VietQR trên hóa đơn).

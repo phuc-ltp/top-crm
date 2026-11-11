@@ -106,6 +106,7 @@ erDiagram
 | `departments` | Phòng ban theo tổ chức. Phòng ban của người dùng lưu ở `organization_user.department_id` (từ bước 2.1; `users.department_id` cũ không còn dùng). |
 | `organization_settings` | Cài đặt riêng của từng tổ chức (khóa–giá trị, unique theo tổ chức). |
 | `roles`, `permissions`, `role_has_permissions`, `model_has_roles`, `model_has_permissions` | spatie/laravel-permission chế độ teams: `roles.organization_id`, `model_has_roles.organization_id`. |
+| `join_requests` | Yêu cầu tạo tài khoản từ trang đăng nhập (v5.10.0): `name`, `email` (đã xác thực bằng mã), `phone`, `password` (bcrypt; thay bằng "-" sau khi duyệt / từ chối), `message`, `status` pending / approved / rejected, `role`, `reject_reason`, `reviewed_by`, `reviewed_at`, `user_id`, `ip_address`. Cài đặt chung `signup_organization_id` = tổ chức nhận yêu cầu (0 = tắt). |
 | `bank_transactions` | Giao dịch ngân hàng nhận qua webhook SePay (v5.9.0): `provider`, `provider_id` (id giao dịch SePay, unique theo tổ chức — chống trùng), `transfer_type` in/out, `amount`, `content`, `code`, `reference_code`, `transaction_at`, `status` matched / unmatched / ignored, `note`, `invoice_id`, `payment_id`. API Key SePay lưu mã hóa ở `organization_settings.sepay_api_key`. |
 | `login_events` | Lịch sử đăng nhập (sự kiện, phương thức, IP, user-agent, băm cookie thiết bị, thiết bị mới). Tự xóa sau 180 ngày. |
 | `personal_access_tokens` | Khóa API Sanctum: chỉ lưu băm SHA-256, `abilities`, `organization_id`, `expires_at`, `last_used_at`, `last_used_ip`. |

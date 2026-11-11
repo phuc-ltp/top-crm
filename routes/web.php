@@ -82,6 +82,16 @@ Route::middleware('guest')->group(function () {
     Route::post('/two-factor-challenge/resend', [\App\Http\Controllers\Auth\TwoFactorChallengeController::class, 'resend'])->name('two-factor.resend')->middleware('throttle:5,1');
 });
 
+// Tạo tài khoản (xin tham gia công ty, chờ duyệt) — chỉ khách chưa đăng nhập
+Route::middleware('guest')->prefix('register')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Auth\RegisterController::class, 'show'])->name('register')->middleware('throttle:30,1,register-view');
+    Route::post('/', [\App\Http\Controllers\Auth\RegisterController::class, 'submit'])->name('register.submit')->middleware('throttle:6,1,register-submit');
+    Route::get('/verify', [\App\Http\Controllers\Auth\RegisterController::class, 'verifyForm'])->name('register.verify')->middleware('throttle:30,1,register-view');
+    Route::post('/verify', [\App\Http\Controllers\Auth\RegisterController::class, 'verify'])->name('register.verify.store')->middleware('throttle:10,1,register-verify');
+    Route::post('/resend', [\App\Http\Controllers\Auth\RegisterController::class, 'resend'])->name('register.resend')->middleware('throttle:5,1,register-resend');
+    Route::get('/done', [\App\Http\Controllers\Auth\RegisterController::class, 'done'])->name('register.done');
+});
+
 // (prefix throttle riêng: các throttle không prefix dùng chung một bộ đếm theo IP)
 // Đăng ký qua link mời (công khai; token 40 ký tự, chỉ lưu bản băm). Trang "show" tự chuyển người đã đăng nhập về Tổng quan.
 Route::prefix('join/{token}')->where(['token' => '[A-Za-z0-9]{40}'])->group(function () {
@@ -312,6 +322,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/users/{user}/password', [UserController::class, 'setPassword'])->name('users.password');
     Route::delete('/users/{user}/two-factor', [UserController::class, 'resetTwoFactor'])->name('users.two-factor.reset')->middleware('throttle:10,1');
     Route::resource('invitations', \App\Http\Controllers\InvitationController::class)->only(['index', 'store', 'destroy']);
+    Route::get('/join-requests', [\App\Http\Controllers\JoinRequestController::class, 'index'])->name('join-requests.index');
+    Route::post('/join-requests/{joinRequest}/approve', [\App\Http\Controllers\JoinRequestController::class, 'approve'])->name('join-requests.approve');
+    Route::post('/join-requests/{joinRequest}/reject', [\App\Http\Controllers\JoinRequestController::class, 'reject'])->name('join-requests.reject');
     Route::resource('users', UserController::class);
 
     Route::resource('roles', RoleController::class)->except(['show']);

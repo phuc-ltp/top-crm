@@ -50,6 +50,7 @@ class NotificationCatalog
         'ticket_sla_warning' => ['support', 'Ticket sắp trễ SLA'],
         'ticket_escalated' => ['support', 'Ticket vi phạm SLA (leo thang)'],
         'security' => ['security', 'Cảnh báo bảo mật (đăng nhập lạ, đổi quyền...)'],
+        'join_request' => ['security', 'Yêu cầu tạo tài khoản cần duyệt'],
     ];
 
     /** Loại không cho tắt. */

@@ -47,6 +47,7 @@ class Setting extends Model
         // Bảo mật: bắt buộc xác thực 2 lớp cho tài khoản quản trị (chỉ quản trị nền tảng đổi được)
         'require_2fa_admins' => '0',
         'require_email_otp' => '0',
+        'signup_organization_id' => '0',
         'lead_form_enabled' => '0',
         'lead_form_token' => '',
         'lead_form_assignee' => '',

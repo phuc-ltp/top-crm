@@ -92,6 +92,7 @@ class Menu
             'Quản trị' => [
                 ['Nhân sự', 'bi-person-badge-fill', null, null, null, [
                     ['Người dùng', null, 'users.index', 'users.view', 'users.*'],
+                    ['Yêu cầu tham gia', null, 'join-requests.index', 'users.create', 'join-requests.*'],
                     ['Link mời đăng ký', null, 'invitations.index', 'users.create', 'invitations.*'],
                     ['Danh bạ nhân viên', null, 'employees.index', 'employees.view', ['employees.index', 'employees.show', 'employees.edit']],
                     ['Sơ đồ tổ chức', null, 'employees.chart', 'employees.view', 'employees.chart'],

@@ -50,6 +50,10 @@ class LoginController extends Controller
             $left = max(0, self::MAX_ATTEMPTS - RateLimiter::attempts($key));
             // Không lưu chuỗi đã gõ khi không khớp tài khoản nào (có thể là mật khẩu gõ nhầm ô)
             $flow->record($request, $user, $left > 0 ? 'failed' : 'locked_out', 'password');
+            // Email chưa có tài khoản nhưng đã gửi yêu cầu tham gia → nói rõ thay vì "sai mật khẩu"
+            if (! $user && $field === 'email' && \App\Models\JoinRequest::pendingFor($login)) {
+                throw ValidationException::withMessages(['login' => __('Yêu cầu tạo tài khoản của email này đang chờ quản trị viên duyệt. Bạn sẽ nhận email khi được duyệt.')]);
+            }
             throw ValidationException::withMessages([
                 'login' => __('Thông tin đăng nhập hoặc mật khẩu không đúng.').($left > 0 ? ' '.__('Còn :left lần thử.', ['left' => $left]) : ''),
             ]);

@@ -150,6 +150,13 @@
     display: inline-flex; align-items: center; justify-content: center; gap: .6rem; transition: transform .15s, box-shadow .15s, filter .15s; }
 .ta-btn:hover { transform: translateY(-1px); filter: brightness(1.06); box-shadow: 0 16px 34px rgba(201, 105, 42, .45); color: #fff; }
 .ta-btn:disabled { opacity: .75; }
+/* Nút phụ (Tạo tài khoản mới): viền đồng, nền trong suốt, thấp hơn nút chính để vừa màn hình đăng nhập */
+.ta-btn.ta-btn-outline { background: transparent; box-shadow: none; border: 1px solid rgba(236, 142, 69, .65); color: #F3C9A2;
+    height: calc(var(--ta-input-h) * .82); font-size: .98rem; }
+.ta-btn.ta-btn-outline:hover { background: rgba(236, 142, 69, .12); color: #fff; box-shadow: none; }
+.ta-steps { color: #CDBBAE; }
+.ta-steps li { margin-bottom: .1rem; }
+.ta-steps li strong { color: #F3C9A2; }
 .ta-or { display: flex; align-items: center; gap: 1rem; color: var(--ta-muted); font-size: .9rem; margin: calc(var(--ta-card-gap) * .95) 0 1rem; }
 .ta-or::before, .ta-or::after { content: ''; flex: 1; height: 1px; background: var(--ta-line); }
 .ta-social { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
