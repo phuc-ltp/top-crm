@@ -66,6 +66,7 @@ class KeyRotationTest extends TestCase
         $oldKey = config('app.key');
         $newKey = KeyRotation::newKey();
         DB::table('sessions')->insert(['id' => 'abc', 'payload' => 'x', 'last_activity' => time()]);
+        $this->assertSame('sepay-bi-mat-123456', Setting::secret('sepay_api_key'));   // nạp bộ nhớ đệm cài đặt (như web đang chạy)
 
         $r = KeyRotation::rotate($this->env, $newKey);
         $this->assertGreaterThanOrEqual(8, $r['reencrypted']);
@@ -134,6 +135,6 @@ class KeyRotationTest extends TestCase
         $this->app->forgetInstance('encrypter');
         Crypt::clearResolvedInstance('encrypter');
         \App\Models\User::encryptUsing(null);
-        \App\Models\Setting::flushCache();
+        // KHÔNG tự xóa bộ nhớ đệm ở đây: công cụ đổi khóa phải tự làm (lỗi thật bắt được khi chạy thử 12/11)
     }
 }

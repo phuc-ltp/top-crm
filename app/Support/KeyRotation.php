@@ -159,6 +159,8 @@ class KeyRotation
 
         $sessions = Schema::hasTable('sessions') ? DB::table('sessions')->delete() : 0;
         @unlink(app()->getCachedConfigPath());
+        // Bộ nhớ đệm còn giữ bản mã hóa CŨ (VD cài đặt: mật khẩu email, API key SePay) → phải xóa, nếu không sẽ lỗi "MAC is invalid"
+        \Illuminate\Support\Facades\Cache::flush();
 
         return ['reencrypted' => count($done), 'fields' => $check['fields'], 'sessions_cleared' => $sessions];
     }
