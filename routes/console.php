@@ -383,6 +383,27 @@ Artisan::command('crm:production-check', function () {
     return $fail === 0 ? 0 : 1;
 })->purpose('Kiểm tra cấu hình trước khi đưa lên web công khai');
 
+Artisan::command('crm:rotate-key {--check : Chỉ kiểm tra, không thay đổi gì} {--force : Không hỏi xác nhận}', function () {
+    $check = \App\Support\KeyRotation::preflight((string) config('app.key'));
+    $this->table(['Bảng.cột', 'Số giá trị mã hóa'], collect($check['fields'])->map(fn ($n, $k) => [$k, $n])->values()->all());
+    if ($check['unreadable']) {
+        $this->error(count($check['unreadable']).' giá trị KHÔNG giải mã được bằng khóa hiện tại: '.implode(', ', array_slice($check['unreadable'], 0, 10)));
+
+        return 1;
+    }
+    $this->info("Tất cả {$check['total']} giá trị giải mã được bằng khóa hiện tại.");
+    if ($this->option('check')) {
+        return 0;
+    }
+    if (! $this->option('force') && ! $this->confirm('Đổi APP_KEY và mã hóa lại toàn bộ? Mọi người sẽ phải đăng nhập lại.')) {
+        return 1;
+    }
+    $r = \App\Support\KeyRotation::rotate(base_path('.env'));
+    $this->info("Đã đổi APP_KEY: mã hóa lại {$r['reencrypted']} giá trị, xóa {$r['sessions_cleared']} phiên đăng nhập.");
+
+    return 0;
+})->purpose('Đổi APP_KEY và mã hóa lại mọi dữ liệu đã mã hóa (CCCD, 2FA, mật khẩu email, API key…)');
+
 Artisan::command('crm:backup-db {--keep=14 : Số bản giữ lại}', function () {
     $r = \App\Support\DatabaseBackup::run(max(1, (int) $this->option('keep')));
     $this->info("Đã sao lưu {$r['tables']} bảng, {$r['rows']} dòng → storage/app/private/backups/{$r['file']} (".round($r['bytes'] / 1024).' KB)');

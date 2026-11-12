@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.13.0] — 12/11/2026
+
+### Bảo mật
+- **Đổi APP_KEY an toàn** (`php artisan crm:rotate-key`, `--check` chỉ kiểm tra): quét mọi cột chữ của mọi bảng tìm dữ liệu mã hóa (CCCD, ngày sinh, địa chỉ nhân viên; 2FA; key bản quyền; mật khẩu email, Google/Facebook secret, API key SePay…), kiểm tra tất cả giải mã được, mã hóa lại bằng khóa mới trong một giao dịch (kiểm tra từng giá trị), thay `.env` sau cùng — lỗi ở bất kỳ bước nào thì không thay đổi gì. Xóa mọi phiên đăng nhập. Hosting không có Terminal: trang đổi khóa dùng một lần.
+
 ## [5.12.0] — 12/11/2026
 
 ### Bảo mật (chạy công khai)
