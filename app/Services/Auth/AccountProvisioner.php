@@ -15,13 +15,26 @@ use Spatie\Permission\Models\Role;
  */
 class AccountProvisioner
 {
-    /** Vai trò được cấp cho người mới: không bao giờ là Chủ sở hữu; Quản trị viên chỉ khi người cấp là chủ sở hữu / quản trị nền tảng. */
-    public static function assignableRoles(User $actor, int $organizationId): array
+    /**
+     * Vai trò $actor được phép cấp (theo cấp bậc PermissionCatalog::LEVELS):
+     *  - quản trị nền tảng / chủ sở hữu: mọi vai trò; vai trò Chủ sở hữu chỉ khi $allowOwner (quản lý người dùng — không dùng cho link mời / tự đăng ký);
+     *  - người khác: chỉ vai trò có cấp THẤP HƠN mình (Quản trị viên không tạo thêm Quản trị viên);
+     *  - giữ được vai trò hiện tại của $target (sửa hồ sơ mà không đổi vai trò).
+     */
+    public static function assignableRoles(User $actor, int $organizationId, bool $allowOwner = false, ?User $target = null): array
     {
-        $canGrantAdmin = $actor->isPlatformAdmin() || $actor->isOrganizationOwner();
+        $top = $actor->isPlatformAdmin() || $actor->isOrganizationOwner();
+        $mine = $actor->hierarchyLevel();
+        $keep = $target ? $target->getRoleNames()->all() : [];
 
         return Role::where('organization_id', $organizationId)->orderBy('id')->get()
-            ->reject(fn ($r) => $r->name === PermissionCatalog::OWNER || ($r->name === 'Organization Administrator' && ! $canGrantAdmin))
+            ->filter(function ($r) use ($top, $mine, $keep, $allowOwner) {
+                if ($r->name === PermissionCatalog::OWNER) {
+                    return $top && $allowOwner;
+                }
+
+                return $top || PermissionCatalog::level($r->name) > $mine || in_array($r->name, $keep, true);
+            })
             ->mapWithKeys(fn ($r) => [$r->name => __($r->name)])->all();
     }
 

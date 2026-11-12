@@ -3345,5 +3345,11 @@
     "Bật thì trang đăng nhập có nút “Tạo tài khoản mới”: người mới xác thực email bằng mã 6 số rồi chờ duyệt ở Người dùng → Yêu cầu tham gia. Cần email gửi đi hoạt động.": "When on, the sign-in page shows “Create a new account”: newcomers verify their email with a 6-digit code and wait for approval in Users → Join requests. Requires working outgoing email.",
     "Yêu cầu tạo tài khoản cần duyệt": "Account requests awaiting approval",
     "Lời nhắn (không bắt buộc)": "Message (optional)",
-    "VD: phòng ban, người giới thiệu — giúp quản trị duyệt nhanh hơn.": "E.g. department, referrer — helps the administrator approve faster."
+    "VD: phòng ban, người giới thiệu — giúp quản trị duyệt nhanh hơn.": "E.g. department, referrer — helps the administrator approve faster.",
+    "Bạn chỉ chỉnh được quyền của vai trò cấp thấp hơn mình.": "You can only edit permissions of roles below your level.",
+    "Cấp bậc: chỉ quản lý được tài khoản, cấp vai trò và chỉnh quyền cho cấp THẤP HƠN mình. Chủ sở hữu quản lý mọi cấp; Quản trị viên không tạo thêm hay khóa Quản trị viên khác.": "Levels: you can only manage accounts, grant roles and edit permissions for levels BELOW yours. The owner manages every level; administrators cannot create or lock other administrators.",
+    "Cấp :n": "Level :n",
+    "Quản trị viên": "Administrator",
+    "Trưởng bộ phận": "Department manager",
+    "Chỉ xem (kiểm toán)": "Read-only (audit)"
 }

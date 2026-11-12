@@ -42,6 +42,18 @@ Có hai tầng:
 - Quyền được kiểm tra ở **máy chủ**, không chỉ ẩn nút. Người không có quyền mà cố truy cập sẽ nhận lỗi 403.
 - Có thể **tạo vai trò mới** tùy ý. Vai trò mặc định không xóa được. Chi tiết kỹ thuật: [RBAC.md](RBAC.md).
 
+### Cấp bậc
+
+| Cấp | Vai trò | Quản lý được |
+|---|---|---|
+| 1 | Chủ sở hữu | Mọi người, mọi vai trò (kể cả cấp Quản trị viên, Chủ sở hữu) |
+| 2 | Quản trị viên | Cấp 3–5; **không** tạo thêm / khóa / đổi mật khẩu Quản trị viên khác |
+| 3 | Trưởng bộ phận (Kinh doanh, Marketing, CSKH, Tài chính, Kho, Dự án) | Dữ liệu cả bộ phận; không quản lý tài khoản |
+| 4 | Nhân viên (Kinh doanh, Marketing, Hỗ trợ, Kế toán, Nhân viên chung) | Dữ liệu của mình / được giao |
+| 5 | Kiểm toán (chỉ xem) | Chỉ xem, không sửa |
+
+Kiểm tra các công ty có cấu hình như nhau: `php artisan crm:org-parity` (thêm `--fix` để bổ sung phần thiếu, không xóa gì).
+
 ## 3a. Tổ chức (không gian làm việc)
 
 - Một tài khoản có thể thuộc nhiều tổ chức; chuyển tổ chức ở ô **Không gian làm việc** góc dưới menu trái. Dữ liệu mỗi tổ chức hoàn toàn tách biệt.

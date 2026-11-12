@@ -16,9 +16,14 @@ class RoleController extends Controller
     {
         $this->authorize('manage', User::class);
         $roles = Role::where('organization_id', app(\App\Support\Tenancy\CurrentOrganization::class)->id())
-            ->withCount(['users', 'permissions'])->orderBy('id')->get();
+            ->withCount(['users', 'permissions'])->orderBy('id')->get()
+            ->sortBy(fn ($r) => [PermissionCatalog::level($r->name), $r->id])->values();
+        $actor = $request->user();
+        $top = $actor->isPlatformAdmin() || $actor->isOrganizationOwner();
 
-        return view('roles.index', ['roles' => $roles, 'defaults' => PermissionCatalog::ORG_ROLES]);
+        return view('roles.index', ['roles' => $roles, 'defaults' => PermissionCatalog::ORG_ROLES,
+            'editable' => fn ($role) => ! in_array($role->name, PermissionCatalog::PROTECTED_ROLES, true)
+                && ($top || PermissionCatalog::level($role->name) > $actor->hierarchyLevel())]);
     }
 
     public function create()
@@ -43,9 +48,12 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('success', __('Đã tạo vai trò :name.', ['name' => $role->name]));
     }
 
-    public function edit(Role $role)
+    public function edit(Request $request, Role $role)
     {
         $this->authorize('manage', User::class);
+        if (! in_array($role->name, PermissionCatalog::PROTECTED_ROLES, true)) {
+            $this->assertCanEditRole($request->user(), $role);
+        }
 
         return view('roles.form', [
             'role' => $role, 'assigned' => $role->permissions->pluck('name')->all(),
@@ -57,6 +65,7 @@ class RoleController extends Controller
     {
         $this->authorize('manage', User::class);
         abort_if(in_array($role->name, PermissionCatalog::PROTECTED_ROLES, true), 422, __('Chủ sở hữu tổ chức luôn có toàn quyền, không cần chỉnh.'));
+        $this->assertCanEditRole($request->user(), $role);
         $isDefault = in_array($role->name, PermissionCatalog::ORG_ROLES, true);
 
         $data = $request->validate([
@@ -87,5 +96,13 @@ class RoleController extends Controller
         $role->delete();
 
         return redirect()->route('roles.index')->with('success', __('Đã xóa vai trò.'));
+    }
+
+    /** Chỉ chủ sở hữu / quản trị nền tảng sửa được vai trò cùng cấp hoặc cao hơn mình. */
+    private function assertCanEditRole(User $actor, Role $role): void
+    {
+        $top = $actor->isPlatformAdmin() || $actor->isOrganizationOwner();
+        abort_unless($top || PermissionCatalog::level($role->name) > $actor->hierarchyLevel(), 403,
+            __('Bạn chỉ chỉnh được quyền của vai trò cấp thấp hơn mình.'));
     }
 }
