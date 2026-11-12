@@ -2,6 +2,11 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.13.1] — 12/11/2026
+
+### Sửa lỗi
+- Đổi APP_KEY: xóa bộ nhớ đệm sau khi mã hóa lại — trước đó cài đặt đã cache (mật khẩu email, API key SePay, Google/Facebook secret) vẫn giữ bản mã hóa cũ → "MAC is invalid" cho tới khi cache hết hạn. Phát hiện khi chạy thử trên bản giả lập hosting.
+
 ## [5.13.0] — 12/11/2026
 
 ### Bảo mật
