@@ -116,6 +116,12 @@ php artisan crm:purge-demo
 
 Chỉ xóa bản ghi demo (`is_demo = 1`) và các tài khoản nhân viên demo. Sau đó dải vàng "DỮ LIỆU DEMO" ở đầu trang sẽ biến mất (trong tối đa 10 phút).
 
+## 7a. Hosting không có Terminal / Cron (VD vPanel)
+
+- **Tác vụ tự động:** Hệ thống → Tác vụ & sao lưu → sao chép *Đường dẫn cron* → tạo tài khoản miễn phí cron-job.org → *Create cronjob*, URL = đường dẫn đó, *Every 1 minute*. Trang sẽ báo "Đang chạy".
+- **Sao lưu:** tự động 02:00 mỗi ngày (giữ 14 bản), tải về máy mỗi tuần. Khôi phục: phpMyAdmin → Import tệp `.sql.gz`.
+- **Cập nhật phiên bản:** dùng gói cập nhật + trang cập nhật một lần (sao lưu → giải nén → migrate → tự xóa).
+
 ## 8. Sao lưu định kỳ
 
 Xem [DATABASE_SETUP.md](DATABASE_SETUP.md) mục 3 và 4. Khuyến nghị sao lưu ít nhất **mỗi tuần một lần**, lưu bản sao ở nơi khác máy tính (USB, Google Drive).

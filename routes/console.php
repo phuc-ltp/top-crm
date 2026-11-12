@@ -383,6 +383,12 @@ Artisan::command('crm:production-check', function () {
     return $fail === 0 ? 0 : 1;
 })->purpose('Kiểm tra cấu hình trước khi đưa lên web công khai');
 
+Artisan::command('crm:backup-db {--keep=14 : Số bản giữ lại}', function () {
+    $r = \App\Support\DatabaseBackup::run(max(1, (int) $this->option('keep')));
+    $this->info("Đã sao lưu {$r['tables']} bảng, {$r['rows']} dòng → storage/app/private/backups/{$r['file']} (".round($r['bytes'] / 1024).' KB)');
+})->purpose('Sao lưu database (PHP, không cần mysqldump) vào storage/app/private/backups');
+
+Schedule::command('crm:backup-db')->dailyAt('02:00')->withoutOverlapping();
 Schedule::command('crm:task-reminders')->everyFifteenMinutes()->withoutOverlapping();
 Schedule::command('crm:sales-automation')->hourly()->withoutOverlapping();
 Schedule::command('crm:prune-notifications')->dailyAt('02:30');

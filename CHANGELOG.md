@@ -2,6 +2,17 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.12.0] — 12/11/2026
+
+### Bảo mật (chạy công khai)
+- Truy cập `http://` tự chuyển (301) sang `https://` ở production — trước đây vào bằng http không đăng nhập được (cookie phiên chỉ gửi qua https → lỗi 419).
+- Nâng cấp bản vá Symfony 7.4 (http-foundation, http-kernel, routing, mime…): vá 7 lỗ hổng đã công bố, trong đó có "URL sinh ra trỏ tới tên miền do client chọn" và "chèn header email". `composer audit`: không còn lỗ hổng.
+- `robots.txt` chặn công cụ tìm kiếm lập chỉ mục (phần mềm nội bộ).
+
+### Thêm mới
+- **Hệ thống → Tác vụ & sao lưu** (quản trị nền tảng): đường dẫn cron bí mật cho hosting không có cron / Terminal (dịch vụ ngoài như cron-job.org gọi mỗi phút → nhắc việc, SLA, nhắc hợp đồng / tài sản, hết hạn báo giá chạy được), trạng thái lần chạy gần nhất.
+- **Sao lưu database tự động** hằng ngày 02:00 (`crm:backup-db`, bằng PHP — không cần mysqldump), giữ 14 bản trong `storage/app/private/backups`; nút "Sao lưu ngay" và tải bản sao lưu về máy.
+
 ## [5.11.0] — 12/11/2026
 
 ### Bảo mật

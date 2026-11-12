@@ -14,6 +14,7 @@ class JsTranslations
         'Đã sao chép khóa API.',
         'Đã sao chép link mời.',
         'Đã sao chép địa chỉ webhook.',
+        'Đã sao chép đường dẫn cron.',
         'Tìm gần đây',
         'giữ',
         'Xóa',
