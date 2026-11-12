@@ -109,6 +109,7 @@ class Menu
                     ['Cấu hình pipeline', null, 'settings.pipelines', 'settings.manage', 'settings.pipelines*'],
                     ['Đăng nhập & thương hiệu', null, 'settings.branding', 'platform', 'settings.branding'],
                     ['Email gửi đi', null, 'settings.mail', 'platform', 'settings.mail'],
+                    ['Tác vụ & sao lưu', null, 'settings.maintenance', 'platform', 'settings.maintenance*'],
                     ['Liên kết SePay', null, 'settings.sepay', 'settings.manage', 'settings.sepay*'],
                     ['Nhật ký hoạt động', null, 'activity-logs.index', 'activity_logs.view', 'activity-logs.*'],
                     ['Thùng rác', null, 'trash.index', 'trash', 'trash.*'],

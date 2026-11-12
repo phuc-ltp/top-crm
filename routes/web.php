@@ -43,6 +43,10 @@ Route::get('/ho-tro', [PageController::class, 'show'])->defaults('slug', 'suppor
 
 // Form thu lead công khai của từng tổ chức (không cần đăng nhập; chống spam: token, honeypot, thời gian điền, giới hạn tần suất)
 Route::get('/manifest.webmanifest', [\App\Http\Controllers\PwaController::class, 'manifest'])->name('pwa.manifest');
+// Cron qua web (hosting không có cron): dịch vụ bên ngoài gọi mỗi phút; token bí mật 48 ký tự
+Route::get('/cron/{token}', \App\Http\Controllers\WebCronController::class)->name('cron.run')
+    ->where('token', '[A-Za-z0-9]{48}')->middleware('throttle:10,1,web-cron');
+
 // Webhook SePay (máy chủ SePay gọi, không có phiên / CSRF): xác thực bằng token URL + header Authorization: Apikey
 Route::post('/webhooks/sepay/{token}', \App\Http\Controllers\SepayWebhookController::class)->name('webhooks.sepay')
     ->where('token', '[A-Za-z0-9]{40}')->middleware('throttle:120,1,sepay')
@@ -411,7 +415,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('/settings/branding', [SettingController::class, 'branding'])->name('settings.branding');
-    Route::get('/settings/sepay', [\App\Http\Controllers\SepaySettingsController::class, 'edit'])->name('settings.sepay');
+    Route::get('/settings/maintenance', [\App\Http\Controllers\MaintenanceController::class, 'edit'])->name('settings.maintenance');
+    Route::post('/settings/maintenance/backup', [\App\Http\Controllers\MaintenanceController::class, 'backup'])->name('settings.maintenance.backup')->middleware('throttle:3,1');
+    Route::get('/settings/maintenance/backups/{file}', [\App\Http\Controllers\MaintenanceController::class, 'download'])->name('settings.maintenance.download')->where('file', '[A-Za-z0-9._-]+\.sql\.gz');
+    Route::post('/settings/maintenance/regenerate', [\App\Http\Controllers\MaintenanceController::class, 'regenerate'])->name('settings.maintenance.regenerate');
+    Route::get('/settings/sepay',[\App\Http\Controllers\SepaySettingsController::class, 'edit'])->name('settings.sepay');
     Route::put('/settings/sepay', [\App\Http\Controllers\SepaySettingsController::class, 'update'])->name('settings.sepay.update');
     Route::post('/settings/sepay/regenerate', [\App\Http\Controllers\SepaySettingsController::class, 'regenerate'])->name('settings.sepay.regenerate');
     Route::get('/settings/mail', [\App\Http\Controllers\MailSettingsController::class, 'edit'])->name('settings.mail');
