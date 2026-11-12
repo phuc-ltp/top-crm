@@ -122,6 +122,12 @@ Chỉ xóa bản ghi demo (`is_demo = 1`) và các tài khoản nhân viên demo
 - **Sao lưu:** tự động 02:00 mỗi ngày (giữ 14 bản), tải về máy mỗi tuần. Khôi phục: phpMyAdmin → Import tệp `.sql.gz`.
 - **Cập nhật phiên bản:** dùng gói cập nhật + trang cập nhật một lần (sao lưu → giải nén → migrate → tự xóa).
 
+## 7b. Đổi APP_KEY (khi nghi khóa bị lộ)
+
+- Có Terminal: `php artisan crm:rotate-key --check` (xem trước) rồi `php artisan crm:rotate-key`. Mọi người phải đăng nhập lại, mật khẩu không đổi.
+- Không có Terminal: dùng trang đổi khóa một lần trong gói cập nhật.
+- Sao lưu database + `.env` trước. Không bao giờ sửa tay APP_KEY: dữ liệu mã hóa cũ sẽ không đọc được nữa.
+
 ## 8. Sao lưu định kỳ
 
 Xem [DATABASE_SETUP.md](DATABASE_SETUP.md) mục 3 và 4. Khuyến nghị sao lưu ít nhất **mỗi tuần một lần**, lưu bản sao ở nơi khác máy tính (USB, Google Drive).
