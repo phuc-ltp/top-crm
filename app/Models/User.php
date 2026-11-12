@@ -200,6 +200,30 @@ class User extends Authenticatable implements HasLocalePreference, \Illuminate\C
         return $this->hasRole(\App\Support\PermissionCatalog::OWNER);
     }
 
+    /** Cấp bậc trong tổ chức đang làm việc (0 = quản trị nền tảng, 1 = chủ sở hữu … 5 = chỉ xem); không có vai trò = 99. */
+    public function hierarchyLevel(): int
+    {
+        if ($this->isPlatformAdmin()) {
+            return 0;
+        }
+        $levels = $this->getRoleNames()->map(fn ($r) => \App\Support\PermissionCatalog::level($r));
+
+        return $levels->isEmpty() ? 99 : (int) $levels->min();
+    }
+
+    /** Được quản lý tài khoản $target: quản trị nền tảng / chủ sở hữu quản lý mọi người (trừ quản trị nền tảng); còn lại phải cấp cao hơn. */
+    public function outranks(User $target): bool
+    {
+        if ($target->isPlatformAdmin()) {
+            return false;
+        }
+        if ($this->isPlatformAdmin() || $this->isOrganizationOwner()) {
+            return true;
+        }
+
+        return $this->hierarchyLevel() < $target->hierarchyLevel();
+    }
+
     /** Tài khoản được bảo vệ: quản trị nền tảng hoặc chủ sở hữu tổ chức. */
     public function isProtectedAccount(): bool
     {

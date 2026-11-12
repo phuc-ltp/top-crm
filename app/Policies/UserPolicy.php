@@ -30,12 +30,13 @@ class UserPolicy
             return false;
         }
 
-        return $user->can('users.update') && (! $target->isOrganizationOwner() || $user->isOrganizationOwner());
+        // Tự sửa hồ sơ của mình, hoặc người có cấp THẤP HƠN (chủ sở hữu quản lý mọi cấp)
+        return $user->can('users.update') && ($user->id === $target->id || $user->outranks($target));
     }
 
     public function delete(User $user, User $target): bool
     {
-        return $user->id !== $target->id && $user->can('users.delete') && ! $target->isProtectedAccount();
+        return $user->id !== $target->id && $user->can('users.delete') && ! $target->isProtectedAccount() && $user->outranks($target);
     }
 
     public function manage(User $user): bool

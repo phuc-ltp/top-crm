@@ -239,6 +239,49 @@ Artisan::command('crm:install', function () {
 /*
 | Kiểm tra tình trạng hệ thống (dùng bởi START_CRM.bat / CHECK_CRM.bat). Mã thoát 0 = OK.
 */
+/*
+| So sánh các tổ chức (VD TOP CRM demo ↔ ToP thật): mỗi tổ chức phải có đủ 14 vai trò mặc định, mỗi vai trò có ít nhất
+| các quyền của ma trận mặc định, cùng pipeline / kho mặc định. Chỉ BÁO CÁO; --fix chỉ THÊM phần còn thiếu (không xóa gì).
+*/
+Artisan::command('crm:org-parity {--fix : Thêm vai trò / quyền mặc định còn thiếu}', function () {
+    $fix = (bool) $this->option('fix');
+    $issues = 0;
+    foreach (\App\Models\Organization::orderBy('id')->get() as $org) {
+        $this->line("<options=bold>#{$org->id} {$org->name}</>");
+        app(\App\Support\Tenancy\CurrentOrganization::class)->run($org->id, function () use ($org, $fix, &$issues) {
+            foreach (\App\Support\PermissionCatalog::ORG_ROLES as $name) {
+                $role = \Spatie\Permission\Models\Role::where('organization_id', $org->id)->where('name', $name)->first();
+                if (! $role) {
+                    $issues++;
+                    $this->warn("  thiếu vai trò: $name");
+
+                    continue;
+                }
+                $missing = array_diff(\App\Support\PermissionCatalog::defaultsFor($name), $role->permissions->pluck('name')->all());
+                if ($missing) {
+                    $issues++;
+                    $this->warn("  $name thiếu ".count($missing).' quyền mặc định: '.implode(', ', $missing));
+                    if ($fix) {
+                        $role->givePermissionTo($missing);
+                        $this->info('    → đã thêm');
+                    }
+                }
+            }
+            if (! \App\Models\Pipeline::where('is_default', true)->exists() || ! \App\Models\Warehouse::exists()) {
+                $issues++;
+                $this->warn('  thiếu pipeline / kho mặc định');
+            }
+        });
+        if ($fix) {
+            app(\App\Support\Tenancy\RoleProvisioner::class)->provision($org->id);   // tạo vai trò còn thiếu (idempotent)
+        }
+    }
+    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+    $issues === 0 ? $this->info('Mọi tổ chức đồng bộ với cấu hình mặc định.') : $this->warn("$issues vấn đề".($fix ? ' (đã sửa phần thêm được)' : ' — chạy lại với --fix để thêm phần còn thiếu'));
+
+    return $issues === 0 || $fix ? 0 : 1;
+})->purpose('Kiểm tra các tổ chức có đủ vai trò, quyền và cấu hình mặc định như nhau');
+
 Artisan::command('crm:health', function () {
     $ok = true;
     $line = function (bool $pass, string $text) use (&$ok) {

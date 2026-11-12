@@ -2,6 +2,15 @@
 
 Định dạng theo [Keep a Changelog](https://keepachangelog.com/vi/1.1.0/). Ngày theo giờ Việt Nam.
 
+## [5.11.0] — 12/11/2026
+
+### Bảo mật
+- **Cấp bậc tài khoản** (1 Chủ sở hữu → 2 Quản trị viên → 3 Trưởng bộ phận → 4 Nhân viên → 5 Chỉ xem): chỉ quản lý tài khoản (sửa, khóa, đặt lại mật khẩu, tắt 2FA, xóa), cấp vai trò và chỉnh quyền cho cấp **thấp hơn** mình; chủ sở hữu quản lý mọi cấp. Trước đây Quản trị viên còn tạo thêm / khóa / đổi mật khẩu Quản trị viên khác và tự sửa quyền của vai trò Quản trị viên. Áp dụng thống nhất cho Người dùng, Hồ sơ nhân sự, Link mời, Yêu cầu tham gia, Vai trò & quyền.
+- Trang **Vai trò & quyền** nhóm theo cấp bậc; chỉ hiện "Chỉnh quyền" với vai trò được phép sửa.
+
+### Đồng bộ TOP CRM ↔ ToP
+- Lệnh `php artisan crm:org-parity` kiểm tra mọi tổ chức có đủ vai trò, quyền mặc định, pipeline / kho như nhau (`--fix` chỉ thêm phần thiếu). Migration bổ sung quyền "xem nhật ký hoạt động" còn thiếu của Kiểm toán viên ở TOP CRM.
+
 ## [5.10.0] — 11/11/2026
 
 ### Thêm mới

@@ -63,6 +63,31 @@ class PermissionCatalog
     /** Vai trò được bảo vệ: không chỉnh quyền / không xóa. */
     public const PROTECTED_ROLES = ['Organization Owner'];
 
+    /**
+     * Cấp bậc (số nhỏ = cao hơn). Chỉ quản lý được tài khoản / cấp vai trò / sửa quyền của cấp THẤP HƠN mình;
+     * chủ sở hữu quản lý mọi cấp. Vai trò tự tạo (không có trong danh sách) mặc định cấp nhân viên.
+     */
+    public const LEVELS = [
+        'Organization Owner' => 1,
+        'Organization Administrator' => 2,
+        'Sales Manager' => 3, 'Marketing Manager' => 3, 'Customer Support Manager' => 3,
+        'Finance Manager' => 3, 'Inventory Manager' => 3, 'Project Manager' => 3,
+        'Sales Employee' => 4, 'Marketing Employee' => 4, 'Support Agent' => 4, 'Accountant' => 4, 'Employee' => 4,
+        'Read-only Auditor' => 5,
+    ];
+
+    public const DEFAULT_LEVEL = 4;
+
+    public static function levels(): array
+    {
+        return [1 => 'Chủ sở hữu', 2 => 'Quản trị viên', 3 => 'Trưởng bộ phận', 4 => 'Nhân viên', 5 => 'Chỉ xem (kiểm toán)'];
+    }
+
+    public static function level(string $role): int
+    {
+        return self::LEVELS[$role] ?? self::DEFAULT_LEVEL;
+    }
+
     public static function all(): array
     {
         $permissions = [];

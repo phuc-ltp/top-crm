@@ -41,14 +41,10 @@ class UserController extends Controller
         return Role::where('organization_id', $this->orgId())->orderBy('id')->pluck('name')->all();
     }
 
-    /** Vai trò của tổ chức hiện tại mà người thao tác được phép gán (chỉ chủ sở hữu gán được vai trò chủ sở hữu). */
-    private function assignableRoles(Request $request): array
+    /** Vai trò người thao tác được gán: chỉ cấp THẤP HƠN mình (chủ sở hữu gán mọi vai trò); giữ được vai trò hiện tại của $target. */
+    private function assignableRoles(Request $request, ?User $target = null): array
     {
-        $canGrantOwner = $request->user()->isPlatformAdmin() || $request->user()->isOrganizationOwner();
-
-        return Role::where('organization_id', $this->orgId())->orderBy('id')->get()
-            ->reject(fn ($r) => $r->name === PermissionCatalog::OWNER && ! $canGrantOwner)
-            ->mapWithKeys(fn ($r) => [$r->name => __($r->name)])->all();
+        return \App\Services\Auth\AccountProvisioner::assignableRoles($request->user(), $this->orgId(), true, $target);
     }
 
     public function index(Request $request)
@@ -141,7 +137,7 @@ class UserController extends Controller
         $this->authorize('update', $user);
 
         return view('users.form', [
-            'user' => $user, 'roles' => $this->assignableRoles($request), 'departments' => Lookup::departments(),
+            'user' => $user, 'roles' => $this->assignableRoles($request, $user), 'departments' => Lookup::departments(),
             'managesAccount' => $this->managesAccount($request, $user),
             'membershipStatus' => $user->membershipStatus(),
         ]);
@@ -281,7 +277,7 @@ class UserController extends Controller
             'position' => ['nullable', 'string', 'max:100'],
             'department_id' => ['nullable', \App\Support\Tenancy\TenantRule::exists('departments')],
             'status' => ['required', Rule::in(array_keys(User::STATUSES))],
-            'role' => ['required', Rule::in(array_keys($this->assignableRoles($request)))],
+            'role' => ['required', Rule::in(array_keys($this->assignableRoles($request, $user)))],
         ];
     }
 

@@ -184,14 +184,10 @@ class EmployeeController extends Controller
         return redirect()->route('employees.show', $user->id)->with('temp_password', ['email' => $user->email, 'password' => $password]);
     }
 
-    /** Vai trò được gán (chỉ chủ sở hữu / quản trị nền tảng gán được vai trò chủ sở hữu). */
+    /** Vai trò được gán khi tạo tài khoản cho nhân viên: chỉ cấp THẤP HƠN người thao tác (chủ sở hữu gán mọi vai trò). */
     private function assignableRoles(Request $request): array
     {
-        $canGrantOwner = $request->user()->isPlatformAdmin() || $request->user()->isOrganizationOwner();
-
-        return \Spatie\Permission\Models\Role::where('organization_id', $this->orgId())->orderBy('id')->get()
-            ->reject(fn ($r) => $r->name === \App\Support\PermissionCatalog::OWNER && ! $canGrantOwner)
-            ->mapWithKeys(fn ($r) => [$r->name => __($r->name)])->all();
+        return \App\Services\Auth\AccountProvisioner::assignableRoles($request->user(), $this->orgId(), true);
     }
 
     /** Không cho tự làm quản lý của mình hoặc tạo vòng (A quản lý B, B quản lý A...). */
